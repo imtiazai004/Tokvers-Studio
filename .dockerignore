@@ -1,0 +1,33 @@
+.git
+.env
+*.env
+!.env.example
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+.venv/
+venv/
+env/
+
+output/
+memory/*.db
+memory/*.db-*
+memory/tiktok_sessions/
+config/client_settings.json
+
+*.log
+.DS_Store
+Thumbs.db
+
+NEW VIDEO.mp4
+videosss/
+
+# Raw/source folders are not needed inside the Render runtime image.
+AIGC Automated ss/
+Enter the platform/
+Website videos/
+Workflow/

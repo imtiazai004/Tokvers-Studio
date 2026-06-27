@@ -3,7 +3,7 @@ import json
 import os
 from datetime import datetime
 
-DB_PATH = "memory/agent_memory.db"
+DB_PATH = os.getenv("DB_PATH", "memory/agent_memory.db")
 
 async def init_db():
     async with aiosqlite.connect(DB_PATH) as db:

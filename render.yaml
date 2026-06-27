@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: aigc-automated
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    disk:
+      name: aigc-automated-data
+      mountPath: /data
+      sizeGB: 10
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: DB_PATH
+        value: /data/memory/agent_memory.db
+      - key: OUTPUT_DIR
+        value: /data/output
+      - key: TIKTOK_CLIENT_KEY
+        sync: false
+      - key: TIKTOK_CLIENT_SECRET
+        sync: false
+      - key: TIKTOK_SHOP_APP_KEY
+        sync: false
+      - key: TIKTOK_SHOP_APP_SECRET
+        sync: false
+      - key: TIKTOK_SHOP_ACCESS_TOKEN
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_VOICE_ID_MALE
+        sync: false
+      - key: ELEVENLABS_VOICE_ID_FEMALE
+        sync: false
+      - key: GROK_API_KEY
+        sync: false
+      - key: GOOGLE_AI_STUDIO_API_KEY
+        sync: false
+      - key: APIFY_API_TOKEN
+        sync: false
+      - key: BRAVE_SEARCH_API_KEY
+        sync: false
