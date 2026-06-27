@@ -1,0 +1,163 @@
+/* ============================================================
+   BUILT FOR · audience positioning section
+   "Is AIGC Automated built for me?" — premium glass cards, 3/2/1 grid,
+   soft float + ambient glow + 3D tilt + light reflection. Continues the
+   white premium design language; fades into Pricing.
+   Reusable: cards render from data (audience.js). Reuses .an-rise system.
+   Requires: base.css, post-wf.css (for --ease-film / .an-rise)
+   ============================================================ */
+
+.aud {
+  position: relative; z-index: 2; overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 46%, #ffffff 100%);
+  padding: clamp(84px, 13vh, 152px) 0 clamp(96px, 15vh, 176px);
+}
+/* breathing ambient brand aura */
+.aud::before {
+  content: ''; position: absolute; z-index: 0; pointer-events: none;
+  left: 50%; top: -6%; transform: translateX(-50%);
+  width: 1000px; height: 600px; max-width: 96vw;
+  background:
+    radial-gradient(closest-side, rgba(0,212,255,0.12), transparent 70%),
+    radial-gradient(closest-side at 68% 60%, rgba(255,0,110,0.08), transparent 72%);
+  filter: blur(8px);
+  animation: audAura 30s ease-in-out infinite alternate; will-change: transform, opacity;
+}
+@keyframes audAura {
+  from { transform: translateX(-50%) scale(1);                 opacity: 0.85; }
+  to   { transform: translateX(-50%) translateY(26px) scale(1.1); opacity: 1; }
+}
+
+/* ---- heading ---- */
+.aud-head {
+  position: relative; z-index: 1; text-align: center;
+  max-width: 760px; margin: 0 auto clamp(48px, 7vh, 76px); padding: 0 24px;
+}
+.aud-label {
+  display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px; border-radius: 30px;
+  background: rgba(255,255,255,0.86); border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+  font-size: 0.74rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cyan);
+}
+.aud-head h2 {
+  font-family: 'Cabinet Grotesk','Satoshi',sans-serif;
+  margin-top: 22px; font-size: clamp(2.1rem, 4.4vw, 3.5rem);
+  line-height: 1.07; font-weight: 800; letter-spacing: -1.6px; color: var(--ink); text-wrap: balance;
+}
+.aud-head h2 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.aud-head p { margin: 18px auto 0; max-width: 60ch; font-size: 1.08rem; line-height: 1.62; color: var(--slate); text-wrap: pretty; }
+
+/* ---- responsive grid: 3 / 2 / 1 ---- */
+.aud-grid {
+  position: relative; z-index: 1;
+  max-width: 1140px; margin: 0 auto; padding: 0 24px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  perspective: 1100px;                       /* enables the 3D tilt */
+}
+@media (max-width: 920px) { .aud-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 580px) { .aud-grid { grid-template-columns: 1fr; } }
+
+/* ---- card ---- */
+.aud-card { position: relative; }                 /* reveal target (.an-rise) */
+.aud-card-inner {
+  position: relative; height: 100%; overflow: hidden;
+  border-radius: 22px; padding: 30px 28px 32px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(255,255,255,0.9);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.8);
+  backdrop-filter: blur(14px) saturate(1.1); -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  transform-style: preserve-3d; will-change: transform;
+  transition: box-shadow 0.4s var(--ease-film), border-color 0.4s var(--ease-film), transform 0.5s var(--ease-film);
+}
+/* outer ring + brand line on the inside edge */
+.aud-card-inner::before {
+  content: ''; position: absolute; inset: 0; border-radius: 22px; pointer-events: none; z-index: 3;
+  border: 1px solid transparent; background: linear-gradient(var(--grad)) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.aud-card-inner.hover { box-shadow: 0 30px 70px rgba(0,212,255,0.16), 0 12px 36px rgba(255,0,110,0.10), inset 0 1px 0 rgba(255,255,255,0.9); border-color: rgba(0,212,255,0.4); }
+.aud-card-inner.hover::before { opacity: 1; }
+
+/* ambient glow that wakes on hover */
+.aud-glow {
+  position: absolute; z-index: 0; inset: -30% -20% auto -20%; height: 70%; pointer-events: none;
+  background: radial-gradient(60% 80% at 50% 0%, rgba(0,212,255,0.22), transparent 70%),
+              radial-gradient(50% 70% at 80% 10%, rgba(255,0,110,0.16), transparent 72%);
+  filter: blur(26px); opacity: 0; transition: opacity 0.5s var(--ease-film); transform: translateZ(-10px);
+}
+.aud-card-inner.hover .aud-glow { opacity: 1; }
+
+/* gentle, staggered breathing while visible (own layer so it never fights tilt) */
+.aud-float { position: relative; z-index: 1; transform-style: preserve-3d; animation: audFloat 7s ease-in-out infinite; }
+.aud-card:nth-child(2) .aud-float { animation-delay: -1.2s; }
+.aud-card:nth-child(3) .aud-float { animation-delay: -2.4s; }
+.aud-card:nth-child(4) .aud-float { animation-delay: -3.1s; }
+.aud-card:nth-child(5) .aud-float { animation-delay: -4.3s; }
+.aud-card:nth-child(6) .aud-float { animation-delay: -5.5s; }
+@keyframes audFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* animated icon tile */
+.aud-icon {
+  position: relative; width: 56px; height: 56px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--grad); box-shadow: 0 10px 24px rgba(0,212,255,0.22), inset 0 1px 0 rgba(255,255,255,0.4);
+  transform: translateZ(26px); transition: transform 0.5s var(--ease-film), box-shadow 0.5s var(--ease-film);
+}
+.aud-icon svg { width: 28px; height: 28px; display: block; }
+.aud-icon svg path, .aud-icon svg circle, .aud-icon svg rect, .aud-icon svg line, .aud-icon svg polyline {
+  stroke: #fff; stroke-width: 1.9; fill: none; stroke-linecap: round; stroke-linejoin: round;
+}
+.aud-card-inner.hover .aud-icon { transform: translateZ(40px) scale(1.08) rotate(-3deg); box-shadow: 0 18px 36px rgba(255,0,110,0.28), inset 0 1px 0 rgba(255,255,255,0.5); }
+/* icon sheen sweep */
+.aud-icon::after {
+  content: ''; position: absolute; inset: 0; border-radius: 16px; pointer-events: none;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+  transform: translateX(-120%); transition: transform 0.7s var(--ease-film);
+}
+.aud-card-inner.hover .aud-icon::after { transform: translateX(120%); }
+
+.aud-card h3 {
+  font-family: 'Cabinet Grotesk','Satoshi',sans-serif;
+  margin: 22px 0 0; font-size: 1.32rem; font-weight: 800; letter-spacing: -0.4px; color: var(--ink);
+  transform: translateZ(16px);
+}
+.aud-card p {
+  margin: 11px 0 0; font-size: 1rem; line-height: 1.6; color: var(--slate); max-width: 34ch;
+  transform: translateZ(10px);
+}
+
+/* moving light reflection across the glass */
+.aud-sheen {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: 22px; overflow: hidden;
+}
+.aud-sheen::before {
+  content: ''; position: absolute; top: -60%; left: -30%; width: 50%; height: 220%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.45), transparent);
+  transform: translateX(-120%) rotate(8deg); transition: transform 0.9s var(--ease-film);
+}
+.aud-card-inner.hover .aud-sheen::before { transform: translateX(360%) rotate(8deg); }
+
+/* ---- closing CTA ---- */
+.aud-cta {
+  position: relative; z-index: 1; text-align: center;
+  max-width: 820px; margin: clamp(64px, 9vh, 104px) auto 0; padding: 0 24px;
+}
+.aud-cta .lead { font-size: 1.05rem; color: var(--slate); font-weight: 600; }
+.aud-cta h3 {
+  font-family: 'Cabinet Grotesk','Satoshi',sans-serif;
+  margin-top: 12px; font-size: clamp(1.7rem, 3.4vw, 2.7rem); line-height: 1.12;
+  font-weight: 800; letter-spacing: -1px; color: var(--ink); text-wrap: balance;
+}
+.aud-cta h3 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* soft fade that hands off to the Pricing section (no hard cut) */
+.aud::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 140px; z-index: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent, #ffffff);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aud::before, .aud-float { animation: none; }
+  .aud-card-inner, .aud-icon { transition: none; }
+}

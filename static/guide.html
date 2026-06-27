@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Setup Guide · TikTok UGC Creator</title>
+<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/settings.css">
+<style>
+  .guide-hero { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 32px; margin-bottom: 24px; text-align: center; }
+  .guide-hero h2 { color: #fff; font-size: 1.6rem; margin: 0 0 8px; }
+  .guide-hero p { color: #a0aec0; margin: 0; font-size: 0.95rem; }
+  .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+  .status-card { background: #1e1e2e; border-radius: 10px; padding: 16px 20px; display: flex; align-items: flex-start; gap: 12px; }
+  .status-icon { font-size: 1.3rem; margin-top: 2px; flex-shrink: 0; }
+  .status-card h4 { margin: 0 0 4px; color: #e2e8f0; font-size: 0.9rem; }
+  .status-card p { margin: 0; color: #718096; font-size: 0.8rem; line-height: 1.4; }
+  .status-card.ready { border-left: 3px solid #48bb78; }
+  .status-card.pending { border-left: 3px solid #ed8936; }
+  .keys-table { width: 100%; border-collapse: collapse; }
+  .keys-table th { text-align: left; padding: 10px 14px; color: #718096; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #2d3748; }
+  .keys-table td { padding: 12px 14px; border-bottom: 1px solid #1a202c; color: #e2e8f0; font-size: 0.85rem; vertical-align: top; }
+  .keys-table tr:last-child td { border-bottom: none; }
+  .badge-req { background: #2d3748; color: #fc8181; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+  .badge-opt { background: #2d3748; color: #68d391; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+  .badge-dev { background: #2d3748; color: #63b3ed; font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+  .key-cost { color: #718096; font-size: 0.78rem; margin-top: 3px; }
+  .tiktok-section { background: #1a1a2e; border: 1px solid #2d3748; border-radius: 10px; padding: 24px; margin-bottom: 24px; }
+  .tiktok-section h3 { color: #fff; margin: 0 0 16px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+  .tiktok-timeline { list-style: none; padding: 0; margin: 0; }
+  .tiktok-timeline li { display: flex; gap: 14px; padding: 10px 0; border-bottom: 1px solid #2d3748; }
+  .tiktok-timeline li:last-child { border-bottom: none; }
+  .tl-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .tl-done { background: #276749; color: #9ae6b4; }
+  .tl-waiting { background: #744210; color: #fbd38d; }
+  .tl-soon { background: #2c5282; color: #90cdf4; }
+  .tl-text h5 { margin: 0 0 3px; color: #e2e8f0; font-size: 0.85rem; }
+  .tl-text p { margin: 0; color: #718096; font-size: 0.78rem; line-height: 1.4; }
+  .alert-box { background: #2d2415; border: 1px solid #744210; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; color: #fbd38d; font-size: 0.85rem; line-height: 1.5; }
+  .alert-box strong { color: #f6ad55; }
+  .steps-list { counter-reset: step-counter; list-style: none; padding: 0; margin: 0; }
+  .steps-list li { counter-increment: step-counter; display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2d3748; }
+  .steps-list li:last-child { border-bottom: none; }
+  .steps-list li::before { content: counter(step-counter); width: 22px; height: 22px; background: #4a5568; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: #e2e8f0; flex-shrink: 0; margin-top: 2px; }
+  .steps-list li span { color: #cbd5e0; font-size: 0.85rem; line-height: 1.5; }
+  .steps-list li a { color: #63b3ed; }
+  @media (max-width: 600px) { .status-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>TikTok UGC Creator</h1>
+    <p class="subtitle">Client Setup Guide</p>
+  </header>
+
+  <div class="settings-nav">
+    <a href="/" class="nav-link">← Back to Dashboard</a>
+    <a href="/settings-page" class="nav-link" style="margin-left:auto">⚙ API Settings</a>
+  </div>
+
+  <!-- Hero -->
+  <div class="guide-hero">
+    <h2>What's Ready & What You Need</h2>
+    <p>Everything you need to start generating TikTok UGC videos automatically.</p>
+  </div>
+
+  <!-- System Status -->
+  <div class="section-title">System Status</div>
+  <div class="status-grid">
+    <div class="status-card ready">
+      <div class="status-icon">✅</div>
+      <div>
+        <h4>AI Script Writing</h4>
+        <p>Research, hooks, product angles, full UGC scripts — fully automated.</p>
+      </div>
+    </div>
+    <div class="status-card ready">
+      <div class="status-icon">✅</div>
+      <div>
+        <h4>Voice Generation</h4>
+        <p>Natural human voiceovers via ElevenLabs — male &amp; female options.</p>
+      </div>
+    </div>
+    <div class="status-card ready">
+      <div class="status-icon">✅</div>
+      <div>
+        <h4>Video Generation</h4>
+        <p>Grok (fast) or Veo3 (high quality) — your choice per video.</p>
+      </div>
+    </div>
+    <div class="status-card ready">
+      <div class="status-icon">✅</div>
+      <div>
+        <h4>Character Consistency</h4>
+        <p>Upload a reference image and the same character appears across all scenes.</p>
+      </div>
+    </div>
+    <div class="status-card ready">
+      <div class="status-icon">✅</div>
+      <div>
+        <h4>TikTok Trend Research</h4>
+        <p>Real TikTok data — top hooks, hashtags, formats — fed into every script.</p>
+      </div>
+    </div>
+    <div class="status-card pending">
+      <div class="status-icon">🔄</div>
+      <div>
+        <h4>Auto-Post to TikTok</h4>
+        <p>In progress. TikTok API approval pending. Videos save locally for now — you upload manually.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Keys You Need -->
+  <div class="section-title">API Keys You Need</div>
+  <div class="panel" style="padding:0; overflow:hidden;">
+    <table class="keys-table">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Why You Need It</th>
+          <th>Cost</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Anthropic</strong><br><span style="color:#718096;font-size:0.78rem">console.anthropic.com</span></td>
+          <td>AI brain — writes scripts, research, quality checks</td>
+          <td><div class="key-cost">Pay per use. ~$5–20/month depending on volume.</div></td>
+          <td><span class="badge-req">Required</span></td>
+        </tr>
+        <tr>
+          <td><strong>ElevenLabs</strong><br><span style="color:#718096;font-size:0.78rem">elevenlabs.io</span></td>
+          <td>Human-quality voiceovers for every video</td>
+          <td><div class="key-cost">Starter $5/mo. Enough for ~30 min of audio.</div></td>
+          <td><span class="badge-req">Required</span></td>
+        </tr>
+        <tr>
+          <td><strong>xAI (Grok)</strong><br><span style="color:#718096;font-size:0.78rem">console.x.ai</span></td>
+          <td>Fast, affordable video generation</td>
+          <td><div class="key-cost">Pay per video. Cheaper than Veo3.</div></td>
+          <td><span class="badge-opt">If using Grok</span></td>
+        </tr>
+        <tr>
+          <td><strong>Google AI Studio</strong><br><span style="color:#718096;font-size:0.78rem">aistudio.google.com</span></td>
+          <td>Veo3 — highest quality video generation</td>
+          <td><div class="key-cost">Paid plan required. Pay per video generated.</div></td>
+          <td><span class="badge-opt">If using Veo3</span></td>
+        </tr>
+        <tr>
+          <td><strong>Apify</strong><br><span style="color:#718096;font-size:0.78rem">apify.com</span></td>
+          <td>Real TikTok data — views, hooks, trends</td>
+          <td><div class="key-cost">~$49/mo. Free trial available.</div></td>
+          <td><span class="badge-opt">Optional but recommended</span></td>
+        </tr>
+        <tr>
+          <td><strong>Brave Search</strong><br><span style="color:#718096;font-size:0.78rem">api.search.brave.com</span></td>
+          <td>Web search for trends. Cheaper alternative to Apify.</td>
+          <td><div class="key-cost">Free tier: 2,000 queries/month.</div></td>
+          <td><span class="badge-opt">Optional</span></td>
+        </tr>
+        <tr>
+          <td><strong>TikTok Account</strong><br><span style="color:#718096;font-size:0.78rem">tiktok.com</span></td>
+          <td>Your TikTok creator/seller account to post videos</td>
+          <td><div class="key-cost">Free.</div></td>
+          <td><span class="badge-dev">Connect via OAuth — coming soon</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TikTok API Section -->
+  <div class="section-title">TikTok Integration — What's Happening</div>
+
+  <div class="alert-box">
+    <strong>Important:</strong> TikTok's Content Posting API requires <strong>developer approval from TikTok</strong> before any app can post videos on behalf of users. This approval is being applied for — it can take 1–4 weeks. Until then, videos are generated and saved on your computer, and you upload them to TikTok manually.
+  </div>
+
+  <div class="tiktok-section">
+    <h3>📋 TikTok API Approval Timeline</h3>
+    <ul class="tiktok-timeline">
+      <li>
+        <div class="tl-num tl-done">✓</div>
+        <div class="tl-text">
+          <h5>TikTok Developer Account Created</h5>
+          <p>Developer app registered at developer.tiktok.com. One app handles all clients.</p>
+        </div>
+      </li>
+      <li>
+        <div class="tl-num tl-waiting">⏳</div>
+        <div class="tl-text">
+          <h5>Content Posting API — Approval Pending</h5>
+          <p>Application submitted to TikTok for Content Posting API access. TikTok reviews manually and approves within 1–4 weeks. No action needed from you.</p>
+        </div>
+      </li>
+      <li>
+        <div class="tl-num tl-soon">→</div>
+        <div class="tl-text">
+          <h5>Once Approved: Connect Your TikTok Account</h5>
+          <p>A "Connect TikTok" button will appear in the dashboard. You click it, log into your TikTok account, and grant permission. The system then posts directly to your account.</p>
+        </div>
+      </li>
+      <li>
+        <div class="tl-num tl-soon">→</div>
+        <div class="tl-text">
+          <h5>Auto-Posting + Scheduling Goes Live</h5>
+          <p>Generate a video → it automatically posts to your TikTok at the best time. Schedule weeks of content in advance.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- How to connect TikTok account (manual for now) -->
+  <div class="section-title">For Now: How to Post Your Generated Videos</div>
+  <div class="panel settings-panel">
+    <div class="key-guide">
+      <p>Videos are saved in the <code>output/</code> folder on your computer. Until TikTok API is approved:</p>
+    </div>
+    <ol class="steps-list">
+      <li><span>Generate your video from the <a href="/">dashboard</a>.</span></li>
+      <li><span>Video saves to the <code>output/</code> folder — open it and find the <code>.mp4</code> file.</span></li>
+      <li><span>Open TikTok on your phone or <a href="https://www.tiktok.com/upload" target="_blank">tiktok.com/upload</a> on desktop.</span></li>
+      <li><span>Upload the video, add your caption and hashtags (the system suggests these), and post.</span></li>
+    </ol>
+  </div>
+
+  <!-- Quick Start -->
+  <div class="section-title">Quick Start — Get Your First Video in 10 Minutes</div>
+  <div class="panel settings-panel">
+    <ol class="steps-list">
+      <li><span>Go to <a href="/settings-page">API Settings</a> and enter your <strong>Anthropic</strong> and <strong>ElevenLabs</strong> keys. These two are enough to start.</span></li>
+      <li><span>Add either a <strong>Grok</strong> or <strong>Google AI Studio</strong> key for video generation.</span></li>
+      <li><span>Go back to the <a href="/">Dashboard</a>.</span></li>
+      <li><span>Enter your product name, niche, and product URL → click <strong>Generate Video</strong>.</span></li>
+      <li><span>Wait 2–5 minutes. Your video will appear ready to download.</span></li>
+    </ol>
+  </div>
+
+</div>
+</body>
+</html>

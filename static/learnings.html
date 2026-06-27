@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learnings · Tokverse</title>
+<link rel="icon" href="/static/logo.png?v=3" type="image/png">
+<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/library.css">
+</head>
+<body>
+<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+<nav class="app-sidebar" id="appSidebar"></nav>
+<script src="/static/sidebar.js"></script>
+
+<div class="app-main">
+  <div class="container">
+    <div class="page-head">
+      <div>
+        <h1>💡 Learnings</h1>
+        <p class="page-sub">What the agents have learned from your videos' performance — used to improve future content.</p>
+      </div>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat-box"><div class="stat-label">Insights Stored</div><div class="stat-value" id="sLearnings">—</div></div>
+      <div class="stat-box"><div class="stat-label">Script Patterns</div><div class="stat-value" id="sPatterns">—</div></div>
+      <div class="stat-box"><div class="stat-label">Agents Learning</div><div class="stat-value" id="sAgents">—</div></div>
+    </div>
+
+    <div id="content"></div>
+  </div>
+</div>
+
+<script>
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function nicheLabel(n) { return (n || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()); }
+
+  async function load() {
+    const content = document.getElementById('content');
+    content.innerHTML = '<div class="loading-row">Loading learnings…</div>';
+    try {
+      const res = await fetch('/api/learnings');
+      const data = await res.json();
+      const learnings = data.learnings || [];
+      const patterns = data.patterns || [];
+
+      const agents = new Set(learnings.map(l => l.agent));
+      document.getElementById('sLearnings').textContent = learnings.length;
+      document.getElementById('sPatterns').textContent = patterns.length;
+      document.getElementById('sAgents').textContent = agents.size;
+
+      if (learnings.length === 0 && patterns.length === 0) {
+        content.innerHTML = `
+          <div class="empty-state">
+            <div class="es-icon">💡</div>
+            <div class="es-title">No learnings yet</div>
+            <div class="es-text">As you generate videos and log their performance, agents store what works best here — winning hooks, script lengths, voices and more.</div>
+            <a href="/" class="es-btn">+ Generate a Video</a>
+          </div>`;
+        return;
+      }
+
+      let html = '';
+
+      if (learnings.length > 0) {
+        html += '<div class="section-label">Agent Insights</div>';
+        html += '<div class="data-table-wrap"><table class="data-table"><thead><tr>' +
+          '<th>Agent</th><th>What it learned</th><th>Value</th><th>Confidence</th></tr></thead><tbody>';
+        html += learnings.map(l => `
+          <tr>
+            <td class="strong">${escapeHtml(l.agent)}</td>
+            <td>${escapeHtml(l.key)}</td>
+            <td>${escapeHtml(l.value)}</td>
+            <td><div class="mini-bar"><span style="width:${Math.round((l.confidence || 0) * 100)}%"></span></div>
+                <small>${Math.round((l.confidence || 0) * 100)}%</small></td>
+          </tr>`).join('');
+        html += '</tbody></table></div>';
+      }
+
+      if (patterns.length > 0) {
+        html += '<div class="section-label">Winning Script Patterns</div>';
+        html += '<div class="data-table-wrap"><table class="data-table"><thead><tr>' +
+          '<th>Niche</th><th>Hook Style</th><th>Length</th><th>Voice</th><th>Avg Score</th><th>Used</th></tr></thead><tbody>';
+        html += patterns.map(p => `
+          <tr>
+            <td class="strong">${nicheLabel(p.niche)}</td>
+            <td>${escapeHtml(p.hook_style || '—')}</td>
+            <td>${escapeHtml(p.script_length || '—')}</td>
+            <td>${escapeHtml(p.voice_gender || '—')}</td>
+            <td>${p.avg_performance}</td>
+            <td>${p.usage_count}×</td>
+          </tr>`).join('');
+        html += '</tbody></table></div>';
+      }
+
+      content.innerHTML = html;
+    } catch (e) {
+      content.innerHTML = '<div class="loading-row">Could not load learnings. Is the server running?</div>';
+    }
+  }
+  load();
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<svg viewBox="0 0 240 258" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tokverse">
+  <defs>
+    <linearGradient id="tvGrad" x1="8%" y1="92%" x2="92%" y2="8%">
+      <stop offset="0%" stop-color="#06e8d8"/>
+      <stop offset="45%" stop-color="#13b9d6"/>
+      <stop offset="100%" stop-color="#ff0a5e"/>
+    </linearGradient>
+    <linearGradient id="tvPlay" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <filter id="tvShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#0b2a3a" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Orbiting swoosh -->
+  <path d="M 42.1 145 A 90 74 -20 1 1 152 178"
+        fill="none" stroke="url(#tvGrad)" stroke-width="14"
+        stroke-linecap="round" transform="rotate(-20 120 108)"/>
+
+  <!-- Play button -->
+  <path d="M 96 70 L 162 102 Q 171 108 162 114 L 96 146 Q 86 151 86 141 L 86 75 Q 86 65 96 70 Z"
+        fill="url(#tvPlay)" stroke="#cbd5e0" stroke-width="1.6" filter="url(#tvShadow)"/>
+
+  <!-- Wordmark -->
+  <text x="120" y="240" text-anchor="middle"
+        font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+        font-weight="700" font-size="46" letter-spacing="-1.5" fill="#2d3748">Tokverse</text>
+</svg>

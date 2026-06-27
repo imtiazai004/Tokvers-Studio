@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings · Tokverse</title>
+<link rel="icon" href="/static/logo.png?v=3" type="image/png">
+<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/settings.css">
+</head>
+<body>
+<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+<nav class="app-sidebar" id="appSidebar"></nav>
+<script src="/static/sidebar.js"></script>
+<div class="app-main">
+<div class="container">
+  <header>
+    <h1>TikTok UGC Creator</h1>
+    <p class="subtitle">API Settings</p>
+  </header>
+
+  <!-- AI Brain -->
+  <div class="section-title">AI Brain</div>
+  <div class="panel settings-panel">
+    <div class="settings-group">
+      <div class="settings-item">
+        <div class="settings-label">
+          <span class="key-name">Anthropic API Key</span>
+          <span class="key-badge required">Required</span>
+        </div>
+        <div class="key-guide">
+          <p>The <strong>main brain</strong> of the system — script writing, research, quality checks, all AI decisions.</p>
+          <div class="key-steps">
+            <span class="step">1. Go to <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></span>
+            <span class="step">2. Create an account or log in</span>
+            <span class="step">3. API Keys → Create Key → Copy</span>
+          </div>
+        </div>
+        <div class="key-input-row">
+          <input type="password" id="anthropic_api_key" placeholder="sk-ant-api03-..." />
+          <span class="key-status" id="status_anthropic_api_key"></span>
+        </div>
+      </div>
+
+      <div class="settings-item">
+        <div class="settings-label">
+          <span class="key-name">OpenAI API Key</span>
+          <span class="key-badge optional">For ChatGPT</span>
+        </div>
+        <div class="key-guide">
+          <p>Use <strong>ChatGPT</strong> as an alternative brain for scripts, research and decisions.</p>
+          <div class="key-steps">
+            <span class="step">1. Go to <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a></span>
+            <span class="step">2. Create new secret key → Copy</span>
+          </div>
+        </div>
+        <div class="key-input-row">
+          <input type="password" id="openai_api_key" placeholder="sk-..." />
+          <span class="key-status" id="status_openai_api_key"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Voice -->
+  <div class="section-title">Voice Generation</div>
+  <div class="panel settings-panel">
+    <div class="settings-group">
+
+      <div class="settings-item">
+        <div class="settings-label">
+          <span class="key-name">ElevenLabs API Key</span>
+          <span class="key-badge required">Required</span>
+        </div>
+        <div class="key-guide">
+          <p>Generates natural, human-sounding voiceovers for every UGC video.</p>
+          <div class="key-steps">
+            <span class="step">1. Go to <a href="https://elevenlabs.io" target="_blank">elevenlabs.io</a> → create account</span>
+            <span class="step">2. Profile → API Key → Copy</span>
+          </div>
+          <div class="key-note">💡 Starter plan ($5/mo) is enough to get started.</div>
+        </div>
+        <div class="key-input-row">
+          <input type="password" id="elevenlabs_api_key" placeholder="sk_..." />
+          <span class="key-status" id="status_elevenlabs_api_key"></span>
+        </div>
+      </div>
+
+      <div class="settings-item">
+        <div class="settings-label">
+          <span class="key-name">Fish Audio API Key</span>
+          <span class="key-badge optional">Alternative voice</span>
+        </div>
+        <div class="key-guide">
+          <p>Use <strong>Fish Audio</strong> as an alternative voice provider — natural and fast.</p>
+          <div class="key-steps">
+            <span class="step">1. Go to <a href="https://fish.audio" target="_blank">fish.audio</a> → create account</span>
+            <span class="step">2. API Keys → Create → Copy</span>
+          </div>
+        </div>
+        <div class="key-input-row">
+          <input type="password" id="fish_audio_api_key" placeholder="fa-..." />
+          <span class="key-status" id="status_fish_audio_api_key"></span>
+        </div>
+      </div>
+
+      <div class="settings-item">
+        <div class="settings-label">
+          <span class="key-name">Female Voice ID</span>
+          <span class="key-badge optional">Optional</span>
+        </div>
+        <div class="key-guide">
+          <p>Leave empty to use the default. Browse at <a href="https://elevenlabs.io/voice-library" target="_blank">elevenlabs.io/voice-library</a> → click a voice → copy Voice ID.</p>
+        </div>
+        <div class="key-input-row">
+          <input type="text" id="elevenlabs_voice_id_female" placeholder="EXAVITQu4vr4xnSDxMaL (default)" />
+          <span class="key-status" id="status_elevenlabs_voice_id_female"></span>
+        </div>
+      </div>
+
+      <div class="settings-item">
+        <div class="settings-label">
+          <span class="key-name">Male Voice ID</span>
+          <span class="key-badge optional">Optional</span>
+        </div>
+        <div class="key-guide">
+          <p>Leave empty to use the default.</p>
+        </div>
+        <div class="key-input-row">
+          <input type="text" id="elevenlabs_voice_id_male" placeholder="pNInz6obpgDQGcFmaJgB (default)" />
+          <span class="key-status" id="status_elevenlabs_voice_id_male"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Video Generation -->
+  <div class="section-title">Video Generation — Use one or more</div>
+  <div class="two-col">
+
+    <!-- Grok -->
+    <div class="panel settings-panel">
+      <div class="tool-header grok-header">
+        <span class="tool-label">Grok (xAI)</span>
+        <span class="tool-tag">Fast · Lower cost</span>
+      </div>
+      <div class="settings-group">
+        <div class="settings-item">
+          <div class="settings-label">
+            <span class="key-name">Grok API Key</span>
+            <span class="key-badge optional">For Grok</span>
+          </div>
+          <div class="key-guide">
+            <p>xAI's video generation model. Faster and cheaper than Veo3.</p>
+            <div class="key-steps">
+              <span class="step">1. Go to <a href="https://console.x.ai" target="_blank">console.x.ai</a></span>
+              <span class="step">2. API Keys → Create → Copy</span>
+            </div>
+          </div>
+          <div class="key-input-row">
+            <input type="password" id="grok_api_key" placeholder="xai-..." />
+            <span class="key-status" id="status_grok_api_key"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Veo3 -->
+    <div class="panel settings-panel">
+      <div class="tool-header veo-header">
+        <span class="tool-label">Veo 3 (Google)</span>
+        <span class="tool-tag">4K Quality</span>
+      </div>
+      <div class="settings-group">
+
+        <div class="settings-item">
+          <div class="settings-label">
+            <span class="key-name">Google AI Studio API Key</span>
+            <span class="key-badge optional">For Veo3</span>
+          </div>
+          <div class="key-guide">
+            <p>Veo3 runs on Google AI Studio. You pay Google directly for each video generated — your own account, your own billing.</p>
+            <div class="key-steps">
+              <span class="step">1. Go to <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a> → sign in with Google</span>
+              <span class="step">2. Click <strong>Get API Key</strong> → Create API Key</span>
+              <span class="step">3. Copy the key and paste it below</span>
+              <span class="step">4. Add a billing method at <a href="https://aistudio.google.com/plan" target="_blank">aistudio.google.com/plan</a> to unlock Veo3</span>
+            </div>
+            <div class="key-note">💡 Key looks like: <code>AIzaSy...</code> — free tier has limits, paid plan required for Veo3 video generation.</div>
+          </div>
+          <div class="key-input-row">
+            <input type="password" id="google_ai_studio_api_key" placeholder="AIzaSy..." />
+            <span class="key-status" id="status_google_ai_studio_api_key"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Higgsfield -->
+    <div class="panel settings-panel">
+      <div class="tool-header">
+        <span class="tool-label">Higgsfield AI</span>
+        <span class="tool-tag">Cinematic motion</span>
+      </div>
+      <div class="settings-group">
+        <div class="settings-item">
+          <div class="settings-label">
+            <span class="key-name">Higgsfield API Key</span>
+            <span class="key-badge optional">For Higgsfield</span>
+          </div>
+          <div class="key-guide">
+            <p>Cinematic AI video generation with dynamic camera motion and effects.</p>
+            <div class="key-steps">
+              <span class="step">1. Go to <a href="https://higgsfield.ai" target="_blank">higgsfield.ai</a> → sign in</span>
+              <span class="step">2. Account → API → Create key → Copy</span>
+            </div>
+          </div>
+          <div class="key-input-row">
+            <input type="password" id="higgsfield_api_key" placeholder="hf-..." />
+            <span class="key-status" id="status_higgsfield_api_key"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Research -->
+  <div class="section-title">Research — Optional</div>
+  <div class="panel settings-panel">
+    <div class="key-guide" style="margin-bottom:14px">
+      <p>Without these the system uses Claude's built-in knowledge. With them it pulls <strong>real TikTok data</strong> for better results.</p>
+    </div>
+    <div class="settings-group two-col-group">
+
+      <div class="settings-item">
+        <div class="settings-label">
+          <span class="key-name">Apify API Token</span>
+          <span class="key-badge optional">Optional</span>
+        </div>
+        <div class="key-guide">
+          <p>Real TikTok data — views, likes, hooks, hashtags. Best research option.</p>
+          <div class="key-steps">
+            <span class="step">1. <a href="https://apify.com" target="_blank">apify.com</a> → create account</span>
+            <span class="step">2. Settings → API Tokens → Create</span>
+          </div>
+          <div class="key-note">💰 ~$49/month. Free trial available.</div>
+        </div>
+        <div class="key-input-row">
+          <input type="password" id="apify_api_token" placeholder="apify_api_..." />
+          <span class="key-status" id="status_apify_api_token"></span>
+        </div>
+      </div>
+
+      <div class="settings-item">
+        <div class="settings-label">
+          <span class="key-name">Brave Search API Key</span>
+          <span class="key-badge optional">Optional</span>
+        </div>
+        <div class="key-guide">
+          <p>Web search for TikTok trends. Cheaper alternative to Apify.</p>
+          <div class="key-steps">
+            <span class="step">1. <a href="https://api.search.brave.com" target="_blank">api.search.brave.com</a></span>
+            <span class="step">2. Free tier: 2,000 queries/month</span>
+          </div>
+        </div>
+        <div class="key-input-row">
+          <input type="password" id="brave_search_api_key" placeholder="BSA..." />
+          <span class="key-status" id="status_brave_search_api_key"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Video Performance Tracking -->
+  <div class="section-title">📊 Track Your Video Performance</div>
+  <div class="panel settings-panel">
+    <div class="settings-group">
+      <p class="perf-intro">
+        Manually track your video performance to help the system learn what works best. Takes 30 seconds per video!
+      </p>
+
+      <div class="settings-item">
+        <div class="settings-label">
+          <span class="key-name">Video Title</span>
+        </div>
+        <input type="text" id="videoTitle" class="perf-input" placeholder="e.g., Product Demo for Coffee Machine" />
+      </div>
+
+      <div class="perf-grid">
+        <div class="settings-item">
+          <div class="settings-label">
+            <span class="key-name">Views</span>
+          </div>
+          <input type="number" id="videoViews" class="perf-input" placeholder="e.g., 10000" min="0" />
+        </div>
+
+        <div class="settings-item">
+          <div class="settings-label">
+            <span class="key-name">Likes</span>
+          </div>
+          <input type="number" id="videoLikes" class="perf-input" placeholder="e.g., 500" min="0" />
+        </div>
+      </div>
+
+      <div class="perf-grid">
+        <div class="settings-item">
+          <div class="settings-label">
+            <span class="key-name">Comments</span>
+          </div>
+          <input type="number" id="videoComments" class="perf-input" placeholder="e.g., 150" min="0" />
+        </div>
+
+        <div class="settings-item">
+          <div class="settings-label">
+            <span class="key-name">Shares</span>
+          </div>
+          <input type="number" id="videoShares" class="perf-input" placeholder="e.g., 50" min="0" />
+        </div>
+      </div>
+
+      <button class="test-btn perf-save-btn" onclick="submitVideoPerformance()">✅ Save Video Performance</button>
+      <span id="videoSubmitResult" class="perf-result"></span>
+    </div>
+  </div>
+
+  <div class="settings-actions">
+    <button class="save-btn" onclick="saveSettings()">Save Settings</button>
+    <span class="save-msg hidden" id="saveMsg">✓ Saved!</span>
+  </div>
+
+</div>
+</div><!-- /.app-main -->
+
+<script src="/static/settings.js"></script>
+</body>
+</html>

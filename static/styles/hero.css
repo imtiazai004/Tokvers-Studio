@@ -1,0 +1,214 @@
+/* ============================================================
+   HERO · Cinematic sticky hero section
+   Requires: base.css
+   ============================================================ */
+
+.hero-pin {
+  position: relative;
+  height: 220vh;
+  z-index: 1;
+}
+.hero {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  min-height: 600px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Layer 1: brand mesh base */
+.hero::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(820px 500px at 50% -8%, rgba(0,212,255,0.18), transparent 60%),
+    radial-gradient(680px 460px at 6% 16%, rgba(19,185,214,0.12), transparent 60%),
+    radial-gradient(760px 520px at 97% 22%, rgba(255,0,110,0.12), transparent 58%),
+    linear-gradient(180deg, #ffffff 0%, #f6f9fe 58%, #eef3fb 100%);
+}
+/* Layer 3: soft light bloom behind the stage */
+.hero::after {
+  content: ''; position: absolute; left: 50%; top: 56%;
+  transform: translateX(-50%);
+  width: min(1080px, 92%); height: 520px; z-index: 0;
+  background: radial-gradient(closest-side, rgba(0,212,255,0.22), rgba(255,0,110,0.10) 58%, transparent 76%);
+  filter: blur(46px); pointer-events: none;
+}
+
+/* Layer 4: cinematic headline */
+.hero-title {
+  position: relative;
+  z-index: 5;
+  max-width: 18ch;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+  font-family: 'Cabinet Grotesk', 'Satoshi', sans-serif;
+  font-size: clamp(2.4rem, 6vw, 4.7rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -2px;
+  text-wrap: balance;
+  color: transparent;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-title::before {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 150%; height: 220%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(248,251,255,0.86), rgba(248,251,255,0.4) 52%, transparent 76%);
+  filter: blur(22px);
+  pointer-events: none;
+}
+.hero-title .word { display: inline-block; white-space: nowrap; }
+.hero-title .ch {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* two-tone logo coloring */
+.hero-title .ch.c-pink, .hero-title .hp1 {
+  background: none;
+  -webkit-text-fill-color: #ff2d9e;
+  color: #ff2d9e;
+}
+.hero-title .ch.c-blue, .hero-title .hp2 {
+  background: none;
+  -webkit-text-fill-color: #00b4e6;
+  color: #00b4e6;
+}
+
+/* timed entrance */
+.js .hero-title {
+  opacity: 0;
+  transform: translateY(-26px);
+  filter: blur(9px);
+  transition: opacity 1.2s ease, transform 1.5s cubic-bezier(0.22, 1, 0.36, 1), filter 1.2s ease;
+}
+.js .hero-title.revealed { opacity: 1; transform: none; filter: none; }
+
+.hero-lead {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.hero-cta {
+  margin-top: 36px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.btn-watch {
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  border-color: var(--line);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.btn-watch:hover { border-color: var(--cyan); background: #fff; box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.btn-watch .play {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--grad); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.6rem;
+}
+.js .hero-cta {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 1s ease 0.25s, transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.25s;
+}
+.js .hero-cta.revealed { opacity: 1; transform: none; }
+
+/* Layer 2: product video background */
+.hero-bg {
+  position: absolute; inset: 0; z-index: 1;
+  overflow: hidden;
+  transform: scale(1.06);
+  will-change: transform, opacity;
+}
+.hero-bg video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 55% 50%;
+  display: block;
+  filter: saturate(1.06) contrast(1.02);
+  -webkit-mask-image: radial-gradient(128% 112% at 50% 42%, #000 30%, rgba(0,0,0,0.5) 62%, transparent 82%);
+          mask-image: radial-gradient(128% 112% at 50% 42%, #000 30%, rgba(0,0,0,0.5) 62%, transparent 82%);
+}
+
+/* Layer 3: readability scrim */
+.hero-scrim {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    radial-gradient(120% 85% at 50% 42%, rgba(255,255,255,0) 0%, rgba(246,249,254,0.22) 56%, rgba(244,248,254,0.78) 82%, #f4f8fe 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 18%, rgba(255,255,255,0) 64%, #f4f8fe 100%);
+}
+
+/* Hero -> next section reveal */
+.reveal-next {
+  position: relative; z-index: 2;
+  background: linear-gradient(180deg, #f4f8fe 0%, #ffffff 100%);
+  padding: clamp(84px, 14vh, 168px) 0 clamp(96px, 16vh, 184px);
+  text-align: center;
+}
+.reveal-next .rn-inner {
+  opacity: 0; transform: translateY(42px);
+  transition: opacity 0.9s ease, transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal-next.in .rn-inner { opacity: 1; transform: none; }
+.rn-kicker {
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--teal); margin-bottom: 14px;
+}
+.rn-head {
+  font-family: 'Cabinet Grotesk', 'Satoshi', sans-serif;
+  font-size: clamp(1.8rem, 3.4vw, 2.8rem);
+  font-weight: 800; letter-spacing: -1px; color: var(--ink);
+  max-width: 20ch; margin: 0 auto; text-wrap: balance;
+}
+.rn-sub { margin: 16px auto 0; max-width: 56ch; color: var(--slate); font-size: 1.02rem; line-height: 1.6; }
+
+.hero-fade {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 140px; z-index: 3; pointer-events: none;
+  background: linear-gradient(180deg, transparent, #f4f8fe 92%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-pin { height: auto; }
+  .hero { position: relative; height: auto; min-height: 100dvh; }
+  .js .hero-title, .js .hero-title.revealed { opacity: 1; transform: none; filter: none; transition: none; }
+  .js .hero-cta, .js .hero-cta.revealed { opacity: 1; transform: none; transition: none; }
+  .reveal-next .rn-inner { opacity: 1; transform: none; }
+}
+
+@media (max-width: 980px) {
+  .hero-pin { height: 200vh; }
+}
+
+@media (max-width: 560px) {
+  .hero-pin { height: 180vh; }
+  .hero-title { font-size: clamp(2rem, 9vw, 2.9rem); padding: 0 18px; }
+  .hero-bg video {
+    object-position: 52% 50%;
+    -webkit-mask-image: radial-gradient(150% 112% at 50% 40%, #000 34%, transparent 86%);
+            mask-image: radial-gradient(150% 112% at 50% 40%, #000 34%, transparent 86%);
+  }
+}

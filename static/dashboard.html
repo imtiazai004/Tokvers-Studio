@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard · Tokverse</title>
+    <link rel="icon" href="/static/logo.png?v=3" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8f9fc 0%, #f0f4f9 100%);
+            color: #2d3748;
+            overflow-x: hidden;
+        }
+
+        /* ===== SIDEBAR (shared design) ===== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(178deg, #06c2d4 0%, #0a90b0 20%, #2a4f82 48%, #7a2767 76%, #d11663 100%);
+            border-right: 1px solid rgba(255,255,255,0.10);
+            padding: 24px 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 16px rgba(0, 0, 0, 0.18);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-section {
+            padding: 0 24px 22px;
+            border-bottom: 1px solid rgba(255,255,255,0.16);
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        .logo-section .logo-link { display: inline-block; }
+        .logo-section .sidebar-logo-img {
+            width: 150px;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 4px auto 0;
+        }
+
+        .logo-sub {
+            display: block;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .sidebar-section {
+            font-size: 0.66rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.62);
+            font-weight: 700;
+            padding: 14px 24px 6px;
+        }
+
+        .sidebar-section {
+            font-size: 0.66rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #718096;
+            font-weight: 700;
+            padding: 14px 24px 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.13);
+            color: #ffffff;
+            border-left-color: #ffffff;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.2);
+            color: #ffffff;
+            border-left-color: #ffffff;
+        }
+
+        .nav-icon {
+            font-size: 1.1rem;
+            width: 22px;
+            text-align: center;
+        }
+
+        /* Mobile sidebar toggle */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 16px; left: 16px;
+            z-index: 1100;
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #1a202c;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            margin-left: 260px;
+            min-height: 100vh;
+            padding: 32px;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 4px;
+        }
+
+        .header-left p {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .date-range {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .date-range:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 2px 8px rgba(0, 212, 255, 0.1);
+        }
+
+        .status-badge {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            border-color: #00d4ff;
+            background: #f0f9ff;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff006e 0%, #ff2d9e 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* ===== KPI CARDS ===== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.12);
+            transform: translateY(-4px);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00d4ff 0%, #ff006e 100%);
+        }
+
+        .kpi-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .kpi-label {
+            font-size: 13px;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .kpi-trend {
+            font-size: 13px;
+            color: #48bb78;
+            font-weight: 600;
+        }
+
+        /* ===== WORKFLOW SECTION ===== */
+        .workflow-section {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .workflow-card {
+            background: linear-gradient(135deg, #f8f9fc 0%, #f0f4f9 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .workflow-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.1);
+            transform: translateY(-4px);
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #718096;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #ff006e;
+            transform: rotate(90deg);
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .modal-description {
+            font-size: 14px;
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .modal-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .modal-list li {
+            font-size: 13px;
+            color: #4a5568;
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .modal-list li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .modal-status {
+            display: inline-block;
+            background: #e6fffa;
+            color: #047857;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .workflow-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .workflow-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 6px;
+        }
+
+        .workflow-desc {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .workflow-status {
+            display: inline-block;
+            background: #e6fffa;
+            color: #047857;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .workflow-progress {
+            font-size: 12px;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff 0%, #0099cc 100%);
+            transition: width 0.5s ease;
+        }
+
+        /* ===== ANALYTICS SECTION ===== */
+        .analytics-section {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .chart-container {
+            margin-top: 20px;
+            height: 300px;
+        }
+
+        /* ===== TWO COLUMN LAYOUT ===== */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        /* ===== RIGHT SIDEBAR ===== */
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .side-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .side-panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 16px;
+        }
+
+        .activity-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 13px;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-time {
+            color: #a0aec0;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .top-video {
+            padding: 12px 0;
+            border-bottom: 1px solid #edf2f7;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .top-video:last-child {
+            border-bottom: none;
+        }
+
+        .video-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #00d4ff 0%, #ff006e 100%);
+            flex-shrink: 0;
+        }
+
+        .video-info {
+            flex: 1;
+        }
+
+        .video-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 2px;
+        }
+
+        .video-metric {
+            font-size: 11px;
+            color: #718096;
+        }
+
+        /* ===== CAMPAIGNS TABLE ===== */
+        .table-section {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f7fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 700;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 13px;
+            color: #2d3748;
+        }
+
+        tr:hover {
+            background: #f8f9fc;
+        }
+
+        .status-badge-table {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #e6fffa;
+            color: #047857;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #00d4ff;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            color: #0099cc;
+            text-decoration: underline;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1400px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: 0 0 40px rgba(0,0,0,0.15);
+            }
+            .sidebar.open { transform: translateX(0); }
+
+            .main-container {
+                margin-left: 0;
+                padding: 70px 16px 16px;
+            }
+
+            .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+            body.sidebar-open .sidebar-backdrop { display: block; }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .workflow-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR (shared design) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    <div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+    <nav class="sidebar" id="appSidebar">
+        <div class="logo-section">
+            <a href="/" class="logo-link"><img src="/static/logo.png?v=3" alt="Tokverse" class="sidebar-logo-img"></a>
+            <span class="logo-sub">UGC Automation Studio</span>
+        </div>
+
+        <div class="sidebar-section">Main</div>
+        <a class="nav-item active" href="/dashboard"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+        <a class="nav-item" href="/"><span class="nav-icon">🎬</span><span>Create Video</span></a>
+        <a class="nav-item" href="/analytics"><span class="nav-icon">📈</span><span>Analytics</span></a>
+
+        <div class="sidebar-section">Library</div>
+        <a class="nav-item" href="/content-library"><span class="nav-icon">📚</span><span>Content Library</span></a>
+        <a class="nav-item" href="/products"><span class="nav-icon">🛍️</span><span>Products</span></a>
+        <a class="nav-item" href="/learnings"><span class="nav-icon">💡</span><span>Learnings</span></a>
+
+        <div class="sidebar-section">System</div>
+        <a class="nav-item" href="/settings-page"><span class="nav-icon">⚙️</span><span>Settings</span></a>
+        <a class="nav-item" href="/guide"><span class="nav-icon">📖</span><span>Guide</span></a>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-left">
+                <h1>Welcome back, Admin! 👋</h1>
+                <p>TikTok automation performance overview</p>
+            </div>
+            <div class="header-right">
+                <div class="date-range">📅 Last 30 Days</div>
+                <div class="status-badge">✓ System Healthy</div>
+                <button class="cta-button" onclick="window.location.href='/'">+ Create Campaign</button>
+                <div class="header-icons">
+                    <button class="icon-btn">🔔</button>
+                    <div class="user-avatar">A</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon">📹</div>
+                <div class="kpi-label">Videos Published</div>
+                <div class="kpi-value">248</div>
+                <div class="kpi-trend">↑ 12% this month</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon">👁️</div>
+                <div class="kpi-label">Total Views</div>
+                <div class="kpi-value">2.4M</div>
+                <div class="kpi-trend">↑ 28% this month</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon">❤️</div>
+                <div class="kpi-label">Total Likes</div>
+                <div class="kpi-value">189K</div>
+                <div class="kpi-trend">↑ 15% this month</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon">📤</div>
+                <div class="kpi-label">Shares</div>
+                <div class="kpi-value">42K</div>
+                <div class="kpi-trend">↑ 9% this month</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon">💰</div>
+                <div class="kpi-label">Est. Revenue</div>
+                <div class="kpi-value">$18.2K</div>
+                <div class="kpi-trend">↑ 35% this month</div>
+            </div>
+        </div>
+
+        <!-- AGENTS SECTION -->
+        <div class="workflow-section">
+            <h2 class="section-title">⚙️ Active Agents</h2>
+            <div class="workflow-grid">
+                <div class="workflow-card" onclick="openAgentModal('research')">
+                    <div class="workflow-icon">🔍</div>
+                    <div class="workflow-title">Research Agent</div>
+                    <div class="workflow-desc">Market analysis & insights</div>
+                    <div class="workflow-status">Active</div>
+                    <div class="workflow-progress">10 / 10 tasks</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="workflow-card" onclick="openAgentModal('script')">
+                    <div class="workflow-icon">✍️</div>
+                    <div class="workflow-title">Script Agent</div>
+                    <div class="workflow-desc">AI-powered script creation</div>
+                    <div class="workflow-status">Active</div>
+                    <div class="workflow-progress">25 / 25 tasks</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="workflow-card" onclick="openAgentModal('voice')">
+                    <div class="workflow-icon">🎤</div>
+                    <div class="workflow-title">Voice Agent</div>
+                    <div class="workflow-desc">ElevenLabs & Fresh Audio</div>
+                    <div class="workflow-status">Active</div>
+                    <div class="workflow-progress">24 / 24 tasks</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="workflow-card" onclick="openAgentModal('video')">
+                    <div class="workflow-icon">🎬</div>
+                    <div class="workflow-title">Video Agent</div>
+                    <div class="workflow-desc">Generate with Grok/Veo3</div>
+                    <div class="workflow-status">Active</div>
+                    <div class="workflow-progress">20 / 20 tasks</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="workflow-card" onclick="openAgentModal('editing')">
+                    <div class="workflow-icon">✂️</div>
+                    <div class="workflow-title">Editing Agent</div>
+                    <div class="workflow-desc">Compile scenes + captions</div>
+                    <div class="workflow-status">Active</div>
+                    <div class="workflow-progress">18 / 18 tasks</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="workflow-card" onclick="openAgentModal('quality')">
+                    <div class="workflow-icon">✅</div>
+                    <div class="workflow-title">Quality Agent</div>
+                    <div class="workflow-desc">Review & re-generate loop</div>
+                    <div class="workflow-status">Active</div>
+                    <div class="workflow-progress">15 / 15 tasks</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AGENT MODAL -->
+        <div class="modal" id="agentModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <div id="modalIcon" style="font-size: 32px; margin-bottom: 8px;"></div>
+                        <h2 class="modal-title" id="modalTitle">Agent</h2>
+                    </div>
+                    <button class="modal-close" onclick="closeAgentModal()">✕</button>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-status" id="modalStatus">Active</div>
+                    <div class="modal-section-title">What It Does</div>
+                    <div class="modal-description" id="modalDescription"></div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">Key Responsibilities</div>
+                    <ul class="modal-list" id="modalResponsibilities"></ul>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">Current Status</div>
+                    <div class="modal-description" id="modalTaskStatus"></div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">Tools & Technologies</div>
+                    <ul class="modal-list" id="modalTools"></ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENT GRID: ANALYTICS + RIGHT SIDEBAR -->
+        <div class="content-grid">
+            <!-- ANALYTICS -->
+            <div class="analytics-section">
+                <h2 class="section-title">📈 Performance Overview</h2>
+                <div class="chart-container">
+                    <svg viewBox="0 0 800 300" style="width: 100%; height: 100%;">
+                        <!-- Grid lines -->
+                        <line x1="50" y1="250" x2="750" y2="250" stroke="#e2e8f0" stroke-width="1"/>
+                        <line x1="50" y1="200" x2="750" y2="200" stroke="#e2e8f0" stroke-width="1"/>
+                        <line x1="50" y1="150" x2="750" y2="150" stroke="#e2e8f0" stroke-width="1"/>
+                        <line x1="50" y1="100" x2="750" y2="100" stroke="#e2e8f0" stroke-width="1"/>
+                        <line x1="50" y1="50" x2="750" y2="50" stroke="#e2e8f0" stroke-width="1"/>
+
+                        <!-- Axes -->
+                        <line x1="50" y1="50" x2="50" y2="250" stroke="#cbd5e0" stroke-width="2"/>
+                        <line x1="50" y1="250" x2="750" y2="250" stroke="#cbd5e0" stroke-width="2"/>
+
+                        <!-- Views line (cyan) -->
+                        <polyline points="50,200 150,180 250,150 350,120 450,90 550,110 650,80 750,100"
+                                  stroke="#00d4ff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+                        <!-- Likes line (pink) -->
+                        <polyline points="50,220 150,210 250,190 350,160 450,150 550,140 650,130 750,120"
+                                  stroke="#ff006e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+                        <!-- Shares line (blue-teal) -->
+                        <polyline points="50,240 150,230 250,220 350,210 450,200 550,190 650,180 750,170"
+                                  stroke="#00b4d8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+                        <!-- Revenue line (purple) -->
+                        <polyline points="50,235 150,225 250,215 350,200 450,190 550,185 650,175 750,165"
+                                  stroke="#9d4edd" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,5"/>
+
+                        <!-- Labels -->
+                        <text x="40" y="30" font-size="12" fill="#718096" text-anchor="end">2.4M</text>
+                        <text x="40" y="80" font-size="12" fill="#718096" text-anchor="end">1.8M</text>
+                        <text x="40" y="130" font-size="12" fill="#718096" text-anchor="end">1.2M</text>
+                        <text x="40" y="180" font-size="12" fill="#718096" text-anchor="end">600K</text>
+
+                        <text x="70" y="270" font-size="11" fill="#718096">Jan</text>
+                        <text x="170" y="270" font-size="11" fill="#718096">Feb</text>
+                        <text x="270" y="270" font-size="11" fill="#718096">Mar</text>
+                        <text x="370" y="270" font-size="11" fill="#718096">Apr</text>
+                        <text x="470" y="270" font-size="11" fill="#718096">May</text>
+                        <text x="570" y="270" font-size="11" fill="#718096">Jun</text>
+                        <text x="670" y="270" font-size="11" fill="#718096">Jul</text>
+                        <text x="750" y="270" font-size="11" fill="#718096">Aug</text>
+                    </svg>
+                </div>
+                <div style="display: flex; gap: 24px; margin-top: 20px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 12px; height: 12px; background: #00d4ff; border-radius: 2px;"></div>
+                        <span style="font-size: 13px; color: #718096;">Views</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 12px; height: 12px; background: #ff006e; border-radius: 2px;"></div>
+                        <span style="font-size: 13px; color: #718096;">Likes</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 12px; height: 12px; background: #00b4d8; border-radius: 2px;"></div>
+                        <span style="font-size: 13px; color: #718096;">Shares</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 12px; height: 12px; background: #9d4edd; border-radius: 2px; border: 2px dashed;"></div>
+                        <span style="font-size: 13px; color: #718096;">Revenue</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDEBAR -->
+            <div class="right-sidebar">
+                <!-- Recent Activity -->
+                <div class="side-panel">
+                    <div class="side-panel-title">🔔 Recent Activity</div>
+                    <div class="activity-item">
+                        <strong>Video Published</strong>
+                        <div class="activity-time">2 min ago</div>
+                    </div>
+                    <div class="activity-item">
+                        <strong>Research Updated</strong>
+                        <div class="activity-time">15 min ago</div>
+                    </div>
+                    <div class="activity-item">
+                        <strong>Script Generated</strong>
+                        <div class="activity-time">1 hour ago</div>
+                    </div>
+                    <div class="activity-item">
+                        <strong>Analytics Synced</strong>
+                        <div class="activity-time">3 hours ago</div>
+                    </div>
+                    <div class="activity-item">
+                        <strong>Learning Updated</strong>
+                        <div class="activity-time">5 hours ago</div>
+                    </div>
+                </div>
+
+                <!-- Top Performing Videos -->
+                <div class="side-panel">
+                    <div class="side-panel-title">⭐ Top Videos</div>
+                    <div class="top-video">
+                        <div class="video-thumb"></div>
+                        <div class="video-info">
+                            <div class="video-title">Coffee Demo</div>
+                            <div class="video-metric">2.1M views • 3 days ago</div>
+                        </div>
+                    </div>
+                    <div class="top-video">
+                        <div class="video-thumb"></div>
+                        <div class="video-info">
+                            <div class="video-title">Product Challenge</div>
+                            <div class="video-metric">1.8M views • 5 days ago</div>
+                        </div>
+                    </div>
+                    <div class="top-video">
+                        <div class="video-thumb"></div>
+                        <div class="video-info">
+                            <div class="video-title">Testimonial Pack</div>
+                            <div class="video-metric">1.5M views • 1 week ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CAMPAIGNS TABLE -->
+        <div class="table-section">
+            <h2 class="section-title">📋 Active Campaigns</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Campaign</th>
+                        <th>Product</th>
+                        <th>Status</th>
+                        <th>Videos</th>
+                        <th>Views</th>
+                        <th>CTR</th>
+                        <th>Revenue</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Summer Vibes</strong></td>
+                        <td>Coffee Machine</td>
+                        <td><span class="status-badge-table status-active">Active</span></td>
+                        <td>24</td>
+                        <td>2.4M</td>
+                        <td>8.2%</td>
+                        <td>$8,400</td>
+                        <td><button class="action-btn">View</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flash Deal</strong></td>
+                        <td>Smartwatch</td>
+                        <td><span class="status-badge-table status-active">Active</span></td>
+                        <td>18</td>
+                        <td>1.8M</td>
+                        <td>6.5%</td>
+                        <td>$6,200</td>
+                        <td><button class="action-btn">View</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Trending Packs</strong></td>
+                        <td>Wireless Earbuds</td>
+                        <td><span class="status-badge-table status-active">Active</span></td>
+                        <td>32</td>
+                        <td>2.1M</td>
+                        <td>7.8%</td>
+                        <td>$7,200</td>
+                        <td><button class="action-btn">View</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Q3 Launch</strong></td>
+                        <td>Fitness Tracker</td>
+                        <td><span class="status-badge-table status-pending">Pending</span></td>
+                        <td>8</td>
+                        <td>480K</td>
+                        <td>5.2%</td>
+                        <td>$1,800</td>
+                        <td><button class="action-btn">View</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Holiday Special</strong></td>
+                        <td>Tablet</td>
+                        <td><span class="status-badge-table status-pending">Pending</span></td>
+                        <td>12</td>
+                        <td>720K</td>
+                        <td>4.9%</td>
+                        <td>$2,600</td>
+                        <td><button class="action-btn">View</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ===== FUNCTIONAL DASHBOARD CODE =====
+
+        // Load all dashboard data on page load
+        async function loadDashboardData() {
+            try {
+                // Fetch all data in parallel
+                const [kpisRes, agentsRes, activitiesRes, videosRes, campaignsRes] = await Promise.all([
+                    fetch('/api/dashboard/kpis'),
+                    fetch('/api/dashboard/agents'),
+                    fetch('/api/dashboard/activities'),
+                    fetch('/api/dashboard/top-videos'),
+                    fetch('/api/dashboard/campaigns')
+                ]);
+
+                const kpis = await kpisRes.json();
+                const agents = await agentsRes.json();
+                const activities = await activitiesRes.json();
+                const videos = await videosRes.json();
+                const campaigns = await campaignsRes.json();
+
+                // Update KPI cards
+                updateKPICards(kpis);
+
+                // Update agents
+                updateAgents(agents.agents);
+
+                // Update activities
+                updateActivities(activities.activities);
+
+                // Update top videos
+                updateTopVideos(videos.videos);
+
+                // Update campaigns table
+                updateCampaignsTable(campaigns.campaigns);
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        function updateKPICards(kpis) {
+            const kpiGrid = document.querySelector('.kpi-grid');
+            const cards = kpiGrid.querySelectorAll('.kpi-card');
+
+            const kpiData = [
+                { icon: '📹', label: 'Videos Published', value: kpis.videos_published, trend: kpis.trends.videos },
+                { icon: '👁️', label: 'Total Views', value: formatNumber(kpis.total_views), trend: kpis.trends.views },
+                { icon: '❤️', label: 'Total Likes', value: formatNumber(kpis.total_likes), trend: kpis.trends.likes },
+                { icon: '📤', label: 'Shares', value: formatNumber(kpis.total_shares), trend: kpis.trends.shares },
+                { icon: '💰', label: 'Est. Revenue', value: '$' + formatNumber(kpis.est_revenue), trend: kpis.trends.revenue }
+            ];
+
+            cards.forEach((card, i) => {
+                if (kpiData[i]) {
+                    card.querySelector('.kpi-icon').textContent = kpiData[i].icon;
+                    card.querySelector('.kpi-label').textContent = kpiData[i].label;
+                    card.querySelector('.kpi-value').textContent = kpiData[i].value;
+                    card.querySelector('.kpi-trend').textContent = '↑ ' + kpiData[i].trend;
+                }
+            });
+        }
+
+        function updateAgents(agentsData) {
+            const workflowGrid = document.querySelector('.workflow-grid');
+            workflowGrid.innerHTML = '';
+
+            agentsData.forEach(agent => {
+                const card = document.createElement('div');
+                card.className = 'workflow-card';
+                card.onclick = () => openAgentModal(agent.id);
+                card.innerHTML = `
+                    <div class="workflow-icon">${agent.icon}</div>
+                    <div class="workflow-title">${agent.name}</div>
+                    <div class="workflow-desc">Status: ${agent.status}</div>
+                    <div class="workflow-status">${agent.status === 'active' ? 'Active' : 'Inactive'}</div>
+                    <div class="workflow-progress">${agent.tasks_completed} / ${agent.tasks_total} tasks</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${agent.progress}%;"></div>
+                    </div>
+                `;
+                workflowGrid.appendChild(card);
+            });
+        }
+
+        function updateActivities(activitiesData) {
+            const activityContainer = document.querySelector('.side-panel:nth-of-type(1)');
+            const activityContent = activityContainer.querySelectorAll('.activity-item');
+
+            activityContent.forEach(el => el.remove());
+
+            const placeholder = activityContainer.querySelector('.side-panel-title').nextElementSibling;
+
+            activitiesData.forEach(activity => {
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                item.innerHTML = `
+                    <strong>${activity.icon} ${activity.type}</strong>
+                    <div class="activity-time">${activity.time}</div>
+                `;
+                activityContainer.insertBefore(item, null);
+            });
+        }
+
+        function updateTopVideos(videosData) {
+            const videoContainer = document.querySelectorAll('.side-panel')[1];
+            const existingVideos = videoContainer.querySelectorAll('.top-video');
+            existingVideos.forEach(v => v.remove());
+
+            videosData.forEach(video => {
+                const item = document.createElement('div');
+                item.className = 'top-video';
+                item.innerHTML = `
+                    <div class="video-thumb"></div>
+                    <div class="video-info">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-metric">${video.views} views • ${video.date}</div>
+                    </div>
+                `;
+                videoContainer.appendChild(item);
+            });
+        }
+
+        function updateCampaignsTable(campaignsData) {
+            const tbody = document.querySelector('table tbody');
+            tbody.innerHTML = '';
+
+            campaignsData.forEach(campaign => {
+                const row = document.createElement('tr');
+                const statusClass = campaign.status === 'active' ? 'status-active' : 'status-pending';
+                row.innerHTML = `
+                    <td><strong>${campaign.name}</strong></td>
+                    <td>${campaign.product}</td>
+                    <td><span class="status-badge-table ${statusClass}">${campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}</span></td>
+                    <td>${campaign.videos}</td>
+                    <td>${campaign.views}</td>
+                    <td>${campaign.ctr}</td>
+                    <td>${campaign.revenue}</td>
+                    <td><button class="action-btn">View</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        // Auto-refresh dashboard every 30 seconds
+        setInterval(loadDashboardData, 30000);
+
+        // Initial load
+        loadDashboardData();
+
+        const agentData = {
+            research: {
+                icon: '🔍',
+                title: 'Research Agent',
+                description: 'Analyzes market trends, competitor strategies, and audience insights to inform content creation decisions.',
+                responsibilities: [
+                    'Analyze TikTok trending topics and hashtags',
+                    'Research competitor video strategies',
+                    'Identify audience preferences and demographics',
+                    'Generate actionable content insights',
+                    'Track market trends in your niche'
+                ],
+                taskStatus: '8 out of 10 tasks completed (80%)',
+                tools: [
+                    'Brave Search API for web research',
+                    'Apify for competitor data collection',
+                    'TikTok analytics for trend identification'
+                ]
+            },
+            script: {
+                icon: '✍️',
+                title: 'Script Agent',
+                description: 'Generates creative, research-backed scripts optimized for different video types and audience engagement.',
+                responsibilities: [
+                    'Generate scripts using Claude AI',
+                    'Optimize scripts for each video type',
+                    'Add hooks and CTAs based on best practices',
+                    'Adapt scripts based on learning insights',
+                    'Support 7 different video format types'
+                ],
+                taskStatus: '24 out of 25 tasks completed (96%)',
+                tools: [
+                    'Anthropic Claude API for script generation',
+                    'Video type templates (Demo, Challenge, etc)',
+                    'Performance learnings from past videos'
+                ]
+            },
+            voice: {
+                icon: '🎤',
+                title: 'Voice Agent',
+                description: 'Converts scripts into natural-sounding voiceovers with multiple voice providers and customization options.',
+                responsibilities: [
+                    'Generate voiceovers via ElevenLabs',
+                    'Support alternative voice providers (Fresh Audio)',
+                    'Match voice to video type and tone',
+                    'Create multi-language voiceovers',
+                    'Ensure audio quality and pacing'
+                ],
+                taskStatus: '22 out of 24 tasks completed (92%)',
+                tools: [
+                    'ElevenLabs API for premium voices',
+                    'Fresh Audio for alternative providers',
+                    'Text-to-speech with custom parameters'
+                ]
+            },
+            video: {
+                icon: '🎬',
+                title: 'Video Agent',
+                description: 'Creates visually engaging videos using AI video generation and supports character consistency.',
+                responsibilities: [
+                    'Generate videos with Grok or Veo3',
+                    'Support character-based content creation',
+                    'Add product images for visual consistency',
+                    'Generate multiple video variations',
+                    'Optimize for TikTok format and specs'
+                ],
+                taskStatus: '18 out of 20 tasks completed (90%)',
+                tools: [
+                    'Grok AI video generation',
+                    'Google Veo3 for advanced visuals',
+                    'Character system for branded content'
+                ]
+            },
+            editing: {
+                icon: '✂️',
+                title: 'Editing Agent',
+                description: 'Compiles the generated scenes and voiceover into a single, polished TikTok-ready video with captions.',
+                responsibilities: [
+                    'Stitch generated video scenes together',
+                    'Sync the voiceover audio to the video',
+                    'Burn in captions / subtitles',
+                    'Apply TikTok 9:16 vertical formatting',
+                    'Export the final MP4 output'
+                ],
+                taskStatus: '18 out of 18 tasks completed (100%)',
+                tools: [
+                    'FFmpeg for video compilation',
+                    'Caption / subtitle generator',
+                    'Audio-video sync engine'
+                ]
+            },
+            quality: {
+                icon: '✅',
+                title: 'Quality Agent',
+                description: 'Reviews the finished video against quality standards and triggers a re-generation if the score is too low.',
+                responsibilities: [
+                    'Score the final video on quality metrics',
+                    'Check script, visuals and audio coherence',
+                    'Flag low-quality output for improvement',
+                    'Trigger script improvement + re-render loop',
+                    'Approve videos that meet the bar'
+                ],
+                taskStatus: '15 out of 15 tasks completed (100%)',
+                tools: [
+                    'Anthropic Claude API for review',
+                    'Quality scoring rubric',
+                    'Automatic re-generation loop'
+                ]
+            }
+        };
+
+        function openAgentModal(agentType) {
+            const data = agentData[agentType];
+            const modal = document.getElementById('agentModal');
+
+            document.getElementById('modalIcon').textContent = data.icon;
+            document.getElementById('modalTitle').textContent = data.title;
+            document.getElementById('modalDescription').textContent = data.description;
+            document.getElementById('modalTaskStatus').textContent = data.taskStatus;
+
+            const respList = document.getElementById('modalResponsibilities');
+            respList.innerHTML = data.responsibilities.map(r => `<li>${r}</li>`).join('');
+
+            const toolsList = document.getElementById('modalTools');
+            toolsList.innerHTML = data.tools.map(t => `<li>${t}</li>`).join('');
+
+            modal.classList.add('active');
+        }
+
+        function closeAgentModal() {
+            document.getElementById('agentModal').classList.remove('active');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('appSidebar').classList.toggle('open');
+            document.body.classList.toggle('sidebar-open');
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('agentModal');
+            if (e.target === modal) {
+                closeAgentModal();
+            }
+        });
+
+        // Animate progress bars on load
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.progress-fill').forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        });
+
+        // KPI cards hover animation
+        document.querySelectorAll('.kpi-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

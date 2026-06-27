@@ -1,0 +1,117 @@
+/* ============================================================
+   PRICING · premium tiers that scale with you
+   Glass cards, a Most-Popular highlight that floats + glows, a
+   monthly/annual toggle, gradient CTAs. Continues the white premium
+   design language; fades onward (FAQ / final CTA).
+   Reusable: plans render from data (pricing.js). Reuses .an-rise.
+   Requires: base.css, post-wf.css (for --ease-film / .an-rise)
+   ============================================================ */
+
+.pr {
+  position: relative; z-index: 2; overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #eef4fc 50%, #ffffff 100%);
+  padding: clamp(84px, 13vh, 152px) 0 clamp(96px, 15vh, 176px);
+}
+.pr::before {
+  content: ''; position: absolute; z-index: 0; pointer-events: none;
+  left: 50%; top: -4%; transform: translateX(-50%);
+  width: 1000px; height: 620px; max-width: 96vw;
+  background:
+    radial-gradient(closest-side, rgba(0,212,255,0.12), transparent 70%),
+    radial-gradient(closest-side at 66% 60%, rgba(255,0,110,0.08), transparent 72%);
+  filter: blur(8px);
+  animation: prAura 30s ease-in-out infinite alternate; will-change: transform, opacity;
+}
+@keyframes prAura { from { transform: translateX(-50%) scale(1); opacity: .85; } to { transform: translateX(-50%) translateY(24px) scale(1.1); opacity: 1; } }
+
+/* ---- heading ---- */
+.pr-head { position: relative; z-index: 1; text-align: center; max-width: 760px; margin: 0 auto clamp(34px, 5vh, 50px); padding: 0 24px; }
+.pr-label { display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px; border-radius: 30px;
+  background: rgba(255,255,255,0.86); border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+  font-size: 0.74rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cyan); }
+.pr-head h2 { font-family: 'Cabinet Grotesk','Satoshi',sans-serif; margin-top: 22px;
+  font-size: clamp(2.1rem, 4.4vw, 3.5rem); line-height: 1.07; font-weight: 800; letter-spacing: -1.6px; color: var(--ink); text-wrap: balance; }
+.pr-head h2 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.pr-head p { margin: 18px auto 0; max-width: 58ch; font-size: 1.08rem; line-height: 1.62; color: var(--slate); text-wrap: pretty; }
+
+/* ---- billing toggle ---- */
+.pr-toggle-wrap { position: relative; z-index: 1; display: flex; justify-content: center; align-items: center; gap: 14px; margin-bottom: clamp(40px, 6vh, 64px); }
+.pr-toggle { position: relative; display: inline-flex; padding: 5px; border-radius: 30px;
+  background: rgba(255,255,255,0.82); border: 1px solid var(--line); box-shadow: var(--shadow-sm); backdrop-filter: blur(8px); }
+.pr-toggle .pr-pill { position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc(50% - 5px); border-radius: 24px;
+  background: var(--grad); box-shadow: 0 8px 20px rgba(0,212,255,0.28); transition: transform 0.4s var(--ease-film); }
+.pr-toggle.annual .pr-pill { transform: translateX(100%); }
+.pr-toggle button { position: relative; z-index: 1; border: none; background: none; cursor: pointer;
+  padding: 9px 22px; border-radius: 24px; font-weight: 700; font-size: 0.9rem; color: var(--slate); transition: color 0.3s ease; }
+.pr-toggle button.active { color: #fff; }
+.pr-save { font-size: 0.78rem; font-weight: 700; color: #047857; background: linear-gradient(135deg,#d1fae5,#a7f3d0); padding: 5px 11px; border-radius: 20px; }
+
+/* ---- grid ---- */
+.pr-grid { position: relative; z-index: 1; max-width: 1140px; margin: 0 auto; padding: 0 24px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: stretch; }
+@media (max-width: 940px) { .pr-grid { grid-template-columns: 1fr; max-width: 460px; } }
+
+/* ---- card ---- */
+.pr-card { position: relative; display: flex; flex-direction: column; height: 100%;
+  border-radius: 24px; padding: 32px 30px 34px;
+  background: rgba(255,255,255,0.74); border: 1px solid rgba(255,255,255,0.9);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.8);
+  backdrop-filter: blur(14px) saturate(1.1); -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  transition: box-shadow 0.45s var(--ease-film), transform 0.45s var(--ease-film), border-color 0.45s var(--ease-film); }
+.pr-card:hover { transform: translateY(-6px); box-shadow: 0 28px 64px rgba(0,212,255,0.14), 0 12px 34px rgba(255,0,110,0.08), inset 0 1px 0 rgba(255,255,255,0.9); border-color: rgba(0,212,255,0.35); }
+
+/* most-popular highlight: lifts, glows, and breathes */
+.pr-card.popular { border-color: transparent; background: rgba(255,255,255,0.9);
+  box-shadow: 0 34px 80px rgba(0,212,255,0.20), 0 14px 40px rgba(255,0,110,0.12), inset 0 1px 0 rgba(255,255,255,0.9);
+  transform: translateY(-10px); }
+@media (min-width: 941px) { .pr-card.popular { transform: translateY(-10px) scale(1.035); } }
+.pr-card.popular::before { content: ''; position: absolute; inset: 0; border-radius: 24px; padding: 1.5px; pointer-events: none;
+  background: var(--grad); -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.pr-card.popular .pr-glow { position: absolute; inset: -30% -16% auto -16%; height: 70%; z-index: -1; pointer-events: none;
+  background: radial-gradient(60% 80% at 50% 0%, rgba(0,212,255,0.26), transparent 70%), radial-gradient(50% 70% at 78% 12%, rgba(255,0,110,0.18), transparent 72%);
+  filter: blur(28px); animation: prBreathe 6s ease-in-out infinite; }
+@keyframes prBreathe { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
+.pr-badge { position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 20px;
+  background: var(--grad); color: #fff; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+  box-shadow: 0 10px 24px rgba(255,0,110,0.28); white-space: nowrap; }
+
+.pr-name { font-family: 'Cabinet Grotesk','Satoshi',sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; }
+.pr-tag { margin-top: 6px; font-size: 0.92rem; color: var(--slate); line-height: 1.5; min-height: 2.7em; }
+
+.pr-price { margin: 22px 0 4px; display: flex; align-items: flex-end; gap: 4px; }
+.pr-price .cur { font-size: 1.5rem; font-weight: 800; color: var(--ink); transform: translateY(-9px); }
+.pr-price .amt { font-family: 'Cabinet Grotesk','Satoshi',sans-serif; font-size: 3.1rem; font-weight: 900; color: var(--ink); line-height: 1; letter-spacing: -2px;
+  transition: opacity 0.25s ease; }
+.pr-price .per { font-size: 0.95rem; font-weight: 700; color: var(--slate); padding-bottom: 6px; }
+.pr-bill { font-size: 0.82rem; color: var(--slate); min-height: 1.2em; }
+
+.pr-cta { margin: 24px 0 26px; display: block; width: 100%; text-align: center; padding: 13px 20px; border-radius: 12px;
+  font-weight: 800; font-size: 0.98rem; cursor: pointer; text-decoration: none; transition: transform 0.2s ease, box-shadow 0.4s ease, background 0.3s ease; }
+.pr-cta--primary { background: var(--grad); color: #fff; border: none; box-shadow: 0 12px 30px rgba(0,212,255,0.28); }
+.pr-cta--primary:hover { transform: translateY(-2px); box-shadow: 0 18px 42px rgba(255,0,110,0.30); }
+.pr-cta--ghost { background: rgba(255,255,255,0.6); color: var(--ink); border: 1px solid var(--line); }
+.pr-cta--ghost:hover { border-color: rgba(0,212,255,0.5); transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,212,255,0.12); }
+
+.pr-feats { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.pr-feats li { position: relative; padding-left: 28px; font-size: 0.94rem; line-height: 1.45; color: var(--slate); }
+.pr-feats li::before { content: ''; position: absolute; left: 0; top: 1px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--grad); -webkit-mask: no-repeat center / 11px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+          mask: no-repeat center / 11px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' d='M5 13l4 4L19 7'/%3E%3C/svg%3E"); }
+.pr-feats li b { color: var(--ink); font-weight: 700; }
+
+/* ---- footnote ---- */
+.pr-foot { position: relative; z-index: 1; text-align: center; margin-top: clamp(40px, 6vh, 60px); padding: 0 24px; }
+.pr-foot .meta { font-size: 0.95rem; color: var(--slate); }
+.pr-foot .meta span { display: inline-block; margin: 0 4px; }
+.pr-foot .ent { margin-top: 14px; font-size: 0.98rem; color: var(--ink); font-weight: 600; }
+.pr-foot .ent a { color: var(--cyan); font-weight: 800; text-decoration: none; }
+.pr-foot .ent a:hover { text-decoration: underline; }
+
+.pr::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 140px; z-index: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent, #ffffff); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pr::before, .pr-card.popular .pr-glow { animation: none; }
+  .pr-card, .pr-toggle .pr-pill { transition: none; }
+}

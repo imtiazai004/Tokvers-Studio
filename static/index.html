@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tokverse · UGC Creator</title>
+<link rel="icon" href="/static/logo.png?v=3" type="image/png">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+<nav class="app-sidebar" id="appSidebar"></nav>
+<script src="/static/sidebar.js"></script>
+<div class="app-main">
+<div class="container">
+  <header class="hero">
+    <div class="hero-text">
+      <h1>Create a UGC Video</h1>
+      <p class="subtitle">Research → Script → Voice → Video · Powered by AI Agents</p>
+      <div class="hero-badges">
+        <span class="hero-badge">⚡ 7 Video Types</span>
+        <span class="hero-badge">🤖 2 AI Engines</span>
+        <span class="hero-badge">🎤 Auto Voiceover</span>
+        <span class="hero-badge">✨ Smart Learning</span>
+      </div>
+    </div>
+    <a href="/settings-page" class="settings-link">⚙ API Settings</a>
+  </header>
+
+  <div class="main-grid">
+    <div class="panel input-panel">
+      <h2>New UGC Video</h2>
+
+      <div class="form-section">
+        <div class="form-section-head"><span class="fs-icon">🛍️</span><span class="fs-title">Your Product</span></div>
+        <div class="form-section-body">
+
+      <div class="form-group">
+        <label>Product Name</label>
+        <input type="text" id="productName" placeholder="e.g. Spicy Ramen Kit, Vitamin C Serum" />
+      </div>
+
+      <div class="form-group">
+        <label>Product Description <span class="optional">(optional - improves results)</span></label>
+        <textarea id="productDesc" rows="3" placeholder="What it does, benefits, price, unique features..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Niche / Category</label>
+        <select id="niche">
+          <option value="food_and_beverage">Food & Beverage</option>
+          <option value="beauty">Beauty & Skincare</option>
+          <option value="fashion">Fashion</option>
+          <option value="fitness">Fitness & Health</option>
+          <option value="tech">Tech & Gadgets</option>
+          <option value="lifestyle">Lifestyle & Home</option>
+          <option value="travel">Travel</option>
+        </select>
+      </div>
+
+        </div>
+      </div><!-- /Your Product -->
+
+      <div class="form-section adv-section" id="advSection">
+        <button type="button" class="adv-toggle" onclick="toggleAdvanced()" aria-expanded="false">
+          <span class="fs-icon">⚙️</span>
+          <span class="fs-title">Advanced Options</span>
+          <span class="fs-hint">Character · Image · Script · Batch</span>
+          <span class="adv-caret" id="advCaret">▾</span>
+        </button>
+        <div class="adv-body" id="advBody" style="display:none">
+
+      <!-- Character Selector - OPTIONAL -->
+      <div class="form-group optional-section">
+        <label>
+          <span>Consistent Character <span class="optional">(optional)</span></span>
+          <button class="char-manage-btn" onclick="openCharacterModal()">+ Add / Manage</button>
+        </label>
+        <p class="optional-hint">Select a character to keep the same person across all scenes. Leave as None and AI will decide.</p>
+        <div id="characterPicker" class="character-picker">
+          <div class="char-card no-char active" data-id="" onclick="selectCharacter(this, '')">
+            <div class="char-avatar">✕</div>
+            <div class="char-name">None</div>
+            <div class="char-desc">Default</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Image Upload - OPTIONAL -->
+      <div class="form-group optional-section">
+        <label>Product Image <span class="optional">(optional - helps AI understand your product)</span></label>
+        <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('productImageInput').click()">
+          <span id="imageUploadText">📸 Click or drag image here</span>
+          <input type="file" id="productImageInput" accept="image/*" style="display:none" onchange="handleProductImageUpload(event)" />
+        </div>
+        <div id="imagePreview" class="image-preview hidden"></div>
+      </div>
+
+      <!-- Script Input - OPTIONAL -->
+      <div class="form-group optional-section">
+        <label>Script <span class="optional">(optional - leave empty for AI to write)</span></label>
+        <div class="script-mode">
+          <button class="script-mode-btn active" data-mode="ai" onclick="selectScriptMode('ai')">AI Write Script</button>
+          <button class="script-mode-btn" data-mode="manual" onclick="selectScriptMode('manual')">I Have a Script</button>
+        </div>
+        <textarea id="scriptInput" rows="5" placeholder="Hook: [Opening line] | Body: [Pitch] | CTA: [Call to action]" style="display:none"></textarea>
+      </div>
+
+      <!-- Batch Generation - OPTIONAL -->
+      <div class="form-group optional-section">
+        <label>Generate Multiple Videos <span class="optional">(optional - generate variations)</span></label>
+        <p class="optional-hint">Generate the same product with different angles, hooks, or variations in one batch.</p>
+        <div class="batch-input">
+          <label>Number of Videos</label>
+          <input type="number" id="batchCount" min="1" max="10" value="1" placeholder="1" />
+          <span class="batch-hint">(1 = single video, 2-10 = variations)</span>
+        </div>
+      </div>
+
+        </div><!-- /adv-body -->
+      </div><!-- /Advanced Options -->
+
+      <div class="form-section">
+        <div class="form-section-head"><span class="fs-icon">🎬</span><span class="fs-title">Video Style</span></div>
+        <div class="form-section-body">
+
+      <div class="form-group">
+        <label>Video Type</label>
+        <div class="video-type-selector">
+          <div class="type-card active" data-type="product_demo" onclick="selectVideoType('product_demo')">
+            <div class="type-icon">📦</div>
+            <div class="type-name">Product Demo</div>
+            <div class="type-desc">Show it in action</div>
+          </div>
+          <div class="type-card" data-type="testimonial" onclick="selectVideoType('testimonial')">
+            <div class="type-icon">⭐</div>
+            <div class="type-name">Testimonial</div>
+            <div class="type-desc">Real user review</div>
+          </div>
+          <div class="type-card" data-type="tiktok_creative" onclick="selectVideoType('tiktok_creative')">
+            <div class="type-icon">🎵</div>
+            <div class="type-name">TikTok Creative</div>
+            <div class="type-desc">Trendy & fun</div>
+          </div>
+          <div class="type-card" data-type="before_after" onclick="selectVideoType('before_after')">
+            <div class="type-icon">✨</div>
+            <div class="type-name">Before/After</div>
+            <div class="type-desc">Transformation</div>
+          </div>
+          <div class="type-card" data-type="educational" onclick="selectVideoType('educational')">
+            <div class="type-icon">📚</div>
+            <div class="type-name">Educational</div>
+            <div class="type-desc">Teach & inform</div>
+          </div>
+          <div class="type-card" data-type="trending_challenge" onclick="selectVideoType('trending_challenge')">
+            <div class="type-icon">🔥</div>
+            <div class="type-name">Trending Challenge</div>
+            <div class="type-desc">Ride a trend</div>
+          </div>
+          <div class="type-card" data-type="problem_solution" onclick="selectVideoType('problem_solution')">
+            <div class="type-icon">💡</div>
+            <div class="type-name">Problem-Solution</div>
+            <div class="type-desc">Pain → fix</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>UGC Approach</label>
+        <div class="approach-selector">
+          <div class="approach-card active" data-mode="auto" onclick="selectMode('auto')">
+            <div class="approach-icon">A</div>
+            <div class="approach-name">Auto</div>
+            <div class="approach-desc">Agent decides</div>
+          </div>
+          <div class="approach-card" data-mode="rewrite" onclick="selectMode('rewrite')">
+            <div class="approach-icon">R</div>
+            <div class="approach-name">Rewrite</div>
+            <div class="approach-desc">Copy top UGC style</div>
+          </div>
+          <div class="approach-card" data-mode="new_angle" onclick="selectMode('new_angle')">
+            <div class="approach-icon">N</div>
+            <div class="approach-name">New Angle</div>
+            <div class="approach-desc">Fresh story</div>
+          </div>
+        </div>
+      </div>
+
+        </div>
+      </div><!-- /Video Style -->
+
+      <button class="generate-btn" id="generateBtn" onclick="startGeneration()">
+        Generate UGC Video
+      </button>
+    </div>
+
+    <div class="panel output-panel">
+      <h2>Agent Pipeline</h2>
+
+      <div class="agent-flow">
+        <div class="agent-step" id="step-research">
+          <div class="step-icon">🔍</div>
+          <div class="step-info">
+            <div class="step-name">Research Agent</div>
+            <div class="step-status" id="status-research">Waiting</div>
+          </div>
+        </div>
+        <div class="agent-step" id="step-script">
+          <div class="step-icon">✍️</div>
+          <div class="step-info">
+            <div class="step-name">Script Agent</div>
+            <div class="step-status" id="status-script">Waiting</div>
+          </div>
+        </div>
+        <div class="agent-step" id="step-voice">
+          <div class="step-icon">🎤</div>
+          <div class="step-info">
+            <div class="step-name">Voice Agent</div>
+            <div class="step-status" id="status-voice">Waiting</div>
+          </div>
+        </div>
+        <div class="agent-step" id="step-video">
+          <div class="step-icon">🎬</div>
+          <div class="step-info">
+            <div class="step-name">Video Agent</div>
+            <div class="step-status" id="status-video">Waiting</div>
+          </div>
+        </div>
+        <div class="agent-step" id="step-editing">
+          <div class="step-icon">✂️</div>
+          <div class="step-info">
+            <div class="step-name">Editing Agent</div>
+            <div class="step-status" id="status-editing">Waiting</div>
+          </div>
+        </div>
+        <div class="agent-step" id="step-quality">
+          <div class="step-icon">✅</div>
+          <div class="step-info">
+            <div class="step-name">Quality Agent</div>
+            <div class="step-status" id="status-quality">Waiting</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">Ready to generate</div>
+
+      <div class="idle-hint" id="idleHint">
+        <div class="ih-icon">🎬</div>
+        <div class="ih-title">Your AI video will appear here</div>
+        <div class="ih-text">Fill in the form and hit Generate — watch the agents work in real time.</div>
+      </div>
+
+      <div id="resultSection" class="result-section hidden">
+        <div class="result-meta">
+          <span class="quality-badge" id="qualityBadge"></span>
+          <span class="approach-badge" id="approachBadge"></span>
+          <span class="authenticity-badge" id="authenticityBadge"></span>
+          <span class="char-used-badge hidden" id="charUsedBadge"></span>
+        </div>
+
+        <video id="previewVideo" controls></video>
+
+        <div class="hook-box" id="hookBox"></div>
+        <div class="hashtags-box" id="hashtagsBox"></div>
+
+        <div class="result-actions">
+          <button class="download-btn" id="downloadBtn">Download Video</button>
+        </div>
+
+        <div id="qualityReport" class="quality-report"></div>
+
+        <div class="feedback-section">
+          <p class="feedback-title">Update performance after posting — agents will learn from this data</p>
+          <div class="feedback-inputs">
+            <input type="number" id="fbViews" placeholder="Views" min="0" />
+            <input type="number" id="fbLikes" placeholder="Likes" min="0" />
+            <input type="number" id="fbSales" placeholder="Sales" min="0" />
+          </div>
+          <button class="feedback-btn" onclick="submitFeedback()">Update Performance</button>
+        </div>
+      </div>
+
+      <div id="errorSection" class="error-section hidden">
+        <p id="errorMessage"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel history-panel">
+    <h2>Video History</h2>
+    <div id="historyList" class="history-list"></div>
+  </div>
+</div>
+
+<!-- Character Modal -->
+<div id="characterModal" class="modal-overlay hidden" onclick="closeCharacterModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Characters</h3>
+      <button class="modal-close" onclick="closeCharacterModal()">✕</button>
+    </div>
+
+    <div class="modal-section">
+      <h4>Create New Character</h4>
+      <div class="char-form">
+        <input type="text" id="charName" placeholder="Character name (e.g. Sara, Alex)" />
+        <input type="text" id="charAppearance" placeholder="Appearance (e.g. Young South Asian woman, 20s, dark hair)" />
+        <input type="text" id="charPersonality" placeholder="Personality (e.g. energetic, relatable, funny)" />
+        <textarea id="charDescription" rows="2" placeholder="Description (optional)"></textarea>
+        <select id="charNiche">
+          <option value="food_and_beverage">Food & Beverage</option>
+          <option value="beauty">Beauty & Skincare</option>
+          <option value="fashion">Fashion</option>
+          <option value="fitness">Fitness & Health</option>
+          <option value="tech">Tech & Gadgets</option>
+          <option value="lifestyle">Lifestyle & Home</option>
+          <option value="travel">Travel</option>
+        </select>
+        <select id="charVoiceGender">
+          <option value="female">Female Voice</option>
+          <option value="male">Male Voice</option>
+        </select>
+        <div class="char-image-upload" onclick="document.getElementById('charImageInput').click()">
+          <div id="charImagePreview" class="image-preview-placeholder">
+            📷 Reference Image (Optional)<br>
+            <small>Upload an image to use the same character across all scenes (image-to-video)</small>
+          </div>
+          <input type="file" id="charImageInput" accept="image/*" style="display:none" onchange="previewCharImage(this)" />
+        </div>
+        <button class="create-char-btn" onclick="createCharacter()">Create Character</button>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h4>Saved Characters</h4>
+      <div id="modalCharacterList" class="modal-char-list">
+        <p class="loading-text">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /.app-main -->
+
+<script>
+  function toggleAdvanced() {
+    const section = document.getElementById('advSection');
+    const body = document.getElementById('advBody');
+    const btn = section.querySelector('.adv-toggle');
+    const isOpen = section.classList.toggle('open');
+    body.style.display = isOpen ? 'flex' : 'none';
+    if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+
+  // Hide the idle placeholder once a generation begins (additive — does not touch app.js)
+  document.addEventListener('DOMContentLoaded', () => {
+    const genBtn = document.getElementById('generateBtn');
+    if (genBtn) genBtn.addEventListener('click', () => {
+      const hint = document.getElementById('idleHint');
+      if (hint) hint.style.display = 'none';
+    });
+  });
+</script>
+<script src="/static/app.js"></script>
+</body>
+</html>

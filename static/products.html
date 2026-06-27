@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products · Tokverse</title>
+<link rel="icon" href="/static/logo.png?v=3" type="image/png">
+<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/library.css">
+</head>
+<body>
+<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+<nav class="app-sidebar" id="appSidebar"></nav>
+<script src="/static/sidebar.js"></script>
+
+<div class="app-main">
+  <div class="container">
+    <div class="page-head">
+      <div>
+        <h1>🛍️ Products</h1>
+        <p class="page-sub">Products you've created content for, ranked by total reach.</p>
+      </div>
+      <a href="/" class="es-btn">+ New Product Video</a>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat-box"><div class="stat-label">Products</div><div class="stat-value" id="sProducts">—</div></div>
+      <div class="stat-box"><div class="stat-label">Videos Made</div><div class="stat-value" id="sVideos">—</div></div>
+      <div class="stat-box"><div class="stat-label">Total Views</div><div class="stat-value" id="sViews">—</div></div>
+      <div class="stat-box"><div class="stat-label">Total Likes</div><div class="stat-value" id="sLikes">—</div></div>
+    </div>
+
+    <div id="content"></div>
+  </div>
+</div>
+
+<script>
+  function fmt(n) {
+    n = Number(n) || 0;
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+    return n.toString();
+  }
+  function nicheLabel(n) { return (n || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()); }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  async function load() {
+    const content = document.getElementById('content');
+    content.innerHTML = '<div class="loading-row">Loading products…</div>';
+    try {
+      const res = await fetch('/api/products');
+      const data = await res.json();
+      const products = data.products || [];
+
+      document.getElementById('sProducts').textContent = products.length;
+      document.getElementById('sVideos').textContent = fmt(products.reduce((a, p) => a + (p.video_count || 0), 0));
+      document.getElementById('sViews').textContent = fmt(products.reduce((a, p) => a + (p.total_views || 0), 0));
+      document.getElementById('sLikes').textContent = fmt(products.reduce((a, p) => a + (p.total_likes || 0), 0));
+
+      if (products.length === 0) {
+        content.innerHTML = `
+          <div class="empty-state">
+            <div class="es-icon">🛍️</div>
+            <div class="es-title">No products yet</div>
+            <div class="es-text">When you generate a video and give it a product name, that product shows up here with combined stats.</div>
+            <a href="/" class="es-btn">+ Create a Product Video</a>
+          </div>`;
+        return;
+      }
+
+      content.innerHTML = '<div class="card-grid">' + products.map(p => `
+        <div class="data-card">
+          <div class="dc-title">${escapeHtml(p.product || 'Untitled')}</div>
+          <div class="dc-sub">${nicheLabel(p.niche)} • ${p.video_count} video${p.video_count == 1 ? '' : 's'}</div>
+          <div class="dc-metrics">
+            <div class="dc-metric"><strong>${fmt(p.total_views)}</strong>Views</div>
+            <div class="dc-metric"><strong>${fmt(p.total_likes)}</strong>Likes</div>
+            <div class="dc-metric"><strong>${fmt(p.total_shares)}</strong>Shares</div>
+          </div>
+          <div class="dc-tags">
+            <span class="dc-tag">${p.video_count} video${p.video_count == 1 ? '' : 's'}</span>
+            <span class="dc-tag gray">Avg score ${p.avg_score}</span>
+          </div>
+        </div>`).join('') + '</div>';
+    } catch (e) {
+      content.innerHTML = '<div class="loading-row">Could not load products. Is the server running?</div>';
+    }
+  }
+  load();
+</script>
+</body>
+</html>

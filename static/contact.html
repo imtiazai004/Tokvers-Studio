@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact · AIGC Automated</title>
+<meta name="description" content="Contact the Tokverse team about AIGC Automated, TikTok automation, and UGC campaign workflows.">
+<link rel="icon" href="/static/logo.png?v=3" type="image/png">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=cabinet-grotesk@800,900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles/base.css">
+<link rel="stylesheet" href="/static/styles/nav.css">
+<link rel="stylesheet" href="/static/styles/marketing-pages.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div id="landing-nav-mount"></div>
+
+<main class="mp-page">
+  <section class="mp-hero">
+    <div class="container">
+      <span class="mp-kicker">Contact</span>
+      <h1 class="mp-title">Talk with the team about your <span class="grad">TikTok content pipeline</span>.</h1>
+      <p class="mp-lede">Use this page for sales questions, implementation help, partnerships, or support around AIGC Automated and Tokverse services.</p>
+    </div>
+  </section>
+
+  <section class="mp-section alt">
+    <div class="container">
+      <div class="mp-grid two">
+        <article class="mp-card">
+          <h3>Contact details</h3>
+          <ul>
+            <li>Email: <a href="mailto:info@thetokverse.com">info@thetokverse.com</a></li>
+            <li>Phone: <a href="tel:+18177834059">+1 817 783 4059</a></li>
+            <li>Website: <a href="https://thetokverse.com/" target="_blank" rel="noopener">thetokverse.com</a></li>
+          </ul>
+        </article>
+        <article class="mp-card">
+          <h3>Send a message</h3>
+          <form class="mp-form" action="mailto:info@thetokverse.com" method="post" enctype="text/plain">
+            <label>
+              Name
+              <input name="name" autocomplete="name" required>
+            </label>
+            <label>
+              Email
+              <input name="email" type="email" autocomplete="email" required>
+            </label>
+            <label>
+              Topic
+              <select name="topic">
+                <option>Sales</option>
+                <option>Support</option>
+                <option>Partnership</option>
+                <option>Custom workflow</option>
+              </select>
+            </label>
+            <label>
+              Message
+              <textarea name="message" required></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">Send Message</button>
+          </form>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="mp-footer">
+  <div class="container mp-footer-inner">
+    <span>AIGC Automated by Tokverse</span>
+    <nav class="mp-footer-links" aria-label="Footer">
+      <a href="/landing">Home</a>
+      <a href="/features">Features</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/about">About</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+window.NAV_CONFIG = {
+  links: [
+    { label: 'Features', href: '/features' },
+    { label: 'AI Agents', href: '/ai-agents' },
+    { label: 'Pricing', href: '/pricing' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' }
+  ],
+  ctas: [
+    { label: 'Log In', href: '/', type: 'ghost' },
+    { label: 'Start Free Trial', href: '/', type: 'primary' }
+  ]
+};
+</script>
+<script src="/static/components/landing-nav.js"></script>
+</body>
+</html>
