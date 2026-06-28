@@ -1,12 +1,12 @@
 services:
   - type: web
-    name: aigc-automated
+    name: tokverse-studio
     runtime: docker
     plan: starter
     dockerfilePath: ./Dockerfile
     dockerContext: .
     disk:
-      name: aigc-automated-data
+      name: tokverse-studio-data
       mountPath: /data
       sizeGB: 10
     envVars:
