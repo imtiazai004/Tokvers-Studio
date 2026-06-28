@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In · Tokverse Studio</title>
+<link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #06c2d4 0%, #0a90b0 22%, #2a4f82 52%, #7a2767 80%, #d11663 100%);
+  }
+  .auth-card {
+    width: 100%; max-width: 410px;
+    background: #fff; border-radius: 18px;
+    padding: 38px 34px 30px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.28);
+  }
+  .auth-logo { text-align: center; margin-bottom: 6px; }
+  .auth-logo img { width: 52px; height: auto; display: block; margin: 0 auto 8px; }
+  .auth-brand {
+    font-size: 1.5rem; font-weight: 800; letter-spacing: -0.6px;
+    background: linear-gradient(90deg, #06e8d8 0%, #13b9d6 42%, #ff0a5e 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .auth-sub { text-align: center; color: #718096; font-size: 0.85rem; margin: 4px 0 26px; }
+  .auth-title { font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 18px; text-align: center; }
+  label { display: block; font-size: 0.8rem; font-weight: 600; color: #4a5568; margin: 14px 0 6px; }
+  input {
+    width: 100%; padding: 12px 14px; font-size: 0.95rem;
+    border: 1px solid #e2e8f0; border-radius: 10px; outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  input:focus { border-color: #13b9d6; box-shadow: 0 0 0 3px rgba(19,185,214,0.15); }
+  .btn {
+    width: 100%; margin-top: 22px; padding: 13px;
+    border: none; border-radius: 10px; cursor: pointer;
+    font-size: 0.98rem; font-weight: 700; color: #fff;
+    background: linear-gradient(90deg, #06e8d8 0%, #13b9d6 42%, #ff0a5e 100%);
+    transition: transform .15s, box-shadow .2s; box-shadow: 0 6px 18px rgba(19,185,214,0.32);
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(255,10,94,0.32); }
+  .btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+  .auth-foot { text-align: center; font-size: 0.85rem; color: #718096; margin-top: 20px; }
+  .auth-foot a { color: #13b9d6; font-weight: 700; text-decoration: none; }
+  .auth-foot a:hover { text-decoration: underline; }
+  .auth-error {
+    display: none; margin-top: 16px; padding: 10px 13px;
+    background: #fff1f2; border: 1px solid #fecdd3; color: #be123c;
+    border-radius: 9px; font-size: 0.85rem;
+  }
+  .auth-error.show { display: block; }
+</style>
+</head>
+<body>
+  <form class="auth-card" id="authForm" autocomplete="on">
+    <div class="auth-logo">
+      <img src="/static/logo-icon.png?v=2" alt="Tokverse Studio">
+      <div class="auth-brand">Tokverse Studio</div>
+      <div class="auth-sub">Automate your entire TikTok workflow</div>
+    </div>
+    <div class="auth-title">Welcome back</div>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+
+    <div class="auth-error" id="authError"></div>
+    <button class="btn" id="submitBtn" type="submit">Log In</button>
+
+    <div class="auth-foot">Don't have an account? <a href="/signup">Sign up</a></div>
+  </form>
+
+<script>
+  const form = document.getElementById('authForm');
+  const errBox = document.getElementById('authError');
+  const btn = document.getElementById('submitBtn');
+
+  function showError(msg) { errBox.textContent = msg; errBox.classList.add('show'); }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errBox.classList.remove('show');
+    btn.disabled = true; btn.textContent = 'Logging in…';
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.getElementById('email').value,
+          password: document.getElementById('password').value,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) { window.location.href = '/'; return; }
+      showError(data.error || 'Login failed. Please try again.');
+    } catch (err) {
+      showError('Could not reach the server. Is it running?');
+    }
+    btn.disabled = false; btn.textContent = 'Log In';
+  });
+</script>
+</body>
+</html>

@@ -88,6 +88,16 @@ async def init_db():
                 synced_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        # User accounts (login / auth)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                name TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
         # Migrations - purani DB mein naye columns add karo
         try:
             await db.execute("ALTER TABLE video_history ADD COLUMN character_id INTEGER DEFAULT NULL")
@@ -137,6 +147,37 @@ async def _update_character_performance(db, character_id: int):
                 SELECT COUNT(*) FROM video_history WHERE character_id=?
             ) WHERE id=?
         """, (row[0] or 0, character_id, character_id))
+
+# ─── Users / Auth ────────────────────────────────────────
+
+async def create_user(email: str, password_hash: str, name: str = "") -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute(
+            "INSERT INTO users (email, password_hash, name, created_at) VALUES (?, ?, ?, ?)",
+            (email, password_hash, name, datetime.now().isoformat())
+        )
+        await db.commit()
+        return cursor.lastrowid
+
+async def get_user_by_email(email: str) -> dict | None:
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute(
+            "SELECT id, email, password_hash, name FROM users WHERE email=?", (email,)
+        )
+        r = await cursor.fetchone()
+        if not r:
+            return None
+        return {"id": r[0], "email": r[1], "password_hash": r[2], "name": r[3]}
+
+async def get_user_by_id(user_id: int) -> dict | None:
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute(
+            "SELECT id, email, name FROM users WHERE id=?", (user_id,)
+        )
+        r = await cursor.fetchone()
+        if not r:
+            return None
+        return {"id": r[0], "email": r[1], "name": r[2]}
 
 # ─── Agent Learnings ─────────────────────────────────────
 

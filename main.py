@@ -2,13 +2,17 @@ import asyncio
 import json
 import os
 import sys
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form
+import bcrypt
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from pydantic import BaseModel
 from memory.database import (
     init_db, get_recent_videos, update_performance, delete_character,
-    save_video, get_all_videos, get_products_summary, get_all_learnings
+    save_video, get_all_videos, get_products_summary, get_all_learnings,
+    create_user, get_user_by_email, get_user_by_id
 )
 from agents.orchestrator import run_pipeline
 from agents.upload_agent import run_upload_agent, get_upload_queue_status
@@ -30,11 +34,110 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/output", StaticFiles(directory="output"), name="output")
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
+# ─── Auth: session + route guard ──────────────────────────
+SESSION_SECRET = os.getenv("SESSION_SECRET", "dev-only-insecure-secret-change-me")
+
+# Pages that render HTML for an authenticated user -> redirect to /login if logged out
+APP_PAGES = {
+    "/", "/dashboard", "/analytics", "/settings-page", "/guide",
+    "/content-library", "/products", "/learnings",
+}
+# Anything publicly reachable without a session
+PUBLIC_EXACT = {
+    "/login", "/signup", "/landing", "/features", "/pricing",
+    "/about", "/contact", "/ai-agents",
+    "/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/me",
+}
+PUBLIC_PREFIX = ("/static", "/assets", "/favicon")
+
+
+async def _auth_guard(request: Request, call_next):
+    path = request.url.path
+    if path in PUBLIC_EXACT or path.startswith(PUBLIC_PREFIX):
+        return await call_next(request)
+    if request.session.get("user_id"):
+        return await call_next(request)
+    # Not authenticated
+    if path in APP_PAGES:
+        return RedirectResponse("/login", status_code=302)
+    return JSONResponse({"error": "Authentication required"}, status_code=401)
+
+
+# Order matters: SessionMiddleware is added last so it runs first (outermost),
+# making request.session available inside the auth guard.
+app.add_middleware(BaseHTTPMiddleware, dispatch=_auth_guard)
+app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET, same_site="lax", https_only=False)
+
+
+def hash_password(pw: str) -> str:
+    return bcrypt.hashpw(pw.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+def verify_password(pw: str, hashed: str) -> bool:
+    try:
+        return bcrypt.checkpw(pw.encode("utf-8"), hashed.encode("utf-8"))
+    except Exception:
+        return False
+
+
 active_connections: dict[str, WebSocket] = {}
 
 @app.on_event("startup")
 async def startup():
     await init_db()
+
+# ─── Auth routes ──────────────────────────────────────────
+
+@app.get("/login")
+async def login_page():
+    return FileResponse("static/login.html")
+
+@app.get("/signup")
+async def signup_page():
+    return FileResponse("static/signup.html")
+
+@app.post("/api/auth/signup")
+async def api_signup(request: Request, data: dict):
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+    name = (data.get("name") or "").strip()
+    if not email or "@" not in email:
+        return JSONResponse({"error": "Please enter a valid email."}, status_code=400)
+    if len(password) < 8:
+        return JSONResponse({"error": "Password must be at least 8 characters."}, status_code=400)
+    if await get_user_by_email(email):
+        return JSONResponse({"error": "An account with this email already exists."}, status_code=409)
+    user_id = await create_user(email, hash_password(password), name)
+    request.session["user_id"] = user_id
+    request.session["user_email"] = email
+    return JSONResponse({"status": "ok"})
+
+@app.post("/api/auth/login")
+async def api_login(request: Request, data: dict):
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+    user = await get_user_by_email(email)
+    if not user or not verify_password(password, user["password_hash"]):
+        return JSONResponse({"error": "Invalid email or password."}, status_code=401)
+    request.session["user_id"] = user["id"]
+    request.session["user_email"] = user["email"]
+    return JSONResponse({"status": "ok"})
+
+@app.post("/api/auth/logout")
+async def api_logout(request: Request):
+    request.session.clear()
+    return JSONResponse({"status": "ok"})
+
+@app.get("/api/auth/me")
+async def api_me(request: Request):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return JSONResponse({"authenticated": False})
+    user = await get_user_by_id(user_id)
+    if not user:
+        request.session.clear()
+        return JSONResponse({"authenticated": False})
+    return JSONResponse({"authenticated": True, "email": user["email"], "name": user["name"]})
 
 @app.get("/")
 async def root():

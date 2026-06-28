@@ -15,3 +15,5 @@ pydantic>=2.9.0
 aiosqlite>=0.20.0
 requests>=2.32.0
 pytrends>=4.9.2
+bcrypt>=4.1.0
+itsdangerous>=2.1.2

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics · AIGC Automated</title>
-    <link rel="icon" href="/static/logo.png?v=3" type="image/png">
+    <link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -22,8 +22,9 @@
         }
         .logo-section { padding: 0 24px 22px; border-bottom: 1px solid rgba(255,255,255,0.16); margin-bottom: 18px; text-align: center; }
         .logo-section .logo-link { display: inline-block; }
-        .logo-section .sidebar-logo-img { width: 150px; max-width: 100%; height: auto; display: block; margin: 4px auto 0; }
-        .logo-sub { display: block; font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 6px; letter-spacing: 0.02em; }
+        .logo-section .sidebar-logo-img { width: 56px; max-width: 100%; height: auto; display: block; margin: 0 auto; }
+        .logo-section .brand-name { display: block; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.4px; color: #ffffff; margin-top: 8px; }
+        .logo-sub { display: block; font-size: 0.7rem; font-weight: 500; color: rgba(255,255,255,0.6); margin-top: 5px; letter-spacing: 0.01em; line-height: 1.3; }
         .sidebar-section { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.62); font-weight: 700; padding: 14px 24px 6px; }
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: #fff; text-decoration: none; font-size: 0.9rem; font-weight: 700; transition: all 0.2s; cursor: pointer; border-left: 3px solid transparent; }
         .nav-item:hover { background: rgba(255,255,255,0.13); border-left-color: #fff; }
@@ -116,8 +117,9 @@
     <div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
     <nav class="sidebar" id="appSidebar">
         <div class="logo-section">
-            <a href="/" class="logo-link"><img src="/static/logo.png?v=3" alt="AIGC Automated" class="sidebar-logo-img"></a>
-            <span class="logo-sub">UGC Automation Studio</span>
+            <a href="/" class="logo-link"><img src="/static/logo-icon.png?v=2" alt="Tokverse Studio" class="sidebar-logo-img"></a>
+            <span class="brand-name">Tokverse Studio</span>
+            <span class="logo-sub">Automate your entire TikTok workflow</span>
         </div>
         <div class="sidebar-section">Main</div>
         <a class="nav-item" href="/dashboard"><span class="nav-icon">📊</span><span>Dashboard</span></a>
@@ -130,6 +132,7 @@
         <div class="sidebar-section">System</div>
         <a class="nav-item" href="/settings-page"><span class="nav-icon">⚙️</span><span>Settings</span></a>
         <a class="nav-item" href="/guide"><span class="nav-icon">📖</span><span>Guide</span></a>
+        <a class="nav-item" href="/login" onclick="logout(event)"><span class="nav-icon">🚪</span><span>Log Out</span></a>
     </nav>
 
     <div class="main-container">
@@ -332,6 +335,12 @@
         function toggleSidebar() {
             document.getElementById('appSidebar').classList.toggle('open');
             document.body.classList.toggle('sidebar-open');
+        }
+
+        async function logout(e) {
+            if (e) e.preventDefault();
+            try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (_) {}
+            window.location.href = '/login';
         }
     </script>
 </body>

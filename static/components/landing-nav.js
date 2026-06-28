@@ -17,11 +17,11 @@
 
   var DEFAULTS = {
     logo: {
-      icon: '/static/logo-icon.png?v=1',
+      icon: '/static/logo-icon.png?v=2',
       text: '/static/logo-text.png?v=1',
-      full: '/static/logo.png?v=3',
+      full: '/static/tokverse-studio-logo.svg',
       href: '/landing',
-      alt:  'AIGC Automated'
+      alt:  'Tokverse Studio'
     },
     links: [
       { label: 'Features',  href: '#features'  },
@@ -31,8 +31,8 @@
       { label: 'FAQ',       href: '#faq'        }
     ],
     ctas: [
-      { label: 'Log In',          href: '/', type: 'ghost'   },
-      { label: 'Start Free Trial', href: '/', type: 'primary' }
+      { label: 'Log In',          href: '/login',  type: 'ghost'   },
+      { label: 'Start Free Trial', href: '/signup', type: 'primary' }
     ]
   };
 
@@ -61,9 +61,9 @@
     mount.outerHTML = [
       '<header class="nav" id="nav">',
       '  <div class="container nav-inner">',
-      '    <a href="' + cfg.logo.href + '" class="nav-logo" aria-label="' + cfg.logo.alt + ' home">',
-      '      <img src="' + cfg.logo.icon + '" class="logo-icon-spin" alt="">',
-      '      <img src="' + cfg.logo.text + '" class="logo-text-still" alt="' + cfg.logo.alt + '">',
+      '    <a href="' + cfg.logo.href + '" class="nav-logo" aria-label="Tokverse Studio home">',
+      '      <img src="/static/logo-icon.png?v=2" class="logo-icon-spin" alt="">',
+      '      <span class="brand-name">Tokverse Studio</span>',
       '    </a>',
       '    <nav class="nav-links" aria-label="Primary">',
             linksHtml,

@@ -12,6 +12,8 @@ services:
     envVars:
       - key: PYTHONUNBUFFERED
         value: "1"
+      - key: SESSION_SECRET
+        generateValue: true
       - key: DB_PATH
         value: /data/memory/agent_memory.db
       - key: OUTPUT_DIR

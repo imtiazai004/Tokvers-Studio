@@ -30,28 +30,29 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
+  gap: 2px;
   text-decoration: none;
 }
 .nav-logo .logo-icon-spin {
-  height: 38px;
+  height: 44px;
   width: auto;
   animation: logoSpin 8s linear infinite;
   transform-origin: center center;
-}
-.nav-logo .logo-text-still {
-  height: 20px;
-  width: auto;
 }
 @keyframes logoSpin {
   from { transform: perspective(500px) rotateY(0deg); }
   to   { transform: perspective(500px) rotateY(-360deg); }
 }
-.nav-logo .brand {
+.nav-logo .brand-name {
   font-weight: 800;
-  font-size: 1.1rem;
-  letter-spacing: -0.4px;
-  color: var(--ink);
+  font-size: 1.15rem;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  background: linear-gradient(90deg, #06e8d8 0%, #13b9d6 42%, #ff0a5e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .nav-links {

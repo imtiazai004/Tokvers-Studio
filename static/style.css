@@ -49,18 +49,28 @@ body {
 }
 .sidebar-logo .logo-link { display: inline-block; }
 .sidebar-logo .sidebar-logo-img {
-  width: 150px;
+  width: 56px;
   max-width: 100%;
   height: auto;
   display: block;
-  margin: 4px auto 0;
+  margin: 0 auto;
+}
+.sidebar-logo .brand-name {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: #ffffff;
+  margin-top: 8px;
 }
 .sidebar-logo .logo-sub {
   display: block;
   font-size: 0.7rem;
-  color: rgba(255,255,255,0.8);
-  margin-top: 6px;
-  letter-spacing: 0.02em;
+  font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  margin-top: 5px;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
 }
 /* Kept for any legacy text logo usage */
 .sidebar-logo .logo-text {

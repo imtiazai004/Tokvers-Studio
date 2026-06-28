@@ -68,8 +68,8 @@
   background: linear-gradient(178deg,#06c2d4 0%,#0a90b0 20%,#2a4f82 48%,#7a2767 76%,#d11663 100%);
   box-shadow: 2px 0 16px rgba(0,0,0,0.16); }
 .dss-side-logo { padding: 0 18px 14px; border-bottom: 1px solid rgba(255,255,255,0.16); margin-bottom: 12px; text-align: center; }
-.dss-side-logo img { width: 112px; height: auto; display: block; margin: 0 auto; }
-.dss-side-logo span { display: block; font-size: .58rem; color: rgba(255,255,255,0.8); margin-top: 5px; }
+.dss-side-logo img { width: 40px; height: auto; display: block; margin: 0 auto; }
+.dss-side-logo span { display: block; font-size: .82rem; font-weight: 800; letter-spacing: -0.3px; margin-top: 5px; color: #ffffff; }
 .dss-side-sec { font-size: .55rem; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,0.6); font-weight: 700; padding: 11px 18px 4px; }
 .dss-nav { display: flex; align-items: center; gap: 11px; padding: 9px 18px; color: #fff; font-size: .8rem; font-weight: 700;
   border-left: 3px solid transparent; transition: background .35s, border-color .35s; }

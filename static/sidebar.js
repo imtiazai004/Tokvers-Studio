@@ -27,8 +27,9 @@
 
     let html = `
       <div class="sidebar-logo">
-        <a href="/" class="logo-link"><img src="/static/logo.png?v=3" alt="Tokverse" class="sidebar-logo-img"></a>
-        <span class="logo-sub">UGC Automation Studio</span>
+        <a href="/" class="logo-link"><img src="/static/logo-icon.png?v=2" alt="Tokverse Studio" class="sidebar-logo-img"></a>
+        <span class="brand-name">Tokverse Studio</span>
+        <span class="logo-sub">Automate your entire TikTok workflow</span>
       </div>`;
 
     for (const item of NAV) {
@@ -41,8 +42,18 @@
       html += `<a href="${item.href}" class="nav-item${isActive ? ' active' : ''}">
         <span class="nav-icon">${item.icon}</span><span>${item.label}</span></a>`;
     }
+
+    html += `<a href="/login" class="nav-item nav-logout" onclick="logout(event)">
+      <span class="nav-icon">🚪</span><span>Log Out</span></a>`;
+
     nav.innerHTML = html;
   }
+
+  window.logout = async function (e) {
+    if (e) e.preventDefault();
+    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (_) {}
+    window.location.href = '/login';
+  };
 
   window.toggleSidebar = function () {
     document.getElementById('appSidebar').classList.toggle('open');
