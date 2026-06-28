@@ -16,6 +16,7 @@ CLIENT_KEYS = {
     "higgsfield_api_key": "",
     "apify_api_token": "",
     "brave_search_api_key": "",
+    "deepgram_api_key": "",
 }
 
 def _load() -> dict:

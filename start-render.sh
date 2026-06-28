@@ -14,6 +14,11 @@ if [ -d "/data" ]; then
   rm -rf /app/assets/music /app/assets/characters
   ln -s /data/assets/music /app/assets/music
   ln -s /data/assets/characters /app/assets/characters
+
+  # Persist client API-key settings across restarts/redeploys
+  mkdir -p /data/config
+  rm -f /app/config/client_settings.json
+  ln -s /data/config/client_settings.json /app/config/client_settings.json
 fi
 
 exec uvicorn main:app --host 0.0.0.0 --port "${PORT:-8000}"

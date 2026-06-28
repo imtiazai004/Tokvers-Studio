@@ -8,6 +8,7 @@ much lighter server.
 """
 import os
 import httpx
+from config.client_config import get_key
 
 DEEPGRAM_URL = "https://api.deepgram.com/v1/listen"
 
@@ -17,9 +18,10 @@ async def generate_captions(audio_path: str, output_srt: str) -> str:
     if out_dir:
         os.makedirs(out_dir, exist_ok=True)
 
-    api_key = os.getenv("DEEPGRAM_API_KEY")
+    # Priority: user's Settings key -> DEEPGRAM_API_KEY env fallback
+    api_key = get_key("deepgram_api_key")
     if not api_key:
-        raise RuntimeError("DEEPGRAM_API_KEY is not set — add it in your environment/settings.")
+        raise RuntimeError("Deepgram API key is not set — add it in Settings (or DEEPGRAM_API_KEY env).")
 
     with open(audio_path, "rb") as f:
         audio_bytes = f.read()
