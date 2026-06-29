@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     session_secret: str = "dev-only-insecure-change-me"
     encryption_key: str = ""        # Fernet key for per-workspace BYOK secrets
 
+    # ── Limits / cost control ───────────────────────────────────
+    max_workspace_monthly_spend: float = 0   # 0 = no cap (USD-equivalent credits/month)
+    generation_enabled: bool = True          # global kill-switch for generation
+
     # ── Cloudflare R2 (object storage) ──────────────────────────
     r2_account_id: str = ""
     r2_access_key_id: str = ""
