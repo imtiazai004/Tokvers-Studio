@@ -16,3 +16,7 @@ requests>=2.32.0
 pytrends>=4.9.2
 bcrypt>=4.1.0
 itsdangerous>=2.1.2
+sqlalchemy[asyncio]>=2.0.0
+asyncpg>=0.29.0
+alembic>=1.13.0
+pydantic-settings>=2.0.0
