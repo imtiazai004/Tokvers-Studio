@@ -79,6 +79,14 @@
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  // fully buffer a clip once, so it plays instantly when it becomes active
+  function preloadVideo(v) {
+    if (!v || v.dataset.pl) return;
+    v.dataset.pl = '1';
+    v.preload = 'auto';
+    try { v.load(); } catch (e) {}
+  }
+
   var activeVideo = -1;
   function setActiveVideo(i) {
     if (i === activeVideo) return;
@@ -86,7 +94,7 @@
     videos.forEach(function (v, idx) {
       if (idx === i) {
         v.classList.add('active');
-        if (v.preload === 'none') v.preload = 'auto';
+        preloadVideo(v);
         var pr = v.play();
         if (pr && pr.catch) pr.catch(function () {});
       } else {
@@ -94,8 +102,8 @@
         if (!v.paused) v.pause();
       }
     });
-    var next = videos[i + 1];
-    if (next && next.preload === 'none') next.preload = 'metadata';
+    // pre-buffer the next clip ahead of time so its transition is seamless too
+    preloadVideo(videos[i + 1]);
   }
 
   var activeScene = -1;
@@ -209,5 +217,18 @@
   }, { rootMargin: '200px 0px' });
 
   io.observe(stage);
+
+  // Warm the first couple of clips as the section approaches (~1.2 screens
+  // early) so the very first scene plays smoothly the first time — not only
+  // after scrolling away and back.
+  var ioWarm = new IntersectionObserver(function (entries) {
+    if (entries[0].isIntersecting) {
+      preloadVideo(videos[0]);
+      preloadVideo(videos[1]);
+      ioWarm.disconnect();
+    }
+  }, { rootMargin: '1200px 0px' });
+  ioWarm.observe(stage);
+
   raf = requestAnimationFrame(tick);
 })();
