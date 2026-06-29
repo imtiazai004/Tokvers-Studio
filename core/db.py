@@ -45,11 +45,12 @@ SessionLocal: async_sessionmaker[AsyncSession] | None = None
 
 if settings.database_url:
     _url, _needs_ssl = prepare_url(settings.database_url)
-    engine = create_async_engine(
-        _url,
-        pool_pre_ping=True,
-        connect_args={"ssl": True} if _needs_ssl else {},
-    )
+    # statement_cache_size=0 makes asyncpg safe behind Neon's PgBouncer pooler
+    # (transaction pooling doesn't support server-side prepared statements).
+    _connect_args: dict = {"statement_cache_size": 0}
+    if _needs_ssl:
+        _connect_args["ssl"] = True
+    engine = create_async_engine(_url, pool_pre_ping=True, connect_args=_connect_args)
     SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

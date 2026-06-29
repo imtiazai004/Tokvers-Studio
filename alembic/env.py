@@ -38,11 +38,14 @@ def _do_run_migrations(connection) -> None:
 
 async def run_migrations_online() -> None:
     url, needs_ssl = prepare_url(settings.database_url)
+    connect_args: dict = {"statement_cache_size": 0}  # Neon/pgbouncer pooler safe
+    if needs_ssl:
+        connect_args["ssl"] = True
     connectable = async_engine_from_config(
         {"sqlalchemy.url": url},
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-        connect_args={"ssl": True} if needs_ssl else {},
+        connect_args=connect_args,
     )
     async with connectable.connect() as connection:
         await connection.run_sync(_do_run_migrations)
