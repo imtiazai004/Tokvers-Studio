@@ -1,0 +1,146 @@
+/* ============================================================
+   NAV · Landing page navbar + mobile drawer
+   Requires: base.css
+   Reuse: include on any landing/marketing page
+   ============================================================ */
+
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+}
+.nav.scrolled {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 4px 24px rgba(20, 30, 55, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.nav-inner {
+  height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.nav-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+}
+.nav-logo .logo-icon-spin {
+  height: 44px;
+  width: auto;
+  animation: logoSpin 8s linear infinite;
+  transform-origin: center center;
+}
+@keyframes logoSpin {
+  from { transform: perspective(500px) rotateY(0deg); }
+  to   { transform: perspective(500px) rotateY(-360deg); }
+}
+.nav-logo .brand-name {
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  background: linear-gradient(90deg, #06e8d8 0%, #13b9d6 42%, #ff0a5e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.nav-links a {
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--slate);
+  transition: all 0.18s ease;
+}
+.nav-links a:hover { color: var(--ink); background: rgba(0, 212, 255, 0.07); }
+
+.nav-actions { display: flex; align-items: center; gap: 12px; }
+
+/* hamburger */
+.nav-toggle {
+  display: none;
+  width: 44px; height: 44px;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+}
+.nav-toggle span {
+  width: 20px; height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: all 0.25s ease;
+}
+
+/* mobile drawer */
+.drawer-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(15, 22, 40, 0.4);
+  backdrop-filter: blur(2px);
+  opacity: 0; visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 110;
+}
+.drawer-backdrop.open { opacity: 1; visibility: visible; }
+.drawer {
+  position: fixed;
+  top: 0; right: 0;
+  width: min(86vw, 340px);
+  height: 100vh;
+  background: #fff;
+  z-index: 120;
+  transform: translateX(100%);
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: -20px 0 60px rgba(20, 30, 55, 0.18);
+}
+.drawer.open { transform: translateX(0); }
+.drawer-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.drawer-head img { height: 48px; }
+.drawer-close {
+  width: 40px; height: 40px; border: 1px solid var(--line);
+  background: #fff; border-radius: 10px; cursor: pointer;
+  font-size: 1.2rem; color: var(--slate);
+}
+.drawer a {
+  padding: 13px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  color: var(--slate);
+  transition: all 0.18s;
+}
+.drawer a:hover { background: var(--bg-soft); color: var(--ink); }
+.drawer .drawer-actions { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.drawer .btn { width: 100%; }
+
+@media (max-width: 980px) {
+  .nav-links { display: none; }
+  .nav-actions .btn-ghost, .nav-actions .btn-primary { display: none; }
+  .nav-toggle { display: flex; }
+}

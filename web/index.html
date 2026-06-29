@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIGC Automated · Automate Your Entire TikTok Content Pipeline with AI</title>
+<meta name="description" content="AIGC Automated researches winning products, generates scripts, creates voiceovers, assembles and edits videos, and improves future content from analytics. One AI automation system.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AIGC Automated · AI TikTok Automation Platform">
+<meta property="og:description" content="Research winning products, generate scripts, create voiceovers, assemble and edit videos, and improve future content from analytics. One AI automation system.">
+<meta property="og:image" content="/static/logo-icon.png?v=2">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=cabinet-grotesk@800,900&display=swap" rel="stylesheet">
+
+<!-- ── Component CSS (each section is self-contained, include only what you need) ── -->
+<link rel="stylesheet" href="/static/styles/base.css">
+<link rel="stylesheet" href="/static/styles/nav.css">
+<link rel="stylesheet" href="/static/styles/hero.css">
+<link rel="stylesheet" href="/static/styles/workflow.css">
+<link rel="stylesheet" href="/static/styles/post-wf.css">
+<link rel="stylesheet" href="/static/styles/why-it-wins.css">
+<link rel="stylesheet" href="/static/styles/capabilities.css">
+<link rel="stylesheet" href="/static/styles/portal.css">
+<link rel="stylesheet" href="/static/styles/dashboard-showcase.css">
+<link rel="stylesheet" href="/static/styles/audience.css">
+<link rel="stylesheet" href="/static/styles/pricing.css">
+<link rel="stylesheet" href="/static/styles/faq.css">
+<link rel="stylesheet" href="/static/styles/about.css">
+<link rel="stylesheet" href="/static/styles/contact.css">
+<link rel="stylesheet" href="/static/styles/footer.css">
+
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- Navbar component (renders itself into this mount point) -->
+<div id="landing-nav-mount"></div>
+
+<!-- ============================ HERO (cinematic product intro) ============================ -->
+<div class="hero-pin" id="heroPin">
+  <section class="hero" id="hero">
+
+    <div class="hero-bg" id="heroBg" aria-hidden="true">
+      <video id="heroVideo"
+             src="/static/hero.mp4?v=6"
+             poster="/static/hero-poster.jpg?v=6"
+             autoplay muted loop playsinline preload="auto"></video>
+    </div>
+
+    <div class="hero-scrim" aria-hidden="true"></div>
+
+    <div class="hero-lead">
+      <h1 class="hero-title" id="heroTitle" aria-label="Automate your entire TikTok content pipeline"><span class="hp1">Automate your entire</span> <span class="hp2">TikTok content pipeline</span></h1>
+      <div class="hero-cta" id="heroCta">
+        <a href="/signup" class="btn btn-primary btn-lg">Start Free Trial</a>
+        <a href="#workflow" class="btn btn-watch btn-lg"><span class="play">▶</span> Watch Workflow</a>
+      </div>
+    </div>
+
+    <div class="hero-fade" aria-hidden="true"></div>
+  </section>
+</div>
+
+<!-- ============================ WORKFLOW (orbit -> pull-forward -> film) ============================ -->
+<section class="wf" id="workflow">
+  <div class="wf-scroll" id="wfScroll">
+    <div class="wf-stage" id="wfStage">
+
+      <div class="wf-cine" id="wfCine">
+        <div class="wf-frame" id="wfFrame">
+          <div class="wf-videos" id="wfVideos">
+            <video data-i="0" src="/static/videos/workflow-research.mp4"  poster="/static/videos/workflow-research.jpg"  muted loop playsinline preload="metadata"></video>
+            <video data-i="1" src="/static/videos/workflow-script.mp4"    poster="/static/videos/workflow-script.jpg"    muted loop playsinline preload="none"></video>
+            <video data-i="2" src="/static/videos/workflow-voice.mp4"     poster="/static/videos/workflow-voice.jpg"     muted loop playsinline preload="none"></video>
+            <video data-i="3" src="/static/videos/workflow-editing.mp4"   poster="/static/videos/workflow-editing.jpg"   muted loop playsinline preload="none"></video>
+            <video data-i="4" src="/static/videos/workflow-upload.mp4"    poster="/static/videos/workflow-upload.jpg"    muted loop playsinline preload="none"></video>
+            <video data-i="5" src="/static/videos/workflow-learning.mp4"  poster="/static/videos/workflow-learning.jpg"  muted loop playsinline preload="none"></video>
+            <video data-i="6" src="/static/videos/workflow-learning2.mp4" poster="/static/videos/workflow-learning2.jpg" muted loop playsinline preload="none"></video>
+          </div>
+          <div class="wf-veil" aria-hidden="true"></div>
+        </div>
+        <div class="wf-overlay" id="wfOverlay">
+          <div class="wf-progress">
+            <span class="count"><b id="wfNum">01</b> / 07</span>
+            <span class="wf-rail-mini" id="wfRailMini"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
+          </div>
+          <div class="wf-scene-text" id="wfSceneText"></div>
+        </div>
+      </div>
+
+      <div class="wf-orbit" id="wfOrbit" aria-hidden="true">
+        <div class="wf-tile" data-i="0"><img src="/static/videos/workflow-research.jpg" alt=""><span class="tring"></span><span class="tlabel">Research</span></div>
+        <div class="wf-tile" data-i="1"><img src="/static/videos/workflow-script.jpg" alt=""><span class="tring"></span><span class="tlabel">Script</span></div>
+        <div class="wf-tile" data-i="2"><img src="/static/videos/workflow-voice.jpg" alt=""><span class="tring"></span><span class="tlabel">Voice</span></div>
+        <div class="wf-tile" data-i="3"><img src="/static/videos/workflow-editing.jpg" alt=""><span class="tring"></span><span class="tlabel">Video</span></div>
+        <div class="wf-tile" data-i="4"><img src="/static/videos/workflow-upload.jpg" alt=""><span class="tring"></span><span class="tlabel">Edit</span></div>
+        <div class="wf-tile" data-i="5"><img src="/static/videos/workflow-learning.jpg" alt=""><span class="tring"></span><span class="tlabel">Auto Upload</span></div>
+        <div class="wf-tile" data-i="6"><img src="/static/videos/workflow-learning2.jpg" alt=""><span class="tring"></span><span class="tlabel">Self Improvement</span></div>
+      </div>
+
+      <div class="wf-intro" id="wfIntro">
+        <span class="wf-eyebrow">Workflow</span>
+        <h2><span class="hp1">From Product Research to Final Video</span><br><span class="hp2">One Automated Workflow</span></h2>
+        <p class="wf-sub">AIGC Automated connects research, scripting, voice generation, video creation, and editing into one premium TikTok content system.</p>
+        <div class="wf-prompt">Scroll to watch the workflow unfold <span class="chev">↓</span></div>
+      </div>
+
+      <!-- reduced-motion / fallback static list -->
+      <div class="wf-list">
+        <div class="row"><div class="r-num">01</div><div class="r-title">Research</div><p class="r-head">Find winning products, viral angles, and competitor signals before production begins</p><p class="r-desc">AIGC Automated starts by reading the market before a single asset is produced. It analyzes competitor creatives, product trends, viral patterns, and performance signals to uncover what is already working, then turns those insights into a clear content direction for the next video.</p><p class="r-out"><b>Output:</b> Product research, competitor intelligence, and a validated content direction</p><video src="/static/videos/workflow-research.mp4" poster="/static/videos/workflow-research.jpg" muted loop playsinline preload="none"></video></div>
+        <div class="row"><div class="r-num">02</div><div class="r-title">Script</div><p class="r-head">Turn raw research into conversion-focused TikTok scripts built to hold attention</p><p class="r-desc">Once the winning angle is clear, AIGC Automated transforms research into structured TikTok scripts. Product insights, competitor learnings, and viral patterns are translated into hooks, pacing, messaging, and storytelling designed specifically for short-form performance.</p><p class="r-out"><b>Output:</b> Hook-first, conversion-ready TikTok script drafts</p><video src="/static/videos/workflow-script.mp4" poster="/static/videos/workflow-script.jpg" muted loop playsinline preload="none"></video></div>
+        <div class="row"><div class="r-num">03</div><div class="r-title">Voice</div><p class="r-head">Generate natural voiceovers matched to the pace, tone, and intent of the script</p><p class="r-desc">With the script locked, AIGC Automated produces voiceovers that fit the style and delivery goals of the content. The result is narration that feels controlled, clear, and aligned with the rhythm of the video, ready to move directly into production.</p><p class="r-out"><b>Output:</b> Polished AI voiceover ready for video assembly</p><video src="/static/videos/workflow-voice.mp4" poster="/static/videos/workflow-voice.jpg" muted loop playsinline preload="none"></video></div>
+        <div class="row"><div class="r-num">04</div><div class="r-title">Video</div><p class="r-head">Turn scripts, voice, and creative direction into TikTok-ready video content</p><p class="r-desc">At this stage, AIGC Automated assembles the actual content output. Scripts, voiceovers, and creative inputs are combined into a structured video workflow designed to produce fast, platform-ready short-form content at scale.</p><p class="r-out"><b>Output:</b> A structured TikTok video draft ready for final editing</p><video src="/static/videos/workflow-editing.mp4" poster="/static/videos/workflow-editing.jpg" muted loop playsinline preload="none"></video></div>
+        <div class="row"><div class="r-num">05</div><div class="r-title">Edit</div><p class="r-head">Refine pacing, captions, structure, and final presentation before publishing</p><p class="r-desc">Before the content goes live, AIGC Automated runs it through a final editing layer to improve polish, pacing, and watchability. This is where the video is tightened, cleaned up, and prepared to perform as a finished TikTok-ready asset.</p><p class="r-out"><b>Output:</b> Final polished TikTok-ready video</p><video src="/static/videos/workflow-upload.mp4" poster="/static/videos/workflow-upload.jpg" muted loop playsinline preload="none"></video></div>
+        <div class="row"><div class="r-num">06</div><div class="r-title">Auto Upload</div><p class="r-head">Publish completed content automatically without breaking the workflow</p><p class="r-desc">Once the final edit is approved, AIGC Automated pushes the content live as part of the same system. Instead of manually downloading, uploading, scheduling, and posting each asset yourself, publishing happens inside the workflow, automatically and at scale.</p><p class="r-out"><b>Output:</b> Published TikTok content delivered automatically from the same workflow</p><video src="/static/videos/workflow-learning.mp4" poster="/static/videos/workflow-learning.jpg" muted loop playsinline preload="none"></video></div>
+        <div class="row"><div class="r-num">07</div><div class="r-title">Self Improvement</div><p class="r-head">Study performance, learn from results, and improve the next content cycle automatically</p><p class="r-desc">AIGC Automated does not stop at publishing. Once a video goes live, the platform studies retention, engagement, and audience response to understand what worked and what needs to improve. Those learnings are then fed back into the next round of research, scripting, and production, making the system smarter after every post.</p><p class="r-out"><b>Output:</b> A smarter next content cycle powered by real performance data</p><video src="/static/videos/workflow-learning2.mp4" poster="/static/videos/workflow-learning2.jpg" muted loop playsinline preload="none"></video></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== POST-WORKFLOW: shared ambient canvas ===== -->
+<div class="post-wf" id="postWf">
+  <div class="ambient" aria-hidden="true">
+    <div class="orb orb1" data-speed="0.10"><i></i></div>
+    <div class="orb orb2" data-speed="0.16"><i></i></div>
+    <div class="orb orb3" data-speed="0.07"><i></i></div>
+    <div class="orb orb4" data-speed="0.13"><i></i></div>
+  </div>
+
+<!-- ============================ WHY IT WINS ============================ -->
+<section class="why" id="why">
+  <div class="why-head an-rise">
+    <span class="why-label">Why it wins</span>
+    <h2>Turn TikTok into a repeatable <span class="grad">growth system</span></h2>
+    <p>AIGC Automated replaces fragmented TikTok workflows with one connected system that combines research, scripting, voice, video, editing, publishing, and performance learning inside a single automation loop. The result is faster execution, less manual work, and a content engine that improves with every post.</p>
+  </div>
+
+  <div class="why-grid" id="whyGrid">
+    <div class="why-node" aria-hidden="true"></div>
+
+    <article class="why-card">
+      <div class="why-top"><span class="why-idx">01</span><span class="why-tag">Unified workflow</span></div>
+      <h3>One workflow instead of five disconnected tools</h3>
+      <p>Research, scripting, voice, video, editing, publishing, and learning all happen inside one connected system, without bouncing between scattered apps, spreadsheets, and manual handoffs.</p>
+    </article>
+
+    <article class="why-card">
+      <div class="why-top"><span class="why-idx">02</span><span class="why-tag">Automated output</span></div>
+      <h3>Move from manual execution to automated output</h3>
+      <p>AIGC Automated does not stop at generating ideas. It pushes the workflow forward from market research to published TikTok content, reducing repetitive work across the entire content pipeline.</p>
+    </article>
+
+    <article class="why-card">
+      <div class="why-top"><span class="why-idx">03</span><span class="why-tag">Self-learning</span></div>
+      <h3>Every post makes the system smarter</h3>
+      <p>Once content goes live, performance data feeds back into the workflow so the platform can identify what worked, detect what failed, and improve the next content cycle automatically.</p>
+    </article>
+
+    <article class="why-card">
+      <div class="why-top"><span class="why-idx">04</span><span class="why-tag">Effortless scale</span></div>
+      <h3>Scale content without scaling manual work</h3>
+      <p>Produce more TikTok content, move faster, and operate with more consistency, without rebuilding the process manually every time you want to launch a new post.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ PLATFORM CAPABILITIES ============================ -->
+<section class="cap" id="features">
+  <div class="cap-head an-rise">
+    <span class="cap-label">Platform Capabilities</span>
+    <h2>Everything you need to automate TikTok content <span class="grad">at scale</span></h2>
+    <p>AIGC Automated combines research, scripting, voice, video production, editing, publishing, and performance learning into one connected platform, giving you the tools to run a complete TikTok content operation from a single system.</p>
+  </div>
+
+  <div class="cap-grid" id="capGrid">
+    <article class="cap-card lead">
+      <div class="cap-top"><div class="cap-icon">🔎</div><span class="cap-tag">Research</span></div>
+      <h3>Competitor Intelligence</h3>
+      <p>Track competitor creatives, content structures, product angles, and viral patterns to understand what is already performing before you begin production. The platform studies the competitive TikTok environment so you never have to guess.</p>
+    </article>
+
+    <article class="cap-card">
+      <div class="cap-top"><div class="cap-icon">📊</div><span class="cap-tag">Research</span></div>
+      <h3>Product &amp; Trend Research</h3>
+      <p>Identify promising products, content opportunities, and market signals by analyzing trend behavior, content momentum, and category-level performance patterns.</p>
+    </article>
+
+    <article class="cap-card">
+      <div class="cap-top"><div class="cap-icon">✍️</div><span class="cap-tag">Create</span></div>
+      <h3>Hook &amp; Script Generation</h3>
+      <p>Turn research insights into short-form scripts built for attention, pacing, messaging, and conversion, structured specifically for TikTok performance.</p>
+    </article>
+
+    <article class="cap-card">
+      <div class="cap-top"><div class="cap-icon">🎙️</div><span class="cap-tag">Create</span></div>
+      <h3>AI Voice Generation</h3>
+      <p>Generate natural voiceovers that match the pace, tone, and delivery goals of the script so content moves cleanly from planning into production.</p>
+    </article>
+
+    <article class="cap-card">
+      <div class="cap-top"><div class="cap-icon">🎬</div><span class="cap-tag">Produce</span></div>
+      <h3>Video Assembly Workflow</h3>
+      <p>Combine scripts, voiceovers, and creative direction into a structured video production workflow designed to produce fast, platform-ready TikTok drafts.</p>
+    </article>
+
+    <article class="cap-card">
+      <div class="cap-top"><div class="cap-icon">✂️</div><span class="cap-tag">Produce</span></div>
+      <h3>Editing &amp; Finalization</h3>
+      <p>Refine pacing, captions, structure, and final presentation before publishing so each piece of content feels tighter, cleaner, and ready to perform.</p>
+    </article>
+
+    <article class="cap-card">
+      <div class="cap-top"><div class="cap-icon">🚀</div><span class="cap-tag">Distribute</span></div>
+      <h3>Automated Publishing</h3>
+      <p>Push completed content live without breaking the workflow. Uploading, scheduling, and publishing happen from the same connected system instead of through manual handoff.</p>
+    </article>
+
+    <article class="cap-card">
+      <div class="cap-top"><div class="cap-icon">🔁</div><span class="cap-tag">Learn</span></div>
+      <h3>Performance Feedback Loop</h3>
+      <p>Study retention, engagement, and post-level response patterns after publishing, then feed those learnings back into the next research and production cycle automatically.</p>
+    </article>
+  </div>
+</section>
+
+</div><!-- /.post-wf -->
+
+<!-- ============================ ENTER THE PLATFORM (cinematic portal) ============================ -->
+<section class="portal" id="portal">
+  <div class="portal-pin" id="portalPin">
+    <div class="portal-stage" id="portalStage">
+
+      <div class="portal-video-wrap" id="portalVideoWrap">
+        <video id="portalVideo" src="/static/videos/portal.mp4?v=3"
+               muted playsinline preload="auto" autoplay></video>
+      </div>
+      <div class="portal-scrim" aria-hidden="true"></div>
+
+      <div class="portal-copy" id="portalCopy">
+        <h2 class="portal-title" id="portalTitle">Step Inside <span class="grad">AIGC Automated</span></h2>
+        <p class="portal-sub" id="portalSub">Everything you've seen so far was the workflow.<br>Now experience the platform itself.</p>
+      </div>
+
+      <div class="portal-cue" aria-hidden="true"><span>Scroll</span><i></i></div>
+
+      <div class="portal-white" id="portalWhite" aria-hidden="true"></div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================ DASHBOARD SHOWCASE · the living operating system ============================ -->
+<section class="dss" id="dashboard">
+  <div class="dss-pin" id="dssPin">
+    <div class="dss-stage" id="dssStage">
+
+      <div class="dss-atmos" aria-hidden="true">
+        <div class="dss-orb dss-orb-a"></div>
+        <div class="dss-orb dss-orb-b"></div>
+      </div>
+
+      <div class="dss-frame" id="dssFrame">
+        <div class="dss-frame-glow" aria-hidden="true"></div>
+
+        <div class="dss-chrome">
+          <div class="dss-lights"><i></i><i></i><i></i></div>
+          <div class="dss-url"><span class="lock">🔒</span><span>app.aigcautomated.com</span><span class="path"><span class="v show" data-path="dash">/dashboard</span><span class="v" data-path="create">/create</span></span></div>
+        </div>
+
+        <div class="dss-os-wrap">
+          <!-- fixed sidebar -->
+          <aside class="dss-side">
+            <div class="dss-side-logo"><img src="/static/logo-icon.png?v=2" alt="Tokverse Studio"><span>Tokverse Studio</span></div>
+            <div class="dss-side-sec">Main</div>
+            <div class="dss-nav active" data-nav="dash"><span class="ico">📊</span><span>Dashboard</span></div>
+            <div class="dss-nav" data-nav="create"><span class="ico">🎬</span><span>Create Video</span></div>
+            <div class="dss-nav"><span class="ico">📈</span><span>Analytics</span></div>
+            <div class="dss-side-sec">Library</div>
+            <div class="dss-nav"><span class="ico">📚</span><span>Content Library</span></div>
+            <div class="dss-nav"><span class="ico">🛍️</span><span>Products</span></div>
+            <div class="dss-nav"><span class="ico">💡</span><span>Learnings</span></div>
+            <div class="dss-side-sec">System</div>
+            <div class="dss-nav"><span class="ico">⚙️</span><span>Settings</span></div>
+          </aside>
+
+          <!-- camera canvas -->
+          <div class="dss-canvas" id="dssCanvas">
+            <div class="dss-os" id="dssOs">
+
+              <!-- ===== DASHBOARD PAGE ===== -->
+              <div class="dss-page" id="dssPageDash">
+                <div class="dss-head">
+                  <div><h1>Welcome back, Admin! 👋</h1><p>TikTok automation performance overview</p></div>
+                  <div class="dss-head-right">
+                    <span class="dss-pill">📅 Last 30 Days</span>
+                    <span class="dss-pill dss-pill--ok">✓ System Healthy</span>
+                    <span class="dss-pill dss-pill--cta">+ Create Campaign</span>
+                    <span class="dss-avatar">A</span>
+                  </div>
+                </div>
+
+                <div class="dss-kpis" id="dssKpis">
+                  <div class="dss-kpi"><div class="ico">📹</div><div class="lbl">Videos Published</div><div class="val" data-val="266">0</div><div class="trd">↑ 12% this month</div></div>
+                  <div class="dss-kpi"><div class="ico">👁️</div><div class="lbl">Total Views</div><div class="val" data-val="55.2" data-dec="1" data-suffix="M">0</div><div class="trd">↑ 28% this month</div></div>
+                  <div class="dss-kpi"><div class="ico">❤️</div><div class="lbl">Total Likes</div><div class="val" data-val="5.3" data-dec="1" data-suffix="M">0</div><div class="trd">↑ 15% this month</div></div>
+                  <div class="dss-kpi"><div class="ico">📤</div><div class="lbl">Shares</div><div class="val" data-val="912.2" data-dec="1" data-suffix="K">0</div><div class="trd">↑ 9% this month</div></div>
+                  <div class="dss-kpi"><div class="ico">💰</div><div class="lbl">Est. Revenue</div><div class="val" data-val="414.0" data-dec="1" data-prefix="$" data-suffix="K">0</div><div class="trd">↑ 35% this month</div></div>
+                </div>
+
+                <div class="dss-card dss-page" id="dssAgentsCard" style="padding:18px;margin-bottom:18px">
+                  <div class="dss-sec-title">⚙️ Active Agents</div>
+                  <div class="dss-agents">
+                    <div class="dss-agent"><span class="ico">🔍</span><div class="nm">Research Agent</div><div class="st"><span class="dot"></span>Active</div><div class="tasks">10 / 10 tasks</div><div class="bar"><i></i></div></div>
+                    <div class="dss-agent"><span class="ico">✍️</span><div class="nm">Script Agent</div><div class="st"><span class="dot"></span>Active</div><div class="tasks">25 / 25 tasks</div><div class="bar"><i></i></div></div>
+                    <div class="dss-agent"><span class="ico">🎤</span><div class="nm">Voice Agent</div><div class="st"><span class="dot"></span>Active</div><div class="tasks">24 / 24 tasks</div><div class="bar"><i></i></div></div>
+                    <div class="dss-agent"><span class="ico">🎬</span><div class="nm">Video Agent</div><div class="st"><span class="dot"></span>Active</div><div class="tasks">20 / 20 tasks</div><div class="bar"><i></i></div></div>
+                    <div class="dss-agent"><span class="ico">✂️</span><div class="nm">Editing Agent</div><div class="st"><span class="dot"></span>Active</div><div class="tasks">18 / 18 tasks</div><div class="bar"><i></i></div></div>
+                    <div class="dss-agent"><span class="ico">✅</span><div class="nm">Quality Agent</div><div class="st"><span class="dot"></span>Active</div><div class="tasks">15 / 15 tasks</div><div class="bar"><i></i></div></div>
+                  </div>
+                </div>
+
+                <div class="dss-lower">
+                  <div class="dss-card dss-chart-card" id="dssChartCard">
+                    <div class="dss-sec-title">📈 Performance Overview</div>
+                    <svg class="dss-chart" viewBox="0 0 760 220" preserveAspectRatio="none">
+                      <g class="grid"><line x1="36" y1="186" x2="740" y2="186"/><line x1="36" y1="140" x2="740" y2="140"/><line x1="36" y1="94" x2="740" y2="94"/><line x1="36" y1="48" x2="740" y2="48"/></g>
+                      <line class="axis" x1="36" y1="30" x2="36" y2="186"/>
+                      <polyline class="ln ln-v" style="--len:760" points="36,150 136,132 236,104 336,80 436,56 536,74 636,46 740,64"/>
+                      <polyline class="ln ln-l" style="--len:760" points="36,168 136,158 236,138 336,114 436,104 536,96 636,86 740,78"/>
+                      <polyline class="ln ln-s" style="--len:760" points="36,180 136,172 236,164 336,154 436,146 536,138 636,130 740,122"/>
+                      <polyline class="ln ln-r" style="--len:760" points="36,176 136,168 236,158 336,146 436,138 536,132 636,124 740,116"/>
+                      <circle class="pt" cx="636" cy="46" r="4"/>
+                    </svg>
+                    <div class="dss-legend"><span><i style="background:#00d4ff"></i>Views</span><span><i style="background:#ff006e"></i>Likes</span><span><i style="background:#00b4d8"></i>Shares</span><span><i style="background:#9d4edd"></i>Revenue</span></div>
+                  </div>
+                  <div class="dss-card dss-activity" id="dssActivityCard" style="padding:18px">
+                    <div class="dss-sec-title">🔔 Recent Activity</div>
+                    <div id="dssActivityList">
+                      <div class="row"><span class="ai">📹</span><div><strong>Video Published</strong><div class="t">2 min ago</div></div></div>
+                      <div class="row"><span class="ai">🔍</span><div><strong>Research Updated</strong><div class="t">15 min ago</div></div></div>
+                      <div class="row"><span class="ai">✍️</span><div><strong>Script Generated</strong><div class="t">1 hour ago</div></div></div>
+                      <div class="row"><span class="ai">📊</span><div><strong>Analytics Synced</strong><div class="t">3 hours ago</div></div></div>
+                      <div class="row"><span class="ai">💡</span><div><strong>Learning Updated</strong><div class="t">5 hours ago</div></div></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="dss-card" id="dssCampaignsCard" style="padding:18px">
+                  <div class="dss-sec-title">📋 Active Campaigns</div>
+                  <table class="dss-table">
+                    <thead><tr><th>Campaign</th><th>Product</th><th>Status</th><th>Videos</th><th>Views</th><th>CTR</th><th>Revenue</th><th>Actions</th></tr></thead>
+                    <tbody>
+                      <tr><td><strong>Summer Vibes</strong></td><td>Coffee Machine</td><td><span class="dss-badge a">Active</span></td><td>24</td><td>2.4M</td><td>8.2%</td><td>$8,400</td><td><span class="view">View</span></td></tr>
+                      <tr><td><strong>Flash Deal</strong></td><td>Smartwatch</td><td><span class="dss-badge a">Active</span></td><td>18</td><td>1.8M</td><td>6.5%</td><td>$6,200</td><td><span class="view">View</span></td></tr>
+                      <tr><td><strong>Trending Packs</strong></td><td>Wireless Earbuds</td><td><span class="dss-badge a">Active</span></td><td>32</td><td>2.1M</td><td>7.8%</td><td>$7,200</td><td><span class="view">View</span></td></tr>
+                      <tr><td><strong>Q3 Launch</strong></td><td>Fitness Tracker</td><td><span class="dss-badge p">Pending</span></td><td>8</td><td>480K</td><td>5.2%</td><td>$1,800</td><td><span class="view">View</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              </div><!-- /.dss-os -->
+          </div><!-- /.dss-canvas -->
+          <div class="dss-shots" id="dssShots" aria-hidden="true">
+            <img class="dss-shot" data-i="0" src="/static/dashboard-shots/create1.png" alt="Create a UGC video">
+            <img class="dss-shot" data-i="1" src="/static/dashboard-shots/create2.png" alt="Choose video type" loading="lazy">
+            <img class="dss-shot" data-i="2" src="/static/dashboard-shots/create3.png" alt="Pick tool and generate" loading="lazy">
+            <img class="dss-shot" data-i="3" src="/static/dashboard-shots/create4.png" alt="Your generated videos" loading="lazy">
+          </div>
+
+          <!-- payoff finale: the generated content + the value statement -->
+          <div class="dss-finale" id="dssFinale" aria-hidden="true">
+            <div class="dss-finale-phone">
+              <video id="dssFinaleVideo" src="/static/videos/unlimited.mp4" muted loop playsinline preload="none"></video>
+            </div>
+            <div class="dss-finale-text">
+              <span class="dss-finale-eyebrow">The result</span>
+              <h2>One product.<br><span class="grad">Unlimited content</span> generated.</h2>
+              <p>From a single product, your AI agents generate an endless stream of scroll-stopping videos — researched, scripted, voiced, filmed and edited. Automatically.</p>
+            </div>
+          </div>
+
+        </div><!-- /.dss-os-wrap -->
+      </div><!-- /.dss-frame -->
+
+      <!-- camera cursor -->
+      <div class="dss-cursor" id="dssCursor" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 3l14 8-6 1.4L9.6 19 5 3z" fill="#fff" stroke="#1a202c" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- film caption -->
+      <div class="dss-caption" id="dssCaption">
+        <div class="dss-cap-card">
+          <div class="dss-cap-num" id="dssCapNum">01 / 09</div>
+          <div class="dss-cap-title">
+            <span class="v show" data-cap="0">Welcome to your <span class="grad">command center</span></span>
+            <span class="v" data-cap="1">Every metric, <span class="grad">counting live</span></span>
+            <span class="v" data-cap="2">Six AI agents, <span class="grad">always working</span></span>
+            <span class="v" data-cap="3">Performance, <span class="grad">drawn in real time</span></span>
+            <span class="v" data-cap="4">Activity that <span class="grad">never stops</span></span>
+            <span class="v" data-cap="5">Tell it <span class="grad">your product</span></span>
+            <span class="v" data-cap="6">Choose <span class="grad">your style</span></span>
+            <span class="v" data-cap="7">One click to <span class="grad">generate</span></span>
+            <span class="v" data-cap="8">Your videos, <span class="grad">ready to post</span></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================ BUILT FOR · audience positioning ============================ -->
+<section class="aud" id="built-for">
+  <div class="aud-head an-rise">
+    <span class="aud-label">Built For</span>
+    <h2>Built For Every Modern <span class="grad">TikTok Business</span></h2>
+    <p>Whether you're scaling a brand, running an agency, selling products, or creating content, AIGC Automated adapts to your workflow.</p>
+  </div>
+
+  <!-- cards render here from audience.js (data-driven, reusable) -->
+  <div class="aud-grid" id="audGrid"></div>
+
+  <div class="aud-cta an-rise">
+    <div class="lead">No matter how you create content…</div>
+    <h3>AIGC Automated becomes your <span class="grad">AI production team</span>.</h3>
+  </div>
+</section>
+
+<!-- ============================ PRICING ============================ -->
+<section class="pr" id="pricing">
+  <div class="pr-head an-rise">
+    <span class="pr-label">Pricing</span>
+    <h2>Simple pricing that <span class="grad">scales with you</span></h2>
+    <p>Start free, then choose the plan that fits your stage — from your first viral video to a full content operation.</p>
+  </div>
+
+  <div class="pr-toggle-wrap an-rise">
+    <div class="pr-toggle annual">
+      <span class="pr-pill" aria-hidden="true"></span>
+      <button id="prMonthly" type="button">Monthly</button>
+      <button id="prAnnual" type="button" class="active">Annual</button>
+    </div>
+    <span class="pr-save">Save 20%</span>
+  </div>
+
+  <!-- plans render here from pricing.js (data-driven, reusable) -->
+  <div class="pr-grid" id="prGrid"></div>
+
+  <div class="pr-foot an-rise">
+    <div class="meta"><span>✓ 14-day free trial</span> · <span>No credit card required</span> · <span>Cancel anytime</span></div>
+    <div class="ent">Need enterprise scale or custom volume? <a href="/contact">Talk to sales →</a></div>
+  </div>
+</section>
+
+<!-- ============================ FAQ ============================ -->
+<section class="faq" id="faq">
+  <div class="faq-head an-rise">
+    <span class="faq-label">FAQ</span>
+    <h2>Questions? <span class="grad">Answered.</span></h2>
+    <p>Everything you need to know before you start creating with AIGC Automated.</p>
+  </div>
+
+  <!-- items render here from faq.js (data-driven, reusable) -->
+  <div class="faq-list" id="faqList"></div>
+
+  <div class="faq-contact an-rise">Still have a question? <a href="/contact">Talk to our team →</a></div>
+</section>
+
+<!-- ============================ ABOUT ============================ -->
+<section class="ab" id="about">
+  <div class="ab-head an-rise">
+    <span class="ab-label">About</span>
+    <h2>Built by people who live and breathe <span class="grad">TikTok</span></h2>
+    <p>AIGC Automated is the AI content engine behind modern TikTok growth — created by the team at Tokverse to turn a single product into an endless stream of high-performing content.</p>
+  </div>
+
+  <div class="ab-tv an-rise">
+    <div class="ab-tv-card">
+      <div class="ab-tv-brand">
+        <span class="ab-tv-eyebrow">A product of</span>
+        <span class="ab-tv-lockup">
+          <img class="ab-tv-icon" src="/static/tokverse-icon.png" alt="Tokverse">
+          <span class="ab-tv-name"><span class="grad">Tokverse</span></span>
+        </span>
+      </div>
+      <div class="ab-tv-body">
+        <p>At <b>Tokverse</b>, we specialize in helping brands thrive on TikTok Shop through expert strategies, data-driven growth, and flawless execution — turning clicks into loyal customers.</p>
+        <a href="https://thetokverse.com/" target="_blank" rel="noopener" class="ab-visit">Visit Tokverse →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CONTACT ============================ -->
+<section class="ct" id="contact">
+  <div class="ct-head an-rise">
+    <span class="ct-label">Contact</span>
+    <h2>Let's <span class="grad">talk</span></h2>
+    <p>Questions, partnerships, or enterprise volume — reach out and our team will get back to you fast.</p>
+  </div>
+
+  <div class="ct-grid">
+    <div class="ct-info an-rise">
+      <a class="ct-method" href="mailto:info@thetokverse.com">
+        <span class="ct-ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+        <span><span class="lbl">Email</span><span class="val">info@thetokverse.com</span></span>
+      </a>
+      <a class="ct-method" href="tel:+18177834059">
+        <span class="ct-ic"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.09 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+        <span><span class="lbl">Phone</span><span class="val">+1 817 783 4059</span></span>
+      </a>
+      <p class="ct-hours">We typically reply within one business day.</p>
+    </div>
+
+    <form class="ct-form an-rise" id="ctForm">
+      <div class="ct-row">
+        <div class="ct-field"><label for="ctName">Name</label><input id="ctName" type="text" placeholder="Your name" required></div>
+        <div class="ct-field"><label for="ctEmail">Email</label><input id="ctEmail" type="email" placeholder="you@company.com" required></div>
+      </div>
+      <div class="ct-field"><label for="ctMsg">Message</label><textarea id="ctMsg" placeholder="How can we help?"></textarea></div>
+      <button class="ct-send" type="submit">Send Message</button>
+      <div class="ct-note">Opens your email app, pre-filled to info@thetokverse.com</div>
+    </form>
+  </div>
+</section>
+
+<!-- ============================ FINAL CTA ============================ -->
+<section class="fin" id="get-started">
+  <div class="fin-inner">
+    <div class="fin-panel an-rise">
+      <div class="fin-glow" aria-hidden="true"></div>
+      <span class="fin-eyebrow">Get started</span>
+      <h2>Your AI production team is <span class="grad">ready</span>.</h2>
+      <p>Turn one product into unlimited scroll-stopping TikToks — researched, scripted, voiced, filmed and edited, automatically.</p>
+      <div class="fin-actions">
+        <a href="/signup" class="fin-btn fin-btn--primary">Start Free Trial</a>
+        <a href="#workflow" class="fin-btn fin-btn--ghost"><span class="play">▶</span> Watch Workflow</a>
+      </div>
+      <div class="fin-note">14-day free trial · No credit card required · Cancel anytime</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ FOOTER ============================ -->
+<footer class="ft">
+  <div class="ft-inner">
+    <div class="ft-brand">
+      <a href="#hero" class="ft-logo">
+        <img class="ft-logo-icon" src="/static/logo-icon.png?v=2" alt="">
+        <span class="ft-wordmark">Tokverse <b>Studio</b></span>
+      </a>
+      <p>Automate your entire TikTok content pipeline with AI — research, scripting, voice, video, editing and publishing in one intelligent system.</p>
+      <div class="ft-social">
+        <a href="/" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M16 3c.3 2.3 1.8 3.9 4 4v3c-1.5 0-2.9-.5-4-1.3V15a6 6 0 1 1-6-6c.34 0 .67.03 1 .08v3.2A3 3 0 1 0 13 15V3h3z"/></svg></a>
+        <a href="/" aria-label="X"><svg viewBox="0 0 24 24"><path d="M17.5 3h3l-6.6 7.6L21.7 21h-6.1l-4.3-5.6L6.2 21H3.2l7.1-8.1L2.6 3h6.2l3.9 5.2L17.5 3zm-1.1 16h1.7L8 5H6.2l10.2 14z"/></svg></a>
+        <a href="/" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 7.6A4.4 4.4 0 1 0 16.4 12 4.4 4.4 0 0 0 12 7.6zm0 7.2A2.8 2.8 0 1 1 14.8 12 2.8 2.8 0 0 1 12 14.8zM17 6.4a1 1 0 1 0 1 1 1 1 0 0 0-1-1zM20.9 8.2a5.4 5.4 0 0 0-1.5-3.6A5.4 5.4 0 0 0 15.8 3c-1.5-.1-5.9-.1-7.4 0A5.4 5.4 0 0 0 4.6 4.6 5.4 5.4 0 0 0 3.1 8.2c-.1 1.5-.1 5.9 0 7.4a5.4 5.4 0 0 0 1.5 3.6 5.4 5.4 0 0 0 3.6 1.5c1.5.1 5.9.1 7.4 0a5.4 5.4 0 0 0 3.6-1.5 5.4 5.4 0 0 0 1.5-3.6c.1-1.5.1-5.9 0-7.4zm-2 8.9a2.8 2.8 0 0 1-1.6 1.6c-1.1.4-3.7.3-5.3.3s-4.2.1-5.3-.3a2.8 2.8 0 0 1-1.6-1.6c-.4-1.1-.3-3.7-.3-5.3s-.1-4.2.3-5.3A2.8 2.8 0 0 1 6.7 5c1.1-.4 3.7-.3 5.3-.3s4.2-.1 5.3.3A2.8 2.8 0 0 1 18.9 6.6c.4 1.1.3 3.7.3 5.3s.1 4.2-.3 5.2z"/></svg></a>
+        <a href="/" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23 12s0-3.2-.4-4.7a2.5 2.5 0 0 0-1.7-1.7C19.4 5.2 12 5.2 12 5.2s-7.4 0-8.9.4a2.5 2.5 0 0 0-1.7 1.7C1 8.8 1 12 1 12s0 3.2.4 4.7a2.5 2.5 0 0 0 1.7 1.7c1.5.4 8.9.4 8.9.4s7.4 0 8.9-.4a2.5 2.5 0 0 0 1.7-1.7C23 15.2 23 12 23 12zm-13 3V9l5 3z"/></svg></a>
+      </div>
+    </div>
+
+    <div class="ft-col">
+      <h4>Product</h4>
+      <a href="#workflow">Workflow</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="#get-started">Start Free Trial</a>
+    </div>
+
+    <div class="ft-col">
+      <h4>Platform</h4>
+      <a href="/" data-app="/">Create Video</a>
+      <a href="/dashboard">Dashboard App</a>
+      <a href="/analytics">Analytics</a>
+      <a href="#built-for">Built For</a>
+    </div>
+
+    <div class="ft-col">
+      <h4>Company</h4>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="https://thetokverse.com/" target="_blank" rel="noopener">Tokverse</a>
+      <a href="mailto:info@thetokverse.com">info@thetokverse.com</a>
+    </div>
+  </div>
+
+  <div class="ft-bottom">
+    <span>© <span id="ftYear">2026</span> AIGC Automated · All rights reserved.</span>
+    <span>Privacy · Terms · <span class="grad">Built for modern TikTok businesses</span></span>
+  </div>
+  <script>document.getElementById('ftYear').textContent = new Date().getFullYear();</script>
+</footer>
+
+<!-- ── Component JS (each is self-contained, include only what you need) ── -->
+<script src="/static/components/landing-nav.js"></script>
+<script src="/static/components/hero.js"></script>
+<script src="/static/components/workflow.js"></script>
+<script src="/static/components/post-wf.js"></script>
+<script src="/static/components/portal.js"></script>
+<script src="/static/components/dashboard-showcase.js"></script>
+<script src="/static/components/audience.js"></script>
+<script src="/static/components/pricing.js"></script>
+<script src="/static/components/faq.js"></script>
+<script src="/static/components/contact.js"></script>
+
+<!-- App config + cross-domain link rewriter (sends app links to the Render app) -->
+<script src="/static/config.js"></script>
+<script src="/static/components/app-links.js"></script>
+</body>
+</html>

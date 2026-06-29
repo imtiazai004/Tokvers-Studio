@@ -1,0 +1,90 @@
+/* ============================================================
+   ENTER THE PLATFORM · fullscreen cinematic portal
+   The video fills the whole viewport (workflow-style, edge-to-edge).
+   Headline overlays the opening; the clip scrubs as you scroll and
+   ends in a white flash that hands straight off to the dashboard.
+   Requires: base.css  (--cyan/--pink/--grad/--ink/--slate/--ease-film)
+   ============================================================ */
+
+.portal { position: relative; z-index: 3; background: #0b1020; }
+
+/* tall track giving the sticky stage room to scrub the whole clip */
+.portal-pin   { position: relative; height: 320vh; }
+.portal-stage { position: sticky; top: 0; height: 100vh; overflow: hidden; background: #0b1020; }
+
+/* ---- fullscreen scrubbed video ---- */
+.portal-video-wrap { position: absolute; inset: 0; z-index: 1; will-change: transform; }
+.portal-video-wrap video {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+
+/* soft top scrim so the dark headline reads on the light opening frames */
+.portal-scrim {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.30) 24%, rgba(255,255,255,0) 50%);
+  transition: opacity 0.4s ease;
+}
+
+/* ---- headline overlay (fades out as the clip takes over) ---- */
+.portal-copy {
+  position: absolute; z-index: 4; left: 50%; top: clamp(13vh, 16vh, 20vh);
+  width: min(1100px, 92vw); transform: translateX(-50%);
+  text-align: center; pointer-events: none; will-change: opacity, transform;
+}
+.portal-title {
+  font-family: 'Cabinet Grotesk','Satoshi',sans-serif;
+  margin: 0; font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 1.03;
+  font-weight: 800; letter-spacing: -2px; color: var(--ink); text-wrap: balance;
+  text-shadow: 0 2px 30px rgba(255,255,255,0.65), 0 1px 3px rgba(255,255,255,0.8);
+  opacity: 0; transform: translateY(26px);
+  transition: opacity 0.9s var(--ease-film) 0.15s, transform 0.9s var(--ease-film) 0.15s;
+}
+.portal-title .grad {
+  background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.portal-stage.in .portal-title { opacity: 1; transform: none; }
+.portal-sub {
+  margin: clamp(14px, 2vh, 22px) auto 0; max-width: 52ch;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem); line-height: 1.6; font-weight: 600;
+  color: #2b3346; text-shadow: 0 1px 16px rgba(255,255,255,0.7);
+  opacity: 0; transform: translateY(18px);
+  transition: opacity 0.85s var(--ease-film) 0.4s, transform 0.85s var(--ease-film) 0.4s;
+}
+.portal-stage.in .portal-sub { opacity: 1; transform: none; }
+
+/* ---- scroll cue (gentle, fades with the copy) ---- */
+.portal-cue {
+  position: absolute; z-index: 4; left: 50%; bottom: 5vh; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: #2b3346;
+  text-shadow: 0 1px 14px rgba(255,255,255,0.7); pointer-events: none;
+  opacity: 0; transition: opacity 0.8s var(--ease-film) 0.9s;
+}
+.portal-stage.in .portal-cue { opacity: 0.85; }
+.portal-cue i { width: 22px; height: 34px; border-radius: 12px; border: 2px solid rgba(43,51,70,0.5); position: relative; }
+.portal-cue i::after { content: ''; position: absolute; left: 50%; top: 6px; width: 3px; height: 7px; border-radius: 3px;
+  background: #2b3346; transform: translateX(-50%); animation: portalCue 1.6s ease-in-out infinite; }
+@keyframes portalCue { 0% { opacity: 0; transform: translate(-50%, 0); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, 10px); } }
+
+/* ---- closing white flash that blends into the dashboard ---- */
+.portal-white {
+  position: fixed; inset: 0; z-index: 12; pointer-events: none;
+  background: #ffffff; opacity: 0; will-change: opacity;
+}
+
+/* ---- responsive ---- */
+@media (max-width: 560px) {
+  .portal-pin { height: auto; }
+  .portal-stage { position: relative; height: 100vh; min-height: 560px; }
+  .portal-copy { top: 12vh; }
+  .portal-white { display: none; }
+}
+
+/* ---- reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .portal-title, .portal-sub { opacity: 1; transform: none; transition: none; }
+  .portal-cue { display: none; }
+  .portal-white { display: none; }
+}

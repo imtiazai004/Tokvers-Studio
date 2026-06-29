@@ -1,0 +1,178 @@
+/* ============================================================
+   PLATFORM CAPABILITIES · 8-card capability grid
+   Requires: base.css, post-wf.css (for .an-rise)
+   ============================================================ */
+
+.cap {
+  position: relative; z-index: 2; overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8fe 100%);
+  padding: clamp(82px, 12vh, 142px) 0 clamp(92px, 14vh, 164px);
+}
+/* one elegant blurred brand orb breathing behind the grid (brand colors only) */
+.cap::before {
+  content: ''; position: absolute; z-index: 0; pointer-events: none;
+  left: 50%; top: 46%; transform: translate(-50%, -50%);
+  width: 780px; height: 780px; max-width: 96vw;
+  background:
+    radial-gradient(closest-side, rgba(0,212,255,0.10), transparent 70%),
+    radial-gradient(closest-side at 72% 58%, rgba(255,0,110,0.075), transparent 72%),
+    radial-gradient(closest-side at 30% 72%, rgba(6,232,216,0.075), transparent 72%);
+  filter: blur(34px);
+  animation: capOrb 42s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+@keyframes capOrb {
+  from { transform: translate(-50%, -50%) scale(1);        opacity: 0.85; }
+  to   { transform: translate(-46%, -54%) scale(1.12);     opacity: 1; }
+}
+.cap-head { position: relative; z-index: 1; text-align: center; max-width: 760px; margin: 0 auto 52px; padding: 0 24px; }
+.cap-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: 30px;
+  background: rgba(255,255,255,0.86); border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+  font-size: 0.74rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--teal);
+}
+.cap-head h2 {
+  font-family: 'Cabinet Grotesk','Satoshi',sans-serif;
+  margin-top: 22px; font-size: clamp(2rem, 4vw, 3.3rem);
+  line-height: 1.08; font-weight: 800; letter-spacing: -1.5px; color: var(--ink); text-wrap: balance;
+}
+.cap-head h2 .grad {
+  background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.cap-head p { margin: 18px auto 0; max-width: 60ch; font-size: 1.08rem; line-height: 1.62; color: var(--slate); text-wrap: pretty; }
+
+.cap-grid {
+  position: relative; z-index: 1;
+  max-width: var(--maxw); margin: 0 auto; padding: 0 24px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+}
+.cap-card {
+  position: relative; overflow: hidden;
+  background: rgba(255,255,255,0.92); border: 1px solid var(--line); border-radius: 20px;
+  padding: 28px; display: flex; flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  opacity: 0; transform: translateY(26px);
+  transition: opacity 0.6s ease, transform 0.46s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.cap-card.in { opacity: 1; transform: none; }
+/* luxurious hover: soft lift + cyan/pink brand glow + stronger shadow */
+.cap-card:hover {
+  transform: translateY(-7px);
+  border-color: rgba(0,212,255,0.5);
+  box-shadow: 0 24px 56px rgba(0,212,255,0.16), 0 10px 32px rgba(255,0,110,0.10);
+  transition-delay: 0s;
+}
+/* keynote staging — featured card, then its neighbour, then row 2, then row 3
+   (cap-card has no preceding sibling, so cards are nth-child 1–8) */
+.cap-card:nth-child(1) { transition-delay: 0.15s; }   /* featured lead */
+.cap-card:nth-child(2) { transition-delay: 0.30s; }   /* secondary large */
+.cap-card:nth-child(3) { transition-delay: 0.46s; }   /* row 2 */
+.cap-card:nth-child(4) { transition-delay: 0.56s; }
+.cap-card:nth-child(5) { transition-delay: 0.66s; }
+.cap-card:nth-child(6) { transition-delay: 0.80s; }   /* row 3 */
+.cap-card:nth-child(7) { transition-delay: 0.90s; }
+.cap-card:nth-child(8) { transition-delay: 1.00s; }
+.cap-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--grad); opacity: 0; transition: opacity 0.3s ease; z-index: 3;
+}
+.cap-card:hover::before { opacity: 1; }
+/* glass reflection — slides across on hover (non-featured cards) */
+.cap-card::after {
+  content: ''; position: absolute; top: 0; left: -130%;
+  width: 70%; height: 100%; z-index: 2; pointer-events: none;
+  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%);
+  transform: skewX(-16deg);
+  opacity: 0;
+  transition: left 0.95s var(--ease-film), opacity 0.3s ease;
+}
+.cap-card:hover::after { left: 140%; opacity: 1; }
+
+/* icon comes alive on hover — gentle scale + brand glow */
+.cap-icon { transition: transform 0.45s var(--ease-film), box-shadow 0.4s ease; }
+.cap-card:hover .cap-icon {
+  transform: scale(1.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 22px rgba(0,212,255,0.22);
+}
+
+/* featured lead: corner glow moved into the background so ::after is free for the sheen */
+.cap-card.lead {
+  grid-column: span 2;
+  background:
+    radial-gradient(240px 240px at calc(100% + 10px) -10px, rgba(0,212,255,0.14), rgba(255,0,110,0.05) 60%, transparent 72%),
+    rgba(255,255,255,0.92);
+}
+/* occasional premium light sweep travelling across the featured card — not frequent */
+.cap-card.lead::after { animation: capSheen 9s ease-in-out infinite; animation-delay: 2.5s; }
+@keyframes capSheen {
+  0%, 85%  { left: -130%; opacity: 0; }
+  88%      { opacity: 1; }
+  100%     { left: 140%;  opacity: 0; }
+}
+
+.cap-top { display: flex; align-items: center; gap: 12px; }
+.cap-icon {
+  width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 1.35rem;
+  background: linear-gradient(135deg, rgba(0,212,255,0.14), rgba(255,0,110,0.12));
+  border: 1px solid rgba(255,255,255,0.8);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 6px 16px rgba(0,212,255,0.12);
+}
+.cap-tag {
+  font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--teal); padding: 4px 10px; border-radius: 20px;
+  background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.22);
+}
+.cap-card h3 {
+  font-family: 'Cabinet Grotesk','Satoshi',sans-serif;
+  margin-top: 18px; font-size: 1.18rem; font-weight: 800; letter-spacing: -0.3px; color: var(--ink);
+}
+.cap-card.lead h3 { font-size: 1.55rem; letter-spacing: -0.6px; margin-top: 20px; max-width: 18ch; }
+.cap-card p { margin-top: 9px; font-size: 0.96rem; line-height: 1.56; color: var(--slate); }
+.cap-card.lead p { font-size: 1.04rem; line-height: 1.6; max-width: 48ch; }
+
+/* the secondary large card also catches an occasional sweep — offset so the
+   two featured cards never glint at the same time */
+.cap-card:nth-child(2)::after { animation: capSheen 11s ease-in-out infinite; animation-delay: 6.5s; }
+
+/* ============================================================
+   LIVING SECTION · staggered intro reveal (label -> headline -> description)
+   The container's blanket .an-rise is neutralised so children arrive in order,
+   with a brief pause before the cards begin their keynote staging.
+   ============================================================ */
+.cap .cap-head.an-rise { opacity: 1; transform: none; filter: none; transition: none; }
+
+.cap-head .cap-label,
+.cap-head h2,
+.cap-head p {
+  opacity: 0;
+  transform: translateY(22px);
+  filter: blur(6px);
+  transition: opacity 0.9s var(--ease-film), transform 0.9s var(--ease-film), filter 0.9s var(--ease-film);
+  will-change: transform, opacity, filter;
+}
+.cap-head.in .cap-label { opacity: 1; transform: none; filter: none; transition-delay: 0.05s; }
+.cap-head.in h2         { opacity: 1; transform: none; filter: none; transition-delay: 0.20s; }
+.cap-head.in p          { opacity: 1; transform: none; filter: none; transition-delay: 0.38s; }
+
+@media (max-width: 920px) {
+  .cap-grid { grid-template-columns: repeat(2, 1fr); }
+  .cap-card.lead { grid-column: span 2; }
+}
+@media (max-width: 560px) {
+  .cap-grid { grid-template-columns: 1fr; }
+  .cap-card.lead { grid-column: span 1; }
+  /* calmer motion on phones: no periodic sweeps, lighter orb */
+  .cap-card.lead::after,
+  .cap-card:nth-child(2)::after { animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cap::before { animation: none; }
+  .cap-card::after { display: none; }
+  .cap-head .cap-label,
+  .cap-head h2,
+  .cap-head p { opacity: 1; transform: none; filter: none; transition: none; }
+}

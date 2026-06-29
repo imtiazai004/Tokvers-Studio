@@ -1,0 +1,74 @@
+/* ============================================================
+   FINAL CTA + FOOTER · the close
+   A premium gradient-edge CTA panel with ambient glow, then a clean
+   light footer. Continues the white premium design language.
+   Requires: base.css, post-wf.css (for --ease-film / .an-rise)
+   ============================================================ */
+
+/* ---- final CTA band ---- */
+.fin { position: relative; z-index: 2; overflow: hidden; background: #ffffff; padding: clamp(40px, 8vh, 96px) 0 clamp(70px, 11vh, 128px); }
+.fin-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+.fin-panel {
+  position: relative; overflow: hidden; text-align: center;
+  border-radius: clamp(24px, 3vw, 36px); padding: clamp(48px, 8vw, 92px) clamp(24px, 5vw, 80px);
+  background: linear-gradient(135deg, #f3faff 0%, #ffffff 45%, #fdf2f8 100%);
+  border: 1px solid rgba(255,255,255,0.9);
+  box-shadow: 0 40px 100px rgba(8,40,90,0.14), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+/* brand gradient edge */
+.fin-panel::after { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; pointer-events: none; z-index: 3;
+  background: var(--grad); -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0.6; }
+/* ambient breathing glow */
+.fin-glow { position: absolute; inset: -40% -10% auto -10%; height: 120%; z-index: 0; pointer-events: none;
+  background: radial-gradient(45% 60% at 30% 10%, rgba(0,212,255,0.22), transparent 70%),
+              radial-gradient(45% 60% at 75% 30%, rgba(255,0,110,0.18), transparent 72%);
+  filter: blur(40px); animation: finGlow 9s ease-in-out infinite alternate; will-change: transform, opacity; }
+@keyframes finGlow { from { transform: translate(0,0) scale(1); opacity: .8; } to { transform: translate(20px,14px) scale(1.08); opacity: 1; } }
+
+.fin-panel > * { position: relative; z-index: 1; }
+.fin-eyebrow { display: inline-block; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cyan); }
+.fin-panel h2 { font-family: 'Cabinet Grotesk','Satoshi',sans-serif; margin: 16px auto 0; max-width: 18ch;
+  font-size: clamp(2.2rem, 5vw, 4rem); line-height: 1.04; font-weight: 800; letter-spacing: -1.8px; color: var(--ink); text-wrap: balance; }
+.fin-panel h2 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.fin-panel p { margin: 20px auto 0; max-width: 56ch; font-size: clamp(1.02rem, 1.5vw, 1.2rem); line-height: 1.6; color: var(--slate); }
+
+.fin-actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 34px; }
+.fin-btn { display: inline-flex; align-items: center; gap: 9px; padding: 15px 32px; border-radius: 14px;
+  font-weight: 800; font-size: 1.02rem; text-decoration: none; transition: transform 0.2s ease, box-shadow 0.4s ease, background 0.3s ease, border-color 0.3s ease; }
+.fin-btn--primary { background: var(--grad); color: #fff; border: none; box-shadow: 0 16px 38px rgba(0,212,255,0.32); }
+.fin-btn--primary:hover { transform: translateY(-2px); box-shadow: 0 22px 50px rgba(255,0,110,0.34); }
+.fin-btn--ghost { background: rgba(255,255,255,0.7); color: var(--ink); border: 1px solid var(--line); }
+.fin-btn--ghost:hover { border-color: rgba(0,212,255,0.5); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,212,255,0.12); }
+.fin-btn .play { font-size: 0.82em; }
+.fin-note { margin-top: 22px; font-size: 0.9rem; color: var(--slate); }
+
+/* ---- footer ---- */
+.ft { position: relative; z-index: 2; background: linear-gradient(180deg, #ffffff, #f5f8fd); border-top: 1px solid var(--line); }
+.ft-inner { max-width: 1200px; margin: 0 auto; padding: clamp(56px, 8vh, 88px) 24px clamp(36px, 5vh, 52px);
+  display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: clamp(28px, 4vw, 56px); }
+@media (max-width: 860px) { .ft-inner { grid-template-columns: 1fr 1fr; gap: 36px 28px; } }
+@media (max-width: 520px) { .ft-inner { grid-template-columns: 1fr 1fr; } .ft-brand { grid-column: 1 / -1; } }
+
+.ft-brand { max-width: 320px; }
+.ft-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.ft-logo-icon { height: 32px; width: auto; display: block; }
+.ft-wordmark { font-family: 'Cabinet Grotesk','Satoshi',sans-serif; font-size: 1.28rem; font-weight: 900; letter-spacing: -0.5px; color: var(--ink); }
+.ft-wordmark b { font-weight: 900; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.ft-brand p { margin: 16px 0 0; font-size: 0.96rem; line-height: 1.6; color: var(--slate); }
+.ft-social { display: flex; gap: 10px; margin-top: 20px; }
+.ft-social a { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center;
+  background: #fff; border: 1px solid var(--line); color: var(--slate); transition: all 0.3s var(--ease-film); }
+.ft-social a:hover { color: #fff; background: var(--grad); border-color: transparent; transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,212,255,0.22); }
+.ft-social svg { width: 18px; height: 18px; fill: currentColor; }
+
+.ft-col h4 { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); margin: 0 0 16px; }
+.ft-col a { display: block; font-size: 0.96rem; color: var(--slate); text-decoration: none; padding: 6px 0; transition: color 0.25s ease, transform 0.25s ease; }
+.ft-col a:hover { color: var(--cyan); transform: translateX(3px); }
+
+.ft-bottom { max-width: 1200px; margin: 0 auto; padding: 22px 24px; border-top: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 10px 20px; justify-content: space-between; align-items: center;
+  font-size: 0.86rem; color: var(--slate); }
+.ft-bottom .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) { .fin-glow { animation: none; } }

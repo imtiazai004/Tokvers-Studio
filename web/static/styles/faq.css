@@ -1,0 +1,83 @@
+/* ============================================================
+   FAQ · answers the last objections before the close
+   Premium glass accordion — smooth height reveal, gradient accent on
+   open, soft hover. Continues the white premium design language.
+   Reusable: items render from data (faq.js). Reuses .an-rise.
+   Requires: base.css, post-wf.css (for --ease-film / .an-rise)
+   ============================================================ */
+
+.faq {
+  position: relative; z-index: 2; overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 48%, #ffffff 100%);
+  padding: clamp(84px, 13vh, 152px) 0 clamp(96px, 15vh, 176px);
+}
+.faq::before {
+  content: ''; position: absolute; z-index: 0; pointer-events: none;
+  left: 50%; top: -4%; transform: translateX(-50%);
+  width: 920px; height: 560px; max-width: 96vw;
+  background:
+    radial-gradient(closest-side, rgba(0,212,255,0.10), transparent 70%),
+    radial-gradient(closest-side at 66% 60%, rgba(255,0,110,0.07), transparent 72%);
+  filter: blur(8px);
+  animation: faqAura 32s ease-in-out infinite alternate; will-change: transform, opacity;
+}
+@keyframes faqAura { from { transform: translateX(-50%) scale(1); opacity: .8; } to { transform: translateX(-50%) translateY(22px) scale(1.1); opacity: 1; } }
+
+/* ---- heading ---- */
+.faq-head { position: relative; z-index: 1; text-align: center; max-width: 720px; margin: 0 auto clamp(44px, 6vh, 64px); padding: 0 24px; }
+.faq-label { display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px; border-radius: 30px;
+  background: rgba(255,255,255,0.86); border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+  font-size: 0.74rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cyan); }
+.faq-head h2 { font-family: 'Cabinet Grotesk','Satoshi',sans-serif; margin-top: 22px;
+  font-size: clamp(2.1rem, 4.4vw, 3.5rem); line-height: 1.07; font-weight: 800; letter-spacing: -1.6px; color: var(--ink); text-wrap: balance; }
+.faq-head h2 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.faq-head p { margin: 18px auto 0; max-width: 56ch; font-size: 1.08rem; line-height: 1.62; color: var(--slate); text-wrap: pretty; }
+
+/* ---- accordion ---- */
+.faq-list { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 0 24px;
+  display: flex; flex-direction: column; gap: 14px; }
+
+.faq-item {
+  position: relative; overflow: hidden; border-radius: 18px;
+  background: rgba(255,255,255,0.72); border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.7);
+  backdrop-filter: blur(12px) saturate(1.05); -webkit-backdrop-filter: blur(12px) saturate(1.05);
+  transition: border-color 0.4s var(--ease-film), box-shadow 0.4s var(--ease-film), transform 0.4s var(--ease-film);
+}
+.faq-item:hover { border-color: rgba(0,212,255,0.4); box-shadow: 0 14px 36px rgba(0,212,255,0.10), inset 0 1px 0 rgba(255,255,255,0.8); }
+/* gradient edge when open */
+.faq-item.open { border-color: transparent; box-shadow: 0 22px 56px rgba(0,212,255,0.14), 0 8px 26px rgba(255,0,110,0.08), inset 0 1px 0 rgba(255,255,255,0.85); }
+.faq-item.open::before { content: ''; position: absolute; inset: 0; border-radius: 18px; padding: 1.5px; pointer-events: none;
+  background: var(--grad); -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+
+.faq-q {
+  display: flex; align-items: center; justify-content: space-between; gap: 18px; width: 100%;
+  padding: 22px 26px; border: none; background: none; cursor: pointer; text-align: left;
+  font-family: inherit; font-size: clamp(1rem, 1.4vw, 1.12rem); font-weight: 700; letter-spacing: -0.2px; color: var(--ink);
+}
+.faq-icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(0,212,255,0.1); transition: background 0.4s var(--ease-film), transform 0.4s var(--ease-film); }
+.faq-icon svg { width: 16px; height: 16px; display: block; }
+.faq-icon svg path { stroke: var(--cyan); stroke-width: 2.4; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.4s ease; }
+.faq-item.open .faq-icon { background: var(--grad); transform: rotate(180deg); }
+.faq-item.open .faq-icon svg path { stroke: #fff; }
+
+/* smooth height reveal (0fr -> 1fr) */
+.faq-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.45s var(--ease-film); }
+.faq-item.open .faq-a { grid-template-rows: 1fr; }
+.faq-a-inner { overflow: hidden; }
+.faq-a p { margin: 0; padding: 0 26px 24px; color: var(--slate); line-height: 1.65; font-size: 1rem; max-width: 68ch; }
+.faq-a p b { color: var(--ink); font-weight: 700; }
+
+/* ---- contact line ---- */
+.faq-contact { position: relative; z-index: 1; text-align: center; margin-top: clamp(36px, 5vh, 52px); font-size: 1.02rem; color: var(--slate); }
+.faq-contact a { color: var(--cyan); font-weight: 800; text-decoration: none; }
+.faq-contact a:hover { text-decoration: underline; }
+
+.faq::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 140px; z-index: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent, #ffffff); }
+
+@media (prefers-reduced-motion: reduce) {
+  .faq::before { animation: none; }
+  .faq-item, .faq-icon, .faq-a { transition: none; }
+}

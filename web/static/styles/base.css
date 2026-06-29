@@ -1,0 +1,119 @@
+/* ============================================================
+   BASE · CSS variables, resets, typography, shared UI primitives
+   Import on every page: <link rel="stylesheet" href="/static/styles/base.css">
+   ============================================================ */
+
+:root {
+  --cyan:    #00d4ff;
+  --aqua:    #06e8d8;
+  --teal:    #13b9d6;
+  --pink:    #ff006e;
+  --magenta: #ff2d9e;
+  --grad:    linear-gradient(135deg, #00d4ff 0%, #13b9d6 45%, #ff006e 100%);
+  --grad-soft: linear-gradient(135deg, #06e8d8 0%, #ff2d9e 100%);
+
+  --ink:     #161b26;
+  --slate:   #44506b;
+  --muted:   #7b879e;
+  --line:    #e7ecf3;
+  --bg:      #ffffff;
+  --bg-soft: #f7f9fd;
+
+  --shadow-sm: 0 2px 10px rgba(20, 30, 55, 0.05);
+  --shadow-md: 0 12px 32px rgba(20, 30, 55, 0.10);
+  --shadow-lg: 0 30px 70px rgba(20, 30, 55, 0.16);
+  --shadow-glow: 0 18px 50px rgba(0, 212, 255, 0.28);
+
+  --radius: 16px;
+  --maxw: 1200px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Satoshi', 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* subtle grain to break digital flatness */
+.grain {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* visible keyboard focus (a11y) */
+a:focus-visible, button:focus-visible, .btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.45);
+}
+
+a { text-decoration: none; color: inherit; }
+img { display: block; max-width: 100%; }
+
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---- Shared Button primitives ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.92rem;
+  border-radius: 12px;
+  padding: 11px 20px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.22s ease;
+  white-space: nowrap;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+.btn-ghost:hover { border-color: var(--cyan); background: #fff; box-shadow: var(--shadow-sm); }
+.btn-primary {
+  background: var(--grad);
+  color: #fff;
+  box-shadow: var(--shadow-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  background-size: 140% 140%;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 22px 56px rgba(255, 0, 110, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+.btn:active { transform: translateY(0) scale(0.972); }
+.btn-lg { padding: 15px 28px; font-size: 1rem; border-radius: 14px; }
+
+/* ---- Shared entrance animations ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.d1 { animation-delay: 0.05s; }
+.d2 { animation-delay: 0.15s; }
+.d3 { animation-delay: 0.25s; }
+.d4 { animation-delay: 0.35s; }
+.d5 { animation-delay: 0.45s; }
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { animation: none; opacity: 1; transform: none; }
+}
+
+@media (max-width: 560px) {
+  .container { padding: 0 18px; }
+}

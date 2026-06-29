@@ -1,0 +1,58 @@
+/* ============================================================
+   POST-WF · Shared ambient atmosphere + scroll-reveal system
+   Import on any page that uses .an-rise reveals or ambient orbs
+   Requires: base.css
+   ============================================================ */
+
+:root { --ease-film: cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* one continuous canvas so ambient + bg carry across sections */
+.post-wf {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #eef3fb 0%, #ffffff 20%, #f6f9fe 56%, #ffffff 100%);
+}
+/* sections become transparent so the shared atmosphere shows through */
+.post-wf .why, .post-wf .cap { background: transparent; }
+
+/* ---- ambient motion layer (drifting brand orbs) ---- */
+.ambient { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.ambient .orb { position: absolute; width: 540px; height: 540px; will-change: transform; }
+.ambient .orb i {
+  display: block; width: 100%; height: 100%; border-radius: 50%;
+  filter: blur(80px); opacity: 0.55;
+  animation: orbDrift 28s ease-in-out infinite;
+}
+.ambient .orb1 { top: 2%;  left: -8%; }
+.ambient .orb1 i { background: radial-gradient(closest-side, rgba(0,212,255,0.5), transparent 70%); }
+.ambient .orb2 { top: 26%; right: -10%; width: 600px; height: 600px; }
+.ambient .orb2 i { background: radial-gradient(closest-side, rgba(255,0,110,0.4), transparent 70%); animation-duration: 34s; animation-delay: -6s; }
+.ambient .orb3 { top: 60%; left: -6%; width: 480px; height: 480px; }
+.ambient .orb3 i { background: radial-gradient(closest-side, rgba(19,185,214,0.42), transparent 70%); animation-duration: 30s; animation-delay: -12s; }
+.ambient .orb4 { top: 82%; right: -6%; }
+.ambient .orb4 i { background: radial-gradient(closest-side, rgba(255,45,158,0.34), transparent 70%); animation-duration: 36s; animation-delay: -3s; }
+@keyframes orbDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(34px, -26px) scale(1.08); }
+}
+
+/* ---- shared scroll-reveal system ---- */
+.an-rise {
+  opacity: 0; transform: translateY(40px); filter: blur(8px);
+  transition: opacity 1s ease, transform 1s var(--ease-film), filter 1s ease;
+}
+.an-rise.in { opacity: 1; transform: none; filter: blur(0); }
+
+/* unify card easing with the film language */
+.why-card, .cap-card { transition-timing-function: var(--ease-film); }
+
+@media (max-width: 760px) {
+  .ambient .orb { width: 360px; height: 360px; }
+  .ambient .orb3, .ambient .orb4 { display: none; }
+  .ambient .orb i { filter: blur(60px); opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient .orb i { animation: none; }
+  .an-rise { opacity: 1; transform: none; filter: none; transition: none; }
+}

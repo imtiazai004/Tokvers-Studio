@@ -1,0 +1,60 @@
+/* ============================================================
+   ABOUT · the team behind AIGC Automated (a Tokverse product)
+   Premium white theme. A mission line + a Tokverse parent-brand card.
+   Requires: base.css, post-wf.css (for --ease-film / .an-rise)
+   ============================================================ */
+
+.ab {
+  position: relative; z-index: 2; overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 48%, #ffffff 100%);
+  padding: clamp(84px, 13vh, 152px) 0 clamp(80px, 12vh, 140px);
+}
+.ab::before {
+  content: ''; position: absolute; z-index: 0; pointer-events: none;
+  left: 50%; top: -4%; transform: translateX(-50%);
+  width: 920px; height: 560px; max-width: 96vw;
+  background: radial-gradient(closest-side, rgba(0,212,255,0.10), transparent 70%),
+              radial-gradient(closest-side at 66% 60%, rgba(255,0,110,0.07), transparent 72%);
+  filter: blur(8px); animation: abAura 32s ease-in-out infinite alternate; will-change: transform, opacity;
+}
+@keyframes abAura { from { transform: translateX(-50%) scale(1); opacity: .8; } to { transform: translateX(-50%) translateY(22px) scale(1.1); opacity: 1; } }
+
+.ab-head { position: relative; z-index: 1; text-align: center; max-width: 760px; margin: 0 auto clamp(40px, 6vh, 58px); padding: 0 24px; }
+.ab-label { display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px; border-radius: 30px;
+  background: rgba(255,255,255,0.86); border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+  font-size: 0.74rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cyan); }
+.ab-head h2 { font-family: 'Cabinet Grotesk','Satoshi',sans-serif; margin-top: 22px;
+  font-size: clamp(2.1rem, 4.4vw, 3.5rem); line-height: 1.07; font-weight: 800; letter-spacing: -1.6px; color: var(--ink); text-wrap: balance; }
+.ab-head h2 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.ab-head p { margin: 18px auto 0; max-width: 60ch; font-size: 1.1rem; line-height: 1.62; color: var(--slate); text-wrap: pretty; }
+
+/* ---- Tokverse parent-brand card ---- */
+.ab-tv { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 24px; }
+.ab-tv-card { position: relative; overflow: hidden; display: grid; grid-template-columns: 0.85fr 1.15fr; gap: clamp(24px, 4vw, 48px); align-items: center;
+  border-radius: 28px; padding: clamp(30px, 4vw, 46px);
+  background: rgba(255,255,255,0.74); border: 1px solid rgba(255,255,255,0.9);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.8);
+  backdrop-filter: blur(14px) saturate(1.1); -webkit-backdrop-filter: blur(14px) saturate(1.1); }
+.ab-tv-card::after { content: ''; position: absolute; inset: 0; border-radius: 28px; padding: 1.5px; pointer-events: none;
+  background: var(--grad); -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0.5; }
+@media (max-width: 760px) { .ab-tv-card { grid-template-columns: 1fr; text-align: center; } }
+
+.ab-tv-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+@media (max-width: 760px) { .ab-tv-brand { align-items: center; } }
+.ab-tv-eyebrow { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cyan); }
+.ab-tv-lockup { display: inline-flex; align-items: center; gap: 12px; }
+.ab-tv-icon { width: 52px; height: 52px; display: block; filter: drop-shadow(0 8px 18px rgba(0,212,255,0.2)); }
+.ab-tv-name { font-family: 'Cabinet Grotesk','Satoshi',sans-serif; font-size: 1.9rem; font-weight: 900; letter-spacing: -0.8px; color: var(--ink); }
+.ab-tv-name .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+.ab-tv-body p { margin: 0; font-size: 1.12rem; line-height: 1.62; color: var(--slate); }
+.ab-tv-body p b { color: var(--ink); font-weight: 700; }
+.ab-visit { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; padding: 13px 26px; border-radius: 12px;
+  background: var(--grad); color: #fff; font-weight: 800; font-size: 0.98rem; text-decoration: none;
+  box-shadow: 0 12px 30px rgba(0,212,255,0.26); transition: transform 0.2s ease, box-shadow 0.4s ease; }
+.ab-visit:hover { transform: translateY(-2px); box-shadow: 0 18px 42px rgba(255,0,110,0.30); }
+
+.ab::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 120px; z-index: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent, #ffffff); }
+
+@media (prefers-reduced-motion: reduce) { .ab::before { animation: none; } }
