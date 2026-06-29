@@ -2,22 +2,17 @@ services:
   - type: web
     name: tokverse-studio
     runtime: docker
-    plan: starter
+    # FREE TEST TIER — no persistent disk (data resets on restart/redeploy).
+    # For production: change plan to "starter" and re-add the disk + DB_PATH/OUTPUT_DIR
+    # (/data) block so the database and videos persist.
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    disk:
-      name: tokverse-studio-data
-      mountPath: /data
-      sizeGB: 10
     envVars:
       - key: PYTHONUNBUFFERED
         value: "1"
       - key: SESSION_SECRET
         generateValue: true
-      - key: DB_PATH
-        value: /data/memory/agent_memory.db
-      - key: OUTPUT_DIR
-        value: /data/output
       - key: TIKTOK_CLIENT_KEY
         sync: false
       - key: TIKTOK_CLIENT_SECRET
