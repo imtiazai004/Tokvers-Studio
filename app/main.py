@@ -9,8 +9,21 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.routes import auth, credits, jobs
 from core.config import settings
+from core.queue import get_pool
 
 app = FastAPI(title="Tokverse Studio API")
+
+
+@app.on_event("startup")
+async def _startup():
+    app.state.arq = await get_pool() if settings.redis_url else None
+
+
+@app.on_event("shutdown")
+async def _shutdown():
+    pool = getattr(app.state, "arq", None)
+    if pool is not None:
+        await pool.aclose()
 
 app.add_middleware(
     SessionMiddleware,

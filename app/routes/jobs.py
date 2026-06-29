@@ -1,7 +1,7 @@
 """Generation job API — create (with credit hold), list, and fetch (workspace-scoped)."""
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -44,6 +44,7 @@ def _job_dto(j: GenerationJob) -> dict:
 @router.post("")
 async def create(
     data: CreateJobIn,
+    request: Request,
     ws=Depends(require_workspace_id),
     uid=Depends(require_user_id),
     session: AsyncSession = Depends(get_session),
@@ -62,8 +63,11 @@ async def create(
     except credits.GenerationDisabled as e:
         return JSONResponse({"error": str(e)}, status_code=503)
 
-    # TODO(walking-skeleton): enqueue generate_video_job(job.id) to Arq once
-    # provider keys + R2 are configured. The credit hold is already placed.
+    # hand the job to a worker (credit hold is already placed)
+    pool = getattr(request.app.state, "arq", None)
+    if pool is not None:
+        await pool.enqueue_job("generate_video_job", str(job.id))
+
     return _job_dto(job)
 
 
