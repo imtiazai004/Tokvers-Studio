@@ -7,7 +7,7 @@ as the cutover proceeds.
 from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.routes import auth, credits, jobs
+from app.routes import auth, credits, jobs, providers
 from core.config import settings
 from core.queue import get_pool
 
@@ -35,6 +35,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(credits.router)
 app.include_router(jobs.router)
+app.include_router(providers.router)
 
 
 @app.get("/api/health")
