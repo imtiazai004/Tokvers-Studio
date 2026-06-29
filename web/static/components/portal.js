@@ -30,13 +30,34 @@
   }, { threshold: 0.25 });
   ioReveal.observe(stage);
 
-  // phones / reduced motion: just play the clip once, no scrub
+  // phones / reduced motion: play the clip once — but only when it scrolls into
+  // view, so the (heavy) clip never loads on initial page open.
   if (reduce || noScrub || !pin) {
-    if (video) { video.loop = false; var pr = video.play && video.play(); if (pr && pr.catch) pr.catch(function () {}); }
+    if (video) {
+      video.loop = false;
+      var ioPlay = new IntersectionObserver(function (es) {
+        if (es[0].isIntersecting) {
+          video.preload = 'auto';
+          var pr = video.play && video.play(); if (pr && pr.catch) pr.catch(function () {});
+          ioPlay.disconnect();
+        }
+      }, { rootMargin: '200px 0px' });
+      ioPlay.observe(stage);
+    }
     return;
   }
 
-  if (video) { video.pause(); video.loop = false; video.preload = 'auto'; }
+  if (video) { video.pause(); video.loop = false; }
+
+  // Lazy-load the heavy portal clip only as it approaches (~1.5 screens early),
+  // not on initial page load. By the time you scroll here it's buffered and
+  // ready to scrub — this keeps ~5MB off the first paint.
+  if (video) {
+    var ioPreload = new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) { video.preload = 'auto'; video.load(); ioPreload.disconnect(); }
+    }, { rootMargin: '1500px 0px' });
+    ioPreload.observe(pin);
+  }
 
   // progress map (p = 0..1 across the pinned track)
   var SCRUB_START = 0.08, SCRUB_END = 0.86;   // scrub the clip
