@@ -7,7 +7,7 @@ as the cutover proceeds.
 from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.routes import auth
+from app.routes import auth, credits, jobs
 from core.config import settings
 
 app = FastAPI(title="Tokverse Studio API")
@@ -20,6 +20,8 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(credits.router)
+app.include_router(jobs.router)
 
 
 @app.get("/api/health")

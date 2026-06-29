@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     # ── Limits / cost control ───────────────────────────────────
     max_workspace_monthly_spend: float = 0   # 0 = no cap (USD-equivalent credits/month)
     generation_enabled: bool = True          # global kill-switch for generation
+    credits_per_scene: float = 1.0           # placeholder estimate until probe gives real cost
 
     # ── Cloudflare R2 (object storage) ──────────────────────────
     r2_account_id: str = ""
