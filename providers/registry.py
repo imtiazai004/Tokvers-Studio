@@ -1,11 +1,13 @@
 """Provider registry / factory — resolve a provider adapter by name."""
 from .base import VideoProvider
 from .grok import GrokProvider
+from .higgsfield import HiggsfieldProvider
 from .veo import VeoProvider
 
 _PROVIDERS: dict[str, type[VideoProvider]] = {
     "veo": VeoProvider,
     "grok": GrokProvider,
+    "higgsfield": HiggsfieldProvider,
 }
 
 

@@ -35,5 +35,18 @@ class ProviderSettings:
         self.grok_model = os.getenv("GROK_MODEL", "grok-imagine-video")
         self.grok_price_per_second = _float_or_none(os.getenv("GROK_PRICE_PER_SECOND"))
 
+        # Higgsfield (video) — optional provider; contract confirmed on first real call
+        self.higgsfield_api_key = os.getenv("HIGGSFIELD_API_KEY") or ""
+        self.higgsfield_model = os.getenv("HIGGSFIELD_MODEL", "higgsfield_v1")
+        self.higgsfield_price_per_second = _float_or_none(os.getenv("HIGGSFIELD_PRICE_PER_SECOND"))
+
+        # Voice providers
+        self.elevenlabs_api_key = os.getenv("ELEVENLABS_API_KEY") or ""
+        self.elevenlabs_voice_male = os.getenv("ELEVENLABS_VOICE_ID_MALE", "pNInz6obpgDQGcFmaJgB")
+        self.elevenlabs_voice_female = os.getenv("ELEVENLABS_VOICE_ID_FEMALE", "EXAVITQu4vr4xnSDxMaL")
+        self.fish_audio_api_key = os.getenv("FISH_AUDIO_API_KEY") or ""
+        self.fish_model = os.getenv("FISH_MODEL", "speech-1.6")
+        self.fish_voice_id = os.getenv("FISH_VOICE_ID", "")  # reference_id of a Fish voice model
+
 
 settings = ProviderSettings()
