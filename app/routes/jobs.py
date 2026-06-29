@@ -18,7 +18,8 @@ router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 class CreateJobIn(BaseModel):
     topic: str
     niche: str | None = None
-    provider: str = "veo"
+    provider: str = "veo"           # video provider
+    voice_provider: str = "elevenlabs"
     video_type: str = "product_demo"
     scenes: int = 6
     product_name: str | None = ""
@@ -29,6 +30,7 @@ class CreateJobIn(BaseModel):
 def _job_dto(j: GenerationJob) -> dict:
     return {
         "job_id": str(j.id),
+        "topic": (j.params or {}).get("topic"),
         "status": j.status,
         "step": j.step,
         "progress": j.progress,

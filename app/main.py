@@ -46,7 +46,7 @@ async def health():
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 _PAGES = {
-    "/": "static/index.html",
+    "/": "static/create.html",
     "/dashboard": "static/dashboard.html",
     "/analytics": "static/analytics.html",
     "/settings-page": "static/settings.html",
