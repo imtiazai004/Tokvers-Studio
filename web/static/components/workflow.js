@@ -218,17 +218,18 @@
 
   io.observe(stage);
 
-  // Warm the first couple of clips as the section approaches (~1.2 screens
-  // early) so the very first scene plays smoothly the first time — not only
-  // after scrolling away and back.
+  // The workflow sits right under the hero, so there's almost no scroll lead
+  // time to buffer its first clip — that's why scene 1 stuttered on first play
+  // but was fine after scrolling back. Start buffering the first two clips ~1s
+  // after load (giving the hero a head start), and also the moment the section
+  // nears — whichever comes first.
+  function warmFirst() { preloadVideo(videos[0]); preloadVideo(videos[1]); }
+  setTimeout(warmFirst, 1000);
+
   var ioWarm = new IntersectionObserver(function (entries) {
-    if (entries[0].isIntersecting) {
-      preloadVideo(videos[0]);
-      preloadVideo(videos[1]);
-      ioWarm.disconnect();
-    }
-  }, { rootMargin: '1200px 0px' });
-  ioWarm.observe(stage);
+    if (entries[0].isIntersecting) { warmFirst(); ioWarm.disconnect(); }
+  }, { rootMargin: '1500px 0px' });
+  ioWarm.observe(scroll);
 
   raf = requestAnimationFrame(tick);
 })();
