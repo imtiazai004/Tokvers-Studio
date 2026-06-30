@@ -164,9 +164,14 @@ async def library(ws=Depends(require_workspace_id), session: AsyncSession = Depe
                 url = await storage.signed_url(v.r2_key, expires=3600)
             except Exception:
                 url = None
-        out.append({"id": str(v.id), "topic": v.topic, "tool": v.tool,
-                    "url": url, "created_at": v.created_at.isoformat() if v.created_at else None})
-    return {"videos": out}
+        out.append({"id": str(v.id), "topic": v.topic, "tool": v.tool, "niche": v.niche,
+                    "url": url, "created_at": v.created_at.isoformat() if v.created_at else None,
+                    "views": v.views or 0, "likes": v.likes or 0, "shares": v.shares or 0})
+    totals = {"videos": len(out),
+              "views": sum(v["views"] for v in out),
+              "likes": sum(v["likes"] for v in out),
+              "shares": sum(v["shares"] for v in out)}
+    return {"videos": out, "totals": totals}
 
 
 @router.get("/products")

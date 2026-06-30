@@ -6,6 +6,22 @@
 <title>Learnings · Tokverse Studio</title>
 <link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
 <link rel="stylesheet" href="/static/appui.css">
+<style>
+  .kpi .ico{ font-size:1.05rem; margin-bottom:5px; }
+  .lgrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:13px; }
+  .lcard{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:15px; box-shadow:var(--shadow-sm); }
+  .lcard .ag{ font-size:.66rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--teal); }
+  .lcard .ky{ font-weight:700; margin:3px 0 6px; }
+  .lcard .vl{ font-size:.86rem; color:var(--slate); }
+  .conf{ height:6px; border-radius:4px; background:#eef3fb; overflow:hidden; margin-top:11px; }
+  .conf i{ display:block; height:100%; background:var(--grad); }
+  .conf-l{ font-size:.68rem; color:var(--muted); margin-top:4px; }
+  .pat{ display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .pat:last-child{ border-bottom:none; }
+  .pat .hook{ flex:1; min-width:180px; font-weight:700; }
+  .pat .tag{ font-size:.68rem; font-weight:700; padding:2px 9px; border-radius:999px; background:#eef3fb; color:#64748b; }
+  .pat .perf{ font-weight:800; color:var(--teal); }
+</style>
 </head>
 <body>
   <div class="top">
@@ -21,27 +37,52 @@
     <button id="logoutBtn">Log out</button>
   </div>
   <div class="wrap">
-    <h2>Agent Learnings</h2>
-    <div class="card" id="learnings"><div class="empty">Loading…</div></div>
-    <h2>Script Patterns</h2>
+    <h2>What your agents have learned</h2>
+    <p class="empty" style="text-align:left;padding:0 0 10px;color:var(--muted)">The agents get smarter as you generate — these insights are built from your real results.</p>
+    <div class="kpis" id="kpis"></div>
+
+    <h2 style="margin-top:24px">Agent learnings</h2>
+    <div id="learnings"><div class="empty">Loading…</div></div>
+
+    <h2 style="margin-top:24px">Winning script patterns</h2>
     <div class="card" id="patterns"><div class="empty">Loading…</div></div>
   </div>
   </div>
 <script>
+const $=id=>document.getElementById(id);
 async function api(p,o){ const r=await fetch(p,Object.assign({headers:{'Content-Type':'application/json'}},o));
   if(r.status===401){ location.href='/login'; throw new Error('unauth'); } return r; }
-document.getElementById('logoutBtn').onclick=async()=>{ await api('/api/auth/logout',{method:'POST'}); location.href='/login'; };
+$('logoutBtn').onclick=async()=>{ await api('/api/auth/logout',{method:'POST'}); location.href='/login'; };
+function kpi(ico,n,l){ return `<div class="kpi"><div class="ico">${ico}</div><div class="n">${n}</div><div class="l">${l}</div></div>`; }
 (async()=>{
   const d=await (await api('/api/learnings')).json();
-  const L=d.learnings||[], P=d.patterns||[];
-  document.getElementById('learnings').innerHTML = L.length ? `<table>
-    <thead><tr><th>Agent</th><th>Learning</th><th>Value</th><th>Confidence</th></tr></thead>
-    <tbody>${L.map(l=>`<tr><td>${l.agent}</td><td>${l.key}</td><td>${l.value}</td><td>${Math.round(l.confidence*100)}%</td></tr>`).join('')}</tbody></table>`
-    : '<div class="empty">No learnings yet — these build up as the agents generate and learn.</div>';
-  document.getElementById('patterns').innerHTML = P.length ? `<table>
-    <thead><tr><th>Niche</th><th>Hook</th><th>Length</th><th>Voice</th><th>Perf</th><th>Used</th></tr></thead>
-    <tbody>${P.map(p=>`<tr><td>${p.niche||''}</td><td>${p.hook||''}</td><td>${p.length||''}</td><td>${p.voice||''}</td><td>${p.perf}</td><td>${p.used}</td></tr>`).join('')}</tbody></table>`
-    : '<div class="empty">No script patterns yet.</div>';
+  const L=(d.learnings||[]), P=(d.patterns||[]);
+  const avgConf = L.length ? Math.round(L.reduce((s,l)=>s+l.confidence,0)/L.length*100) : 0;
+  $('kpis').innerHTML = kpi('🧠',L.length,'Learnings')+kpi('📝',P.length,'Script patterns')
+    +kpi('🎯',L.length?avgConf+'%':'—','Avg confidence');
+
+  $('learnings').innerHTML = L.length ? `<div class="lgrid">${L.map(l=>`
+    <div class="lcard">
+      <div class="ag">${l.agent}</div>
+      <div class="ky">${l.key}</div>
+      <div class="vl">${l.value}</div>
+      <div class="conf"><i style="width:${Math.round(l.confidence*100)}%"></i></div>
+      <div class="conf-l">${Math.round(l.confidence*100)}% confidence</div>
+    </div>`).join('')}</div>`
+    : '<div class="empty">No learnings yet — these build up automatically as the agents generate and learn from real performance.</div>';
+
+  // Patterns sorted by performance (best first)
+  P.sort((a,b)=>(b.perf||0)-(a.perf||0));
+  $('patterns').innerHTML = P.length ? P.map(p=>`
+    <div class="pat">
+      <span class="hook">${p.hook||'—'}</span>
+      ${p.niche?`<span class="tag">${p.niche}</span>`:''}
+      ${p.length?`<span class="tag">${p.length}</span>`:''}
+      ${p.voice?`<span class="tag">${p.voice}</span>`:''}
+      <span class="perf">${p.perf}</span>
+      <span class="tag">used ${p.used}×</span>
+    </div>`).join('')
+    : '<div class="empty">No script patterns yet — winning hooks &amp; formats will appear here as videos perform.</div>';
 })();
 </script>
 </body>

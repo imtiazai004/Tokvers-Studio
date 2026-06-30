@@ -6,6 +6,17 @@
 <title>Library · Tokverse Studio</title>
 <link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
 <link rel="stylesheet" href="/static/appui.css">
+<style>
+  .kpi .ico{ font-size:1.05rem; margin-bottom:5px; }
+  .toolbar{ display:flex; align-items:center; gap:10px; margin:18px 0 14px; flex-wrap:wrap; }
+  .toolbar input{ max-width:260px; }
+  .toolbar .sp{ flex:1; }
+  .vid .meta2{ display:flex; gap:12px; padding:0 11px 10px; font-size:.74rem; color:var(--muted); }
+  .vid .meta2 b{ color:var(--ink); }
+  .vid .c{ display:flex; align-items:center; gap:8px; }
+  .vid .c .sp{ flex:1; }
+  .chip{ font-size:.66rem; font-weight:700; padding:2px 7px; border-radius:6px; background:#eef3fb; color:#64748b; }
+</style>
 </head>
 <body>
   <div class="top">
@@ -22,23 +33,53 @@
   </div>
   <div class="wrap">
     <h2>Content Library</h2>
+    <div class="kpis" id="kpis"></div>
+    <div class="toolbar">
+      <input id="search" placeholder="🔍 Search by topic…">
+      <select id="sort">
+        <option value="recent">Newest first</option>
+        <option value="views">Most views</option>
+        <option value="likes">Most likes</option>
+      </select>
+      <div class="sp"></div>
+      <span class="empty" id="count" style="padding:0"></span>
+    </div>
     <div id="grid" class="grid"></div>
     <div id="empty" class="empty" style="display:none">No videos yet — generate one from <a href="/" style="color:var(--teal);font-weight:600">Create</a>.</div>
   </div>
   </div>
 <script>
+const $=id=>document.getElementById(id);
 async function api(p,o){ const r=await fetch(p,Object.assign({headers:{'Content-Type':'application/json'}},o));
   if(r.status===401){ location.href='/login'; throw new Error('unauth'); } return r; }
-document.getElementById('logoutBtn').onclick=async()=>{ await api('/api/auth/logout',{method:'POST'}); location.href='/login'; };
-(async()=>{
-  const d=await (await api('/api/library')).json();
-  const vids=d.videos||[];
-  if(!vids.length){ document.getElementById('empty').style.display='block'; return; }
-  document.getElementById('grid').innerHTML = vids.map(v=>`
+$('logoutBtn').onclick=async()=>{ await api('/api/auth/logout',{method:'POST'}); location.href='/login'; };
+function nfmt(n){ return (n||0).toLocaleString(); }
+function kpi(ico,n,l){ return `<div class="kpi"><div class="ico">${ico}</div><div class="n">${n}</div><div class="l">${l}</div></div>`; }
+
+let VIDS=[];
+function render(){
+  const q=($('search').value||'').toLowerCase().trim();
+  const sort=$('sort').value;
+  let list=VIDS.filter(v=>!q || (v.topic||'').toLowerCase().includes(q));
+  if(sort==='views') list.sort((a,b)=>b.views-a.views);
+  else if(sort==='likes') list.sort((a,b)=>b.likes-a.likes);
+  $('count').textContent = `${list.length} video${list.length===1?'':'s'}`;
+  $('grid').innerHTML = list.map(v=>`
     <div class="vid">
       ${v.url?`<video src="${v.url}" controls preload="metadata"></video>`:`<div class="ph">processing…</div>`}
-      <div class="c">${v.topic||'video'}<br><span class="bar">${v.tool||''}</span></div>
+      <div class="c"><span style="font-weight:600">${v.topic||'video'}</span><span class="sp"></span>${v.tool?`<span class="chip">${v.tool}</span>`:''}</div>
+      <div class="meta2"><span>👁️ <b>${nfmt(v.views)}</b></span><span>❤️ <b>${nfmt(v.likes)}</b></span><span>🔁 <b>${nfmt(v.shares)}</b></span></div>
     </div>`).join('');
+}
+$('search').oninput=render; $('sort').onchange=render;
+(async()=>{
+  const d=await (await api('/api/library')).json();
+  VIDS=d.videos||[];
+  const t=d.totals||{videos:0,views:0,likes:0,shares:0};
+  $('kpis').innerHTML = kpi('🎬',nfmt(t.videos),'Videos')+kpi('👁️',nfmt(t.views),'Total Views')
+    +kpi('❤️',nfmt(t.likes),'Total Likes')+kpi('🔁',nfmt(t.shares),'Shares');
+  if(!VIDS.length){ $('empty').style.display='block'; $('count').textContent=''; return; }
+  render();
 })();
 </script>
 </body>
