@@ -6,6 +6,36 @@
 <title>Dashboard · Tokverse Studio</title>
 <link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
 <link rel="stylesheet" href="/static/appui.css">
+<style>
+  .dhead { display:flex; align-items:flex-start; gap:14px; margin-bottom:20px; flex-wrap:wrap; }
+  .dhead h1 { font-size:1.5rem; font-weight:800; letter-spacing:-0.5px; }
+  .dhead p { font-size:.84rem; color:var(--muted); margin-top:3px; }
+  .dhead .sp { flex:1; }
+  .statpill { display:inline-flex; align-items:center; gap:7px; font-size:.8rem; font-weight:600;
+    padding:7px 13px; border-radius:999px; border:1px solid var(--line); background:#fff; box-shadow:var(--shadow-sm); }
+  .statpill .dot { width:8px; height:8px; border-radius:50%; }
+  .statpill.on  .dot { background:#10b981; box-shadow:0 0 0 3px rgba(16,185,129,.15); }
+  .statpill.off .dot { background:#f59e0b; }
+  .kpi .trend { font-size:.74rem; font-weight:700; margin-top:7px; }
+  .kpi .trend.up { color:#059669; } .kpi .trend.down { color:#dc2626; } .kpi .trend.flat { color:var(--muted); }
+  .kpi .ico { font-size:1.1rem; margin-bottom:6px; }
+  .sec { font-size:1.05rem; font-weight:800; margin:26px 0 13px; }
+  .agents { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
+  .agent { background:var(--card); border:1px solid var(--line); border-radius:13px; padding:15px; box-shadow:var(--shadow-sm); }
+  .agent .top2 { display:flex; align-items:center; gap:9px; }
+  .agent .ai { font-size:1.4rem; }
+  .agent .an { font-weight:800; font-size:.95rem; }
+  .agent .st { display:inline-flex; align-items:center; gap:6px; font-size:.72rem; font-weight:700;
+    padding:3px 9px; border-radius:999px; margin-top:10px; }
+  .agent .st .d { width:7px; height:7px; border-radius:50%; }
+  .agent .st.active { background:#d1fae5; color:#065f46; } .agent .st.active .d { background:#10b981; animation:pulse 1.8s infinite; }
+  .agent .st.idle { background:#eef3fb; color:#64748b; } .agent .st.idle .d { background:#94a3b8; }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)} 50%{box-shadow:0 0 0 5px rgba(16,185,129,0)} }
+  .agent .nums { display:flex; gap:16px; margin-top:12px; }
+  .agent .nums .v { font-size:1.25rem; font-weight:800; line-height:1; }
+  .agent .nums .k { font-size:.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-top:3px; }
+  .twrap table { margin-top:4px; }
+</style>
 </head>
 <body>
   <div class="top">
@@ -19,9 +49,27 @@
     <button id="logoutBtn">Log out</button>
   </div>
   <div class="wrap">
+    <div class="dhead">
+      <div>
+        <h1 id="greet">Welcome back 👋</h1>
+        <p>Your real-time TikTok automation overview</p>
+      </div>
+      <div class="sp"></div>
+      <span class="statpill" id="sysPill"><span class="dot"></span><span id="sysText">…</span></span>
+    </div>
+
     <div class="kpis" id="kpis"></div>
-    <h2>Recent jobs</h2>
+
+    <div class="sec">Active Agents <span style="font-size:.78rem;font-weight:500;color:var(--muted)">— live pipeline status</span></div>
+    <div class="agents" id="agents"></div>
+
+    <div class="sec">Recent activity</div>
     <div id="recent"><div class="empty">Loading…</div></div>
+
+    <div id="topwrap" style="display:none">
+      <div class="sec">Top performing videos</div>
+      <div class="card twrap" id="top"></div>
+    </div>
   </div>
   </div>
 <script>
@@ -29,21 +77,74 @@ const $=id=>document.getElementById(id);
 async function api(p,o){ const r=await fetch(p,Object.assign({headers:{'Content-Type':'application/json'}},o));
   if(r.status===401){ location.href='/login'; throw new Error('unauth'); } return r; }
 function badge(s){ return `<span class="badge b-${s}">${s}</span>`; }
-function kpi(n,l,cls){ return `<div class="kpi ${cls||''}"><div class="n">${n}</div><div class="l">${l}</div></div>`; }
+function nfmt(n){ return (n||0).toLocaleString(); }
+
+// KPI card with an OPTIONAL real trend (null trend => no chip, never faked)
+function kpi(ico,n,l,trend){
+  let t='';
+  if(trend!==null && trend!==undefined){
+    const cls = trend>0?'up':(trend<0?'down':'flat');
+    const arr = trend>0?'↑':(trend<0?'↓':'→');
+    t=`<div class="trend ${cls}">${arr} ${Math.abs(trend)}% vs last month</div>`;
+  }
+  return `<div class="kpi"><div class="ico">${ico}</div><div class="n">${n}</div><div class="l">${l}</div>${t}</div>`;
+}
+
 async function load(){
-  const me=await (await api('/api/auth/me')).json(); if(!me.authenticated){location.href='/login';return;} $('userPill').textContent=me.email;
+  const me=await (await api('/api/auth/me')).json();
+  if(!me.authenticated){ location.href='/login'; return; }
+  $('userPill').textContent=me.email;
+  const nm = (me.name && me.name.trim()) ? me.name.trim().split(' ')[0] : me.email.split('@')[0];
+  $('greet').textContent = `Welcome back, ${nm}! 👋`;
+
   const d=await (await api('/api/dashboard')).json();
   $('balance').textContent=d.balance;
-  $('kpis').innerHTML = kpi(d.jobs.total,'Total jobs')+kpi(d.jobs.done,'Completed','done')
-    +kpi(d.jobs.failed,'Failed','failed')+kpi(d.jobs.running+d.jobs.queued,'In progress','running')
-    +kpi(d.videos,'Videos')+kpi(d.balance,'Credits');
+
+  // System status (real): generation on/off + running count
+  const on = d.system.generation_enabled;
+  $('sysPill').className = 'statpill ' + (on?'on':'off');
+  $('sysText').textContent = on
+    ? (d.system.running>0 ? `${d.system.running} generating now` : 'Generation ready')
+    : 'Generation off';
+
+  // KPIs — all real. Trend only where we can truly compute it (videos).
+  const p=d.performance;
+  $('kpis').innerHTML =
+      kpi('🎬', nfmt(d.videos), 'Videos', d.trends.videos)
+    + kpi('👁️', nfmt(p.views), 'Total Views')
+    + kpi('❤️', nfmt(p.likes), 'Total Likes')
+    + kpi('🔁', nfmt(p.shares), 'Shares')
+    + kpi('✅', nfmt(d.jobs.done), 'Completed')
+    + kpi('💎', nfmt(d.balance), 'Credits');
+
+  // Active agents — real status from running jobs
+  const ICONS={script:'✍️',voice:'🎙️',video:'🎬',editing:'🎞️'};
+  $('agents').innerHTML = (d.agents||[]).map(a=>`
+    <div class="agent">
+      <div class="top2"><span class="ai">${ICONS[a.key]||'🤖'}</span><span class="an">${a.name}</span></div>
+      <span class="st ${a.status}"><span class="d"></span>${a.status==='active'?'Active':'Idle'}</span>
+      <div class="nums">
+        <div><div class="v">${a.active}</div><div class="k">In progress</div></div>
+        <div><div class="v">${a.completed}</div><div class="k">Completed</div></div>
+      </div>
+    </div>`).join('');
+
+  // Recent activity — real
   $('recent').innerHTML = (d.recent && d.recent.length) ? d.recent.map(j=>`
     <div class="job"><div class="job-row"><span class="t">${j.topic||j.provider||'job'}</span>${badge(j.status)}</div>
-    <div class="meta">${j.provider||''}${j.cost!=null?' · cost '+j.cost:''}${j.created_at?' · '+new Date(j.created_at).toLocaleString():''}</div></div>`).join('')
-    : '<div class="empty">No jobs yet — go to Create.</div>';
+    <div class="meta">${j.provider||''}${j.step?' · '+j.step:''}${j.cost!=null?' · cost '+j.cost:''}${j.created_at?' · '+new Date(j.created_at).toLocaleString():''}</div></div>`).join('')
+    : '<div class="empty">No activity yet — go to <a href="/" style="color:var(--teal);font-weight:600">Create</a> to generate your first video.</div>';
+
+  // Top videos — only show if there's real performance data
+  const tv=d.top_videos||[];
+  if(tv.length){
+    $('topwrap').style.display='block';
+    $('top').innerHTML = `<table><thead><tr><th>Video</th><th>Views</th><th>Likes</th><th>Shares</th></tr></thead>
+      <tbody>${tv.map(v=>`<tr><td>${v.topic||'video'}</td><td>${nfmt(v.views)}</td><td>${nfmt(v.likes)}</td><td>${nfmt(v.shares)}</td></tr>`).join('')}</tbody></table>`;
+  } else { $('topwrap').style.display='none'; }
 }
 $('logoutBtn').addEventListener('click', async()=>{ await api('/api/auth/logout',{method:'POST'}); location.href='/login'; });
-load(); setInterval(load, 4000);
+load(); setInterval(load, 5000);   // real-time refresh
 </script>
 </body>
 </html>
