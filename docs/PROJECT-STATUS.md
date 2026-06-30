@@ -2,7 +2,7 @@
 
 > **Yeh file** sab kuch ek jagah rakhti hai: kya ho chuka, kya **pending** hai, aur
 > aage ka plan. Jab bhi confusion ho, pehle yeh padho.
-> **Last updated:** 2026-06-30.
+> **Last updated:** 2026-06-30 (rich dashboard + Settings page added).
 
 ---
 
@@ -31,7 +31,13 @@
   captions → R2 upload → learnings. *(Keys ke baghair graceful-fail karta hai.)*
 - **Providers**: video (Veo / Grok / Higgsfield) + voice (ElevenLabs / Fish) — selectable.
 - **Full UI**: Create (8 video types incl. **UGC**, product-image, batch, characters,
-  manual script), Dashboard, Library, Products, Learnings, Analytics, Billing.
+  manual script), Dashboard, Library, Products, Learnings, Analytics, Billing, **Settings**.
+- **Rich real-time Dashboard**: welcome greeting + system status, performance KPIs
+  (videos/views/likes/shares/completed/credits), **real** month-over-month trend,
+  live **Active Agents** panel (status from actual running jobs), recent activity +
+  top videos. All wired to real data — **no dummy numbers** (zeros/idle until you generate).
+- **Settings page** (real, NOT BYOK): Profile + password change, **Generation
+  defaults** (pre-fill the Create form), Connections (TikTok), Plan & usage.
 - **Branding**: marketing light theme + landing logo + left gradient sidebar + top action bar.
 - **Billing core** (provider-agnostic): plans (Free/Starter/Pro), monthly credits,
   signup pe free credits, gateway-interface ready (Paddle/LemonSqueezy baad mein plug).
