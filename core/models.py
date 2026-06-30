@@ -128,6 +128,23 @@ class Subscription(Base, TimestampMixin):
     last_grant_period: Mapped[str | None] = mapped_column(String(7), nullable=True)  # "YYYY-MM"
 
 
+# ── TikTok integration (official OAuth — no password storage) ───
+
+class TikTokAccount(Base, TimestampMixin):
+    """A workspace's connected TikTok account (Login Kit). Tokens encrypted at rest."""
+    __tablename__ = "tiktok_accounts"
+    __table_args__ = (UniqueConstraint("workspace_id", "open_id", name="uq_tiktok_ws_open"),)
+    id: Mapped[uuid.UUID] = _pk()
+    workspace_id: Mapped[uuid.UUID] = _ws_fk()
+    open_id: Mapped[str] = mapped_column(String(120))            # TikTok user id
+    display_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    scope: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    encrypted_access_token: Mapped[str] = mapped_column(Text)
+    encrypted_refresh_token: Mapped[str | None] = mapped_column(Text, nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(nullable=True)
+
+
 # ── Generation pipeline ─────────────────────────────────────────
 
 class GenerationJob(Base, TimestampMixin):

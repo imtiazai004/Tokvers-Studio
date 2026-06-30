@@ -10,6 +10,16 @@
   .kpis { margin-bottom:8px; }
   td input { width:84px; padding:6px 8px; }
   td button { padding:6px 11px; }
+  .tt { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .tt img.av { width:46px; height:46px; border-radius:50%; object-fit:cover; background:#eef3fb; }
+  .tt .info { flex:1; min-width:160px; }
+  .tt .info .nm { font-weight:700; }
+  .tt .info .s { font-size:.8rem; color:var(--muted); margin-top:2px; }
+  .btn-tt { background:linear-gradient(90deg,#06e8d8,#13b9d6,#ff0a5e); color:#fff; font-weight:700; border:none; padding:10px 16px; }
+  .banner { display:none; padding:10px 14px; border-radius:10px; font-size:.85rem; margin-bottom:12px; }
+  .banner.ok { display:block; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; }
+  .banner.err { display:block; background:#fff1f2; border:1px solid #fecdd3; color:#be123c; }
+  .banner.info { display:block; background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; }
 </style>
 </head>
 <body>
@@ -26,6 +36,9 @@
     <button id="logoutBtn">Log out</button>
   </div>
   <div class="wrap">
+    <div class="banner" id="banner"></div>
+    <h2>TikTok account</h2>
+    <div class="card" id="ttcard"><div class="empty">Loading…</div></div>
     <h2>Analytics</h2>
     <div class="kpis" id="kpis"></div>
     <h2>Track performance</h2>
@@ -38,6 +51,34 @@ async function api(p,o){ const r=await fetch(p,Object.assign({headers:{'Content-
   if(r.status===401){ location.href='/login'; throw new Error('unauth'); } return r; }
 $('logoutBtn').onclick=async()=>{ await api('/api/auth/logout',{method:'POST'}); location.href='/login'; };
 function kpi(n,l){ return `<div class="kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`; }
+
+function showBanner(){
+  const m={connected:['ok','TikTok account connected ✓'],error:['err','Could not connect TikTok. Please try again.'],
+    unconfigured:['info','TikTok integration is coming soon — it activates once our TikTok app is approved.']};
+  const q=new URLSearchParams(location.search).get('tiktok');
+  if(m[q]){ const b=$('banner'); b.textContent=m[q][1]; b.className='banner '+m[q][0];
+    history.replaceState({},'',location.pathname); }
+}
+async function loadTikTok(){
+  const s=await (await api('/api/tiktok/status')).json();
+  const c=$('ttcard');
+  if(s.connected){
+    c.innerHTML=`<div class="tt">
+      ${s.avatar_url?`<img class="av" src="${s.avatar_url}">`:`<img class="av">`}
+      <div class="info"><div class="nm">${s.display_name||'TikTok account'}</div>
+      <div class="s">Connected · auto-sync analytics &amp; publishing</div></div>
+      <button id="ttoff">Disconnect</button></div>`;
+    $('ttoff').onclick=async()=>{ await api('/api/tiktok/disconnect',{method:'POST'}); loadTikTok(); };
+  } else if(s.configured){
+    c.innerHTML=`<div class="tt"><div class="info"><div class="nm">Connect your TikTok</div>
+      <div class="s">Auto-pull performance &amp; publish generated videos directly.</div></div>
+      <a class="btn-tt" href="/api/tiktok/connect" style="border-radius:9px;text-decoration:none">Connect TikTok</a></div>`;
+  } else {
+    c.innerHTML=`<div class="tt"><div class="info"><div class="nm">TikTok integration — coming soon</div>
+      <div class="s">Connect (analytics auto-sync + 1-click publishing) activates once our TikTok app is approved.</div></div>
+      <button disabled>Connect TikTok</button></div>`;
+  }
+}
 async function load(){
   const d=await (await api('/api/analytics')).json();
   const t=d.totals;
@@ -62,7 +103,7 @@ async function load(){
     b.textContent='Saved'; setTimeout(()=>b.textContent='Save',1200); load();
   });
 }
-load();
+showBanner(); loadTikTok(); load();
 </script>
 </body>
 </html>

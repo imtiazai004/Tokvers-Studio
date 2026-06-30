@@ -38,6 +38,16 @@ class Settings(BaseSettings):
     # ── Billing ─────────────────────────────────────────────────
     billing_provider: str = "manual"         # manual | paddle | lemonsqueezy (plug gateway later)
 
+    # ── TikTok integration (Login Kit + Content Posting API) ────
+    tiktok_client_key: str = ""
+    tiktok_client_secret: str = ""
+    tiktok_redirect_uri: str = ""            # must match the app's registered redirect
+    tiktok_scopes: str = "user.info.basic,video.list,video.upload,video.publish"
+
+    @property
+    def tiktok_configured(self) -> bool:
+        return bool(self.tiktok_client_key and self.tiktok_client_secret and self.tiktok_redirect_uri)
+
     # ── Cloudflare R2 (object storage) ──────────────────────────
     r2_account_id: str = ""
     r2_access_key_id: str = ""
