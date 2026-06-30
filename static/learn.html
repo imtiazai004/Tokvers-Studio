@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learnings · Tokverse Studio</title>
+<link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
+<link rel="stylesheet" href="/static/appui.css">
+</head>
+<body>
+  <div class="top">
+    <span class="brand">Tokverse Studio</span>
+    <span class="nav">
+      <a href="/">Create</a><a href="/dashboard">Dashboard</a>
+      <a href="/content-library">Library</a><a href="/products">Products</a>
+      <a href="/learnings" class="active">Learnings</a>
+    </span>
+    <span class="spacer"></span>
+    <button id="logoutBtn">Log out</button>
+  </div>
+  <div class="wrap">
+    <h2>Agent Learnings</h2>
+    <div class="card" id="learnings"><div class="empty">Loading…</div></div>
+    <h2>Script Patterns</h2>
+    <div class="card" id="patterns"><div class="empty">Loading…</div></div>
+  </div>
+<script>
+async function api(p,o){ const r=await fetch(p,Object.assign({headers:{'Content-Type':'application/json'}},o));
+  if(r.status===401){ location.href='/login'; throw new Error('unauth'); } return r; }
+document.getElementById('logoutBtn').onclick=async()=>{ await api('/api/auth/logout',{method:'POST'}); location.href='/login'; };
+(async()=>{
+  const d=await (await api('/api/learnings')).json();
+  const L=d.learnings||[], P=d.patterns||[];
+  document.getElementById('learnings').innerHTML = L.length ? `<table>
+    <thead><tr><th>Agent</th><th>Learning</th><th>Value</th><th>Confidence</th></tr></thead>
+    <tbody>${L.map(l=>`<tr><td>${l.agent}</td><td>${l.key}</td><td>${l.value}</td><td>${Math.round(l.confidence*100)}%</td></tr>`).join('')}</tbody></table>`
+    : '<div class="empty">No learnings yet — these build up as the agents generate and learn.</div>';
+  document.getElementById('patterns').innerHTML = P.length ? `<table>
+    <thead><tr><th>Niche</th><th>Hook</th><th>Length</th><th>Voice</th><th>Perf</th><th>Used</th></tr></thead>
+    <tbody>${P.map(p=>`<tr><td>${p.niche||''}</td><td>${p.hook||''}</td><td>${p.length||''}</td><td>${p.voice||''}</td><td>${p.perf}</td><td>${p.used}</td></tr>`).join('')}</tbody></table>`
+    : '<div class="empty">No script patterns yet.</div>';
+})();
+</script>
+</body>
+</html>

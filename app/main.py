@@ -51,9 +51,9 @@ _PAGES = {
     "/dashboard": "static/dash.html",
     "/analytics": "static/analytics.html",
     "/settings-page": "static/settings.html",
-    "/content-library": "static/content-library.html",
-    "/products": "static/products.html",
-    "/learnings": "static/learnings.html",
+    "/content-library": "static/lib.html",
+    "/products": "static/prod.html",
+    "/learnings": "static/learn.html",
     "/guide": "static/guide.html",
 }
 

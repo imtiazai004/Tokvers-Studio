@@ -1,0 +1,26 @@
+/* Shared styles for the new app pages (library, products, learnings) */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #0f1420; color: #e6edf6; }
+a { color: inherit; }
+.top { display: flex; align-items: center; gap: 16px; padding: 12px 22px; background: #141b2b; border-bottom: 1px solid #20293c; position: sticky; top: 0; z-index: 5; }
+.brand { font-weight: 800; font-size: 1.05rem; background: linear-gradient(90deg,#06e8d8,#13b9d6,#ff0a5e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav a { text-decoration: none; color: #9fb0c9; font-size: .88rem; padding: 6px 11px; border-radius: 8px; }
+.nav a.active, .nav a:hover { background: #1b2540; color: #e6edf6; }
+.spacer { flex: 1; }
+.pill { background: #1b2540; border: 1px solid #2a375a; padding: 6px 12px; border-radius: 999px; font-size: .85rem; }
+.pill b { color: #06e8d8; }
+button { font: inherit; cursor: pointer; border-radius: 9px; background: #1b2540; color: #cdd9ee; border: 1px solid #2a375a; padding: 7px 12px; font-size: .85rem; }
+.wrap { max-width: 1000px; margin: 0 auto; padding: 22px; }
+h2 { font-size: 1rem; margin: 6px 0 14px; }
+.card { background: #141b2b; border: 1px solid #20293c; border-radius: 13px; padding: 16px; margin-bottom: 12px; }
+.empty { color: #6b7a96; font-size: .9rem; padding: 18px 4px; text-align: center; }
+table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid #20293c; }
+th { color: #8294af; font-weight: 600; font-size: .78rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.vid { background: #141b2b; border: 1px solid #20293c; border-radius: 12px; overflow: hidden; }
+.vid video, .vid .ph { width: 100%; aspect-ratio: 9/16; background: #0a0f1a; object-fit: cover; display: block; }
+.vid .ph { display: flex; align-items: center; justify-content: center; color: #46566f; font-size: .8rem; }
+.vid .c { padding: 9px 11px; font-size: .82rem; }
+.bar { font-size: .76rem; color: #06e8d8; }

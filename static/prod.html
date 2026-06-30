@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products · Tokverse Studio</title>
+<link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
+<link rel="stylesheet" href="/static/appui.css">
+</head>
+<body>
+  <div class="top">
+    <span class="brand">Tokverse Studio</span>
+    <span class="nav">
+      <a href="/">Create</a><a href="/dashboard">Dashboard</a>
+      <a href="/content-library">Library</a>
+      <a href="/products" class="active">Products</a><a href="/learnings">Learnings</a>
+    </span>
+    <span class="spacer"></span>
+    <button id="logoutBtn">Log out</button>
+  </div>
+  <div class="wrap">
+    <h2>Products</h2>
+    <div class="card" id="card"><div class="empty">Loading…</div></div>
+  </div>
+<script>
+async function api(p,o){ const r=await fetch(p,Object.assign({headers:{'Content-Type':'application/json'}},o));
+  if(r.status===401){ location.href='/login'; throw new Error('unauth'); } return r; }
+document.getElementById('logoutBtn').onclick=async()=>{ await api('/api/auth/logout',{method:'POST'}); location.href='/login'; };
+(async()=>{
+  const d=await (await api('/api/products')).json();
+  const p=d.products||[];
+  if(!p.length){ document.getElementById('card').innerHTML='<div class="empty">No products yet — generate videos and they’ll group here by topic.</div>'; return; }
+  document.getElementById('card').innerHTML = `<table>
+    <thead><tr><th>Product</th><th>Videos</th><th>Views</th><th>Likes</th><th>Shares</th></tr></thead>
+    <tbody>${p.map(r=>`<tr><td>${r.product||''}</td><td>${r.videos}</td><td>${r.views}</td><td>${r.likes}</td><td>${r.shares}</td></tr>`).join('')}</tbody></table>`;
+})();
+</script>
+</body>
+</html>

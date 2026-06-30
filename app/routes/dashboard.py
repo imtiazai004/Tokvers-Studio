@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.deps import require_workspace_id
 from core import credits, storage
 from core.db import get_session
-from core.models import GenerationJob, Video
+from core.models import GenerationJob, Learning, ScriptPattern, Video
 
 router = APIRouter(prefix="/api", tags=["dashboard"])
 
@@ -73,3 +73,42 @@ async def library(ws=Depends(require_workspace_id), session: AsyncSession = Depe
         out.append({"id": str(v.id), "topic": v.topic, "tool": v.tool,
                     "url": url, "created_at": v.created_at.isoformat() if v.created_at else None})
     return {"videos": out}
+
+
+@router.get("/products")
+async def products(ws=Depends(require_workspace_id), session: AsyncSession = Depends(get_session)):
+    rows = (
+        await session.execute(
+            select(
+                Video.topic, func.count(),
+                func.coalesce(func.sum(Video.views), 0),
+                func.coalesce(func.sum(Video.likes), 0),
+                func.coalesce(func.sum(Video.shares), 0),
+            )
+            .where(Video.workspace_id == ws)
+            .group_by(Video.topic)
+            .order_by(func.count().desc())
+        )
+    ).all()
+    return {"products": [
+        {"product": r[0], "videos": r[1], "views": int(r[2]), "likes": int(r[3]), "shares": int(r[4])}
+        for r in rows
+    ]}
+
+
+@router.get("/learnings")
+async def learnings(ws=Depends(require_workspace_id), session: AsyncSession = Depends(get_session)):
+    ls = list(await session.scalars(
+        select(Learning).where(Learning.workspace_id == ws).order_by(Learning.confidence.desc())
+    ))
+    ps = list(await session.scalars(
+        select(ScriptPattern).where(ScriptPattern.workspace_id == ws)
+    ))
+    return {
+        "learnings": [{"agent": l.agent_name, "key": l.learning_key, "value": l.learning_value,
+                       "confidence": float(l.confidence)} for l in ls],
+        "patterns": [{"niche": p.niche, "hook": p.hook_style, "length": p.script_length,
+                      "voice": p.voice_gender, "perf": float(p.avg_performance),
+                      "used": p.usage_count} for p in ps],
+    }
+

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Library · Tokverse Studio</title>
+<link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
+<link rel="stylesheet" href="/static/appui.css">
+</head>
+<body>
+  <div class="top">
+    <span class="brand">Tokverse Studio</span>
+    <span class="nav">
+      <a href="/">Create</a><a href="/dashboard">Dashboard</a>
+      <a href="/content-library" class="active">Library</a>
+      <a href="/products">Products</a><a href="/learnings">Learnings</a>
+    </span>
+    <span class="spacer"></span>
+    <button id="logoutBtn">Log out</button>
+  </div>
+  <div class="wrap">
+    <h2>Content Library</h2>
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" style="display:none">No videos yet — generate one from <a href="/" style="color:#13b9d6">Create</a>.</div>
+  </div>
+<script>
+async function api(p,o){ const r=await fetch(p,Object.assign({headers:{'Content-Type':'application/json'}},o));
+  if(r.status===401){ location.href='/login'; throw new Error('unauth'); } return r; }
+document.getElementById('logoutBtn').onclick=async()=>{ await api('/api/auth/logout',{method:'POST'}); location.href='/login'; };
+(async()=>{
+  const d=await (await api('/api/library')).json();
+  const vids=d.videos||[];
+  if(!vids.length){ document.getElementById('empty').style.display='block'; return; }
+  document.getElementById('grid').innerHTML = vids.map(v=>`
+    <div class="vid">
+      ${v.url?`<video src="${v.url}" controls preload="metadata"></video>`:`<div class="ph">processing…</div>`}
+      <div class="c">${v.topic||'video'}<br><span class="bar">${v.tool||''}</span></div>
+    </div>`).join('');
+})();
+</script>
+</body>
+</html>
