@@ -50,7 +50,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 _PAGES = {
     "/": "static/create.html",
     "/dashboard": "static/dash.html",
-    "/analytics": "static/analytics.html",
+    "/analytics": "static/analyt.html",
     "/settings-page": "static/settings.html",
     "/content-library": "static/lib.html",
     "/products": "static/prod.html",

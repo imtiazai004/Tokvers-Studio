@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics · Tokverse Studio</title>
+<link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
+<link rel="stylesheet" href="/static/appui.css">
+<style>
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:8px; }
+  .kpi { background:#141b2b; border:1px solid #20293c; border-radius:13px; padding:16px; }
+  .kpi .n { font-size:1.6rem; font-weight:800; } .kpi .l { font-size:.78rem; color:#8294af; margin-top:3px; }
+  td input { width:84px; padding:6px 8px; background:#0f1626; color:#e6edf6; border:1px solid #2a375a; border-radius:7px; }
+  td button { padding:6px 11px; }
+</style>
+</head>
+<body>
+  <div class="top">
+    <span class="brand">Tokverse Studio</span>
+    <span class="nav">
+      <a href="/">Create</a><a href="/dashboard">Dashboard</a><a href="/characters">Characters</a>
+      <a href="/content-library">Library</a><a href="/products">Products</a>
+      <a href="/learnings">Learnings</a><a href="/analytics" class="active">Analytics</a>
+    </span>
+    <span class="spacer"></span>
+    <button id="logoutBtn">Log out</button>
+  </div>
+  <div class="wrap">
+    <h2>Analytics</h2>
+    <div class="kpis" id="kpis"></div>
+    <h2>Track performance</h2>
+    <div class="card" id="table"><div class="empty">Loading…</div></div>
+  </div>
+<script>
+const $=id=>document.getElementById(id);
+async function api(p,o){ const r=await fetch(p,Object.assign({headers:{'Content-Type':'application/json'}},o));
+  if(r.status===401){ location.href='/login'; throw new Error('unauth'); } return r; }
+$('logoutBtn').onclick=async()=>{ await api('/api/auth/logout',{method:'POST'}); location.href='/login'; };
+function kpi(n,l){ return `<div class="kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`; }
+async function load(){
+  const d=await (await api('/api/analytics')).json();
+  const t=d.totals;
+  $('kpis').innerHTML = kpi(t.videos,'Videos')+kpi(t.views.toLocaleString(),'Views')
+    +kpi(t.likes.toLocaleString(),'Likes')+kpi(t.shares.toLocaleString(),'Shares');
+  const vids=d.videos||[];
+  $('table').innerHTML = vids.length ? `<table>
+    <thead><tr><th>Video</th><th>Views</th><th>Likes</th><th>Shares</th><th></th></tr></thead>
+    <tbody>${vids.map(v=>`<tr data-id="${v.id}">
+      <td>${v.topic||'video'}</td>
+      <td><input class="vw" type="number" value="${v.views}"></td>
+      <td><input class="lk" type="number" value="${v.likes}"></td>
+      <td><input class="sh" type="number" value="${v.shares}"></td>
+      <td><button class="save">Save</button></td></tr>`).join('')}</tbody></table>`
+    : '<div class="empty">No videos yet — generate some, then track their TikTok performance here.</div>';
+  document.querySelectorAll('.save').forEach(b=>b.onclick=async()=>{
+    const tr=b.closest('tr');
+    await api('/api/videos/'+tr.dataset.id+'/metrics',{method:'POST',body:JSON.stringify({
+      views:parseInt(tr.querySelector('.vw').value)||0,
+      likes:parseInt(tr.querySelector('.lk').value)||0,
+      shares:parseInt(tr.querySelector('.sh').value)||0 })});
+    b.textContent='Saved'; setTimeout(()=>b.textContent='Save',1200); load();
+  });
+}
+load();
+</script>
+</body>
+</html>

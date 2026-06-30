@@ -1,5 +1,8 @@
-"""Dashboard + library data — real, workspace-scoped (empty until you generate)."""
-from fastapi import APIRouter, Depends
+"""Dashboard + library + analytics data — real, workspace-scoped (empty until you generate)."""
+import uuid
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -111,4 +114,40 @@ async def learnings(ws=Depends(require_workspace_id), session: AsyncSession = De
                       "voice": p.voice_gender, "perf": float(p.avg_performance),
                       "used": p.usage_count} for p in ps],
     }
+
+
+@router.get("/analytics")
+async def analytics(ws=Depends(require_workspace_id), session: AsyncSession = Depends(get_session)):
+    vids = list(await session.scalars(
+        select(Video).where(Video.workspace_id == ws).order_by(Video.views.desc())
+    ))
+    return {
+        "totals": {
+            "videos": len(vids),
+            "views": sum(v.views or 0 for v in vids),
+            "likes": sum(v.likes or 0 for v in vids),
+            "shares": sum(v.shares or 0 for v in vids),
+        },
+        "videos": [{"id": str(v.id), "topic": v.topic, "tool": v.tool,
+                    "views": v.views or 0, "likes": v.likes or 0, "shares": v.shares or 0}
+                   for v in vids],
+    }
+
+
+class MetricsIn(BaseModel):
+    views: int = 0
+    likes: int = 0
+    shares: int = 0
+
+
+@router.post("/videos/{video_id}/metrics")
+async def set_metrics(video_id: uuid.UUID, data: MetricsIn,
+                      ws=Depends(require_workspace_id), session: AsyncSession = Depends(get_session)):
+    v = await session.scalar(select(Video).where(Video.id == video_id, Video.workspace_id == ws))
+    if not v:
+        raise HTTPException(status_code=404, detail="Video not found")
+    v.views, v.likes, v.shares = data.views, data.likes, data.shares
+    v.performance_score = data.views + data.likes * 3 + data.shares * 5
+    await session.commit()
+    return {"status": "ok", "performance_score": float(v.performance_score)}
 
