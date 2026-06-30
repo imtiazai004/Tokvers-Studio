@@ -21,18 +21,33 @@ _redis = None
 _mem: dict[str, tuple[int, float]] = {}  # key -> (count, window_reset_epoch)
 
 
+_redis_unavailable = False
+
+
 async def _get_redis():
-    global _redis
-    if not settings.redis_url or _redis_from_url is None:
+    """Return a Redis client, or None if unavailable/misconfigured (caller then
+    uses the in-memory fallback). A bad REDIS_URL must never raise here."""
+    global _redis, _redis_unavailable
+    if _redis_unavailable or _redis_from_url is None:
+        return None
+    url = (settings.redis_url or "").strip().strip('"').strip("'")
+    if not url:
         return None
     if _redis is None:
-        _redis = _redis_from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
+        try:
+            _redis = _redis_from_url(url, encoding="utf-8", decode_responses=True)
+        except Exception:
+            _redis_unavailable = True   # bad URL — stop retrying, use memory
+            return None
     return _redis
 
 
 async def check(key: str, limit: int, window: int) -> tuple[bool, int]:
     """Return (allowed, retry_after_seconds). Counts this hit against the window."""
-    r = await _get_redis()
+    try:
+        r = await _get_redis()
+    except Exception:
+        r = None
     if r is not None:
         try:
             rk = f"rl:{key}"
