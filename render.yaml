@@ -55,8 +55,7 @@ services:
     plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    dockerCommand: sh start-web.sh   # migrations + uvicorn app.main:app
-    preDeployCommand: alembic upgrade head
+    dockerCommand: sh start-web.sh   # runs migrations (alembic upgrade) + uvicorn app.main:app
     envVars:
       - fromGroup: tokverse-shared
       - key: PYTHONUNBUFFERED
