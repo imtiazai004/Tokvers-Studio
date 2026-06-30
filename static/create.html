@@ -15,6 +15,9 @@
   }
   .brand { font-weight: 800; font-size: 1.05rem;
     background: linear-gradient(90deg,#06e8d8,#13b9d6,#ff0a5e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav { display:flex; gap:6px; }
+  .nav a { text-decoration:none; color:#9fb0c9; font-size:.9rem; padding:6px 12px; border-radius:8px; }
+  .nav a.active, .nav a:hover { background:#1b2540; color:#e6edf6; }
   .top .spacer { flex: 1; }
   .pill { background: #1b2540; border: 1px solid #2a375a; padding: 6px 12px; border-radius: 999px; font-size: .85rem; }
   .pill b { color: #06e8d8; }
@@ -50,6 +53,7 @@
 <body>
   <div class="top">
     <span class="brand">Tokverse Studio</span>
+    <span class="nav"><a href="/" class="active">Create</a><a href="/dashboard">Dashboard</a></span>
     <span class="spacer"></span>
     <span class="pill">Credits: <b id="balance">…</b></span>
     <button class="btn-ghost" id="topupBtn">+ Add 50 (test)</button>

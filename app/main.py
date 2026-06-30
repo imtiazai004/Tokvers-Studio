@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.routes import auth, credits, jobs, providers
+from app.routes import auth, credits, dashboard, jobs, providers
 from core.config import settings
 from core.queue import get_pool
 
@@ -35,6 +35,7 @@ app.include_router(auth.router)
 app.include_router(credits.router)
 app.include_router(jobs.router)
 app.include_router(providers.router)
+app.include_router(dashboard.router)
 
 
 @app.get("/api/health")
@@ -47,7 +48,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 _PAGES = {
     "/": "static/create.html",
-    "/dashboard": "static/dashboard.html",
+    "/dashboard": "static/dash.html",
     "/analytics": "static/analytics.html",
     "/settings-page": "static/settings.html",
     "/content-library": "static/content-library.html",
