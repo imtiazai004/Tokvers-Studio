@@ -6,9 +6,10 @@ from .config import settings
 
 
 def redis_settings() -> RedisSettings:
-    if not settings.redis_url:
+    url = (settings.redis_url or "").strip().strip('"').strip("'")
+    if not url:
         raise RuntimeError("REDIS_URL not configured.")
-    return RedisSettings.from_dsn(settings.redis_url)
+    return RedisSettings.from_dsn(url)
 
 
 async def get_pool():

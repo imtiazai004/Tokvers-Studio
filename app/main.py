@@ -29,7 +29,14 @@ app = FastAPI(title="Tokverse Studio")
 # ── Startup / shutdown: Arq pool for enqueueing jobs ────────
 @app.on_event("startup")
 async def _startup():
-    app.state.arq = await get_pool() if settings.redis_url else None
+    # Never let a missing/misconfigured queue crash the web tier — generation
+    # enqueue just degrades (and is gated by GENERATION_ENABLED anyway).
+    app.state.arq = None
+    if settings.redis_url:
+        try:
+            app.state.arq = await get_pool()
+        except Exception as e:
+            print(f"WARNING: Arq/Redis pool unavailable ({e}); job enqueue disabled.", flush=True)
 
 
 @app.on_event("shutdown")
