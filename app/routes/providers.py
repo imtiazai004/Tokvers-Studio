@@ -3,6 +3,7 @@ from fastapi import APIRouter
 
 from providers import available_providers, get_provider
 from providers.voice import available_voice_providers, get_voice_provider
+from tools.video_types import VIDEO_TYPES
 
 router = APIRouter(prefix="/api/providers", tags=["providers"])
 
@@ -34,4 +35,5 @@ async def list_providers():
             {"id": p, "label": LABELS.get(p, p), "configured": _configured(get_voice_provider, p)}
             for p in available_voice_providers()
         ],
+        "video_types": [{"id": k, "label": v["name"]} for k, v in VIDEO_TYPES.items()],
     }

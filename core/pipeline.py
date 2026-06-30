@@ -25,6 +25,10 @@ from tools.ffmpeg_tool import (
     convert_to_tiktok_format,
     merge_video_clips,
 )
+from tools.video_types import (
+    get_video_type_script_instruction,
+    get_video_type_visual_instruction,
+)
 from tools.whisper_tool import generate_captions
 
 WORK_DIR = "output/gen"
@@ -49,19 +53,24 @@ def _clean_json(raw: str) -> str:
     return raw
 
 
-async def write_script(topic, niche, product_name, product_description, scenes_n) -> dict:
+async def write_script(topic, niche, product_name, product_description, scenes_n,
+                       video_type="product_demo") -> dict:
     """UGC script with per-scene narration + visual prompts (async Claude)."""
     client = _anthropic()
+    s_instr = get_video_type_script_instruction(video_type)
+    v_instr = get_video_type_visual_instruction(video_type)
     system = (
         f"You are a TikTok UGC creator in the {niche or 'lifestyle'} niche. Write authentic, "
         "first-person, non-salesy short-form scripts that feel like a real person sharing an "
-        "honest experience. Hook in the first 3 seconds. Respond ONLY with valid JSON."
+        "honest experience. Hook in the first 3 seconds. Respond ONLY with valid JSON.\n"
+        f"Video type — script guidance: {s_instr}"
     )
     prod = f"\nProduct: {product_name}" if product_name else ""
     prod += f"\nDetails: {product_description}" if product_description else ""
     user = f"""Topic: {topic}{prod}
 Niche: {niche or 'lifestyle'}
 Scenes: {scenes_n}
+Visual guidance for this video type: {v_instr}
 
 Return JSON:
 {{
@@ -91,15 +100,27 @@ async def run_pipeline(*, job_id, params, workspace_id, progress) -> dict:
     product_name = params.get("product_name") or topic
     video_provider_name = params.get("provider") or "veo"
     voice_provider_name = params.get("voice_provider") or "elevenlabs"
+    video_type = params.get("video_type") or "product_demo"
+    manual_script = (params.get("manual_script") or "").strip()
+    product_image = params.get("product_image") or None  # base64, for image-to-video
     scenes_n = max(1, min(8, int(params.get("scenes") or 4)))
 
     out_dir = os.path.join(WORK_DIR, str(job_id))
     os.makedirs(out_dir, exist_ok=True)
     cost = 0.0
 
-    # 1) Script
+    # 1) Script — generated, or the user's manual script
     await progress("script", 12)
-    script = await write_script(topic, niche, product_name, params.get("product_description"), scenes_n)
+    if manual_script:
+        script = {
+            "hook": manual_script[:80], "full_script": manual_script, "hashtags": [],
+            "scenes": [{"narration": "", "duration_seconds": 8,
+                        "visual_prompt": f"{topic}, realistic candid 9:16 UGC scene"}
+                       for _ in range(scenes_n)],
+        }
+    else:
+        script = await write_script(topic, niche, product_name,
+                                    params.get("product_description"), scenes_n, video_type)
     scenes = script["scenes"][:scenes_n]
 
     # 2) Voiceover (full narration)
@@ -116,7 +137,8 @@ async def run_pipeline(*, job_id, params, workspace_id, progress) -> dict:
         await progress("video", pct)
         clip = os.path.join(out_dir, f"scene_{i+1:02d}.mp4")
         res = await video.generate(scene.get("visual_prompt", topic), clip,
-                                   duration_seconds=int(scene.get("duration_seconds", 8)))
+                                   duration_seconds=int(scene.get("duration_seconds", 8)),
+                                   reference_image_b64=product_image)
         if res.cost_usd:
             cost += res.cost_usd
         clip_paths.append(clip)

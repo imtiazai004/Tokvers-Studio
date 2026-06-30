@@ -30,11 +30,12 @@
   .card { background: #141b2b; border: 1px solid #20293c; border-radius: 14px; padding: 18px; }
   h2 { font-size: 1rem; margin-bottom: 14px; }
   label { display: block; font-size: .78rem; color: #9fb0c9; margin: 12px 0 5px; }
-  input, select {
-    width: 100%; padding: 10px 12px; font-size: .92rem; color: #e6edf6;
+  input, select, textarea {
+    width: 100%; padding: 10px 12px; font-size: .92rem; color: #e6edf6; font-family: inherit;
     background: #0f1626; border: 1px solid #2a375a; border-radius: 9px; outline: none;
   }
-  input:focus, select:focus { border-color: #13b9d6; }
+  textarea { resize: vertical; }
+  input:focus, select:focus, textarea:focus { border-color: #13b9d6; }
   .jobs { display: flex; flex-direction: column; gap: 10px; }
   .job { background: #0f1626; border: 1px solid #20293c; border-radius: 11px; padding: 12px 14px; }
   .job-row { display: flex; align-items: center; gap: 10px; }
@@ -68,12 +69,20 @@
       <input id="topic" placeholder="e.g. Spicy Ramen Kit">
       <label>Niche</label>
       <input id="niche" placeholder="e.g. food_and_beverage">
+      <label>Video type</label>
+      <select id="vtype"></select>
       <label>Video provider</label>
       <select id="provider"></select>
       <label>Voice provider</label>
       <select id="voice"></select>
-      <label>Scenes</label>
-      <input id="scenes" type="number" value="6" min="1" max="12">
+      <label>Product image (optional — image-to-video)</label>
+      <input id="image" type="file" accept="image/*">
+      <label>Manual script (optional — leave empty to auto-write)</label>
+      <textarea id="manual" rows="3" placeholder="Your own voiceover script…"></textarea>
+      <div style="display:flex; gap:10px">
+        <div style="flex:1"><label>Scenes</label><input id="scenes" type="number" value="6" min="1" max="8"></div>
+        <div style="flex:1"><label>Batch (videos)</label><input id="batch" type="number" value="1" min="1" max="10"></div>
+      </div>
       <button class="btn-primary" id="genBtn" style="margin-top:18px">Generate</button>
       <div class="err" id="err"></div>
     </div>
@@ -101,7 +110,10 @@ async function loadProviders(){
   const opt = p => `<option value="${p.id}">${p.label}${p.configured?'':' (no key)'}</option>`;
   $('provider').innerHTML = d.video.map(opt).join('');
   $('voice').innerHTML = d.voice.map(opt).join('');
+  $('vtype').innerHTML = (d.video_types||[]).map(t=>`<option value="${t.id}">${t.label}</option>`).join('');
 }
+function fileToB64(file){ return new Promise((res,rej)=>{ const r=new FileReader();
+  r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=rej; r.readAsDataURL(file); }); }
 function badge(s){ return `<span class="badge b-${s}">${s}</span>`; }
 async function loadJobs(){
   const d = await (await api('/api/jobs')).json();
@@ -121,10 +133,15 @@ $('genBtn').addEventListener('click', async () => {
   if(!topic){ showErr('Enter a topic.'); return; }
   $('genBtn').disabled = true; $('genBtn').textContent = 'Submitting…';
   try {
+    let product_image = null;
+    const f = $('image').files[0];
+    if (f) product_image = await fileToB64(f);
     const r = await api('/api/jobs', { method:'POST', body: JSON.stringify({
       topic, niche: $('niche').value.trim()||null,
       provider: $('provider').value, voice_provider: $('voice').value,
-      scenes: parseInt($('scenes').value)||6,
+      video_type: $('vtype').value, scenes: parseInt($('scenes').value)||6,
+      manual_script: $('manual').value.trim()||null,
+      product_image, batch_count: parseInt($('batch').value)||1,
     })});
     if(r.status === 402){ showErr('Not enough credits — click "+ Add 50".'); }
     else if(!r.ok){ const e = await r.json(); showErr(e.error||'Failed to create job'); }

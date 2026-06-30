@@ -24,7 +24,10 @@ class CreateJobIn(BaseModel):
     scenes: int = 6
     product_name: str | None = ""
     product_description: str | None = ""
+    product_image: str | None = None   # base64 (no data-URI prefix) for image-to-video
+    manual_script: str | None = None   # if set, skip the script agent
     character_id: str | None = None
+    batch_count: int = 1               # generate N videos at once
 
 
 def _job_dto(j: GenerationJob) -> dict:
@@ -53,24 +56,27 @@ async def create(
 ):
     scenes = max(1, min(12, data.scenes))
     estimate = scenes * settings.credits_per_scene
-    try:
-        job = await jobs.create_job(
-            session, ws, uid, params=data.model_dump(),
-            cost_estimate=estimate, provider=data.provider,
-        )
-    except credits.InsufficientCredits as e:
-        return JSONResponse({"error": str(e)}, status_code=402)
-    except credits.CapExceeded as e:
-        return JSONResponse({"error": str(e)}, status_code=402)
-    except credits.GenerationDisabled as e:
-        return JSONResponse({"error": str(e)}, status_code=503)
-
-    # hand the job to a worker (credit hold is already placed)
+    batch = max(1, min(10, data.batch_count or 1))
+    params = data.model_dump()
     pool = getattr(request.app.state, "arq", None)
-    if pool is not None:
-        await pool.enqueue_job("generate_video_job", str(job.id))
 
-    return _job_dto(job)
+    created = []
+    for _ in range(batch):
+        try:
+            job = await jobs.create_job(
+                session, ws, uid, params=params, cost_estimate=estimate, provider=data.provider,
+            )
+        except (credits.InsufficientCredits, credits.CapExceeded):
+            break  # ran out mid-batch — return what we made
+        except credits.GenerationDisabled as e:
+            return JSONResponse({"error": str(e)}, status_code=503)
+        if pool is not None:
+            await pool.enqueue_job("generate_video_job", str(job.id))
+        created.append(_job_dto(job))
+
+    if not created:
+        return JSONResponse({"error": "Not enough credits"}, status_code=402)
+    return {"jobs": created}
 
 
 @router.get("")
