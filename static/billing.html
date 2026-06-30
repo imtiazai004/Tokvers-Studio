@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Billing · Tokverse Studio</title>
+<link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
+<link rel="stylesheet" href="/static/appui.css">
+<style>
+  .plans { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; }
+  .plan { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; }
+  .plan.cur { border-color:var(--teal); box-shadow:0 12px 30px rgba(0,212,255,0.16); }
+  .plan .nm { font-size:1.1rem; font-weight:800; }
+  .plan .tg { font-size:.8rem; color:var(--muted); margin-top:2px; }
+  .plan .pr { font-size:2rem; font-weight:800; margin:14px 0 2px; }
+  .plan .pr small { font-size:.85rem; color:var(--muted); font-weight:600; }
+  .plan ul { list-style:none; margin:14px 0; padding:0; flex:1; }
+  .plan li { font-size:.85rem; color:var(--slate); padding:5px 0 5px 22px; position:relative; }
+  .plan li::before { content:'✓'; position:absolute; left:0; color:var(--teal); font-weight:800; }
+  .plan .act { margin-top:6px; }
+  .badge-cur { display:inline-block; font-size:.66rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em;
+    background:#d1fae5; color:#065f46; padding:3px 9px; border-radius:999px; margin-left:8px; vertical-align:middle; }
+  .note { color:var(--muted); font-size:.82rem; margin-top:18px; }
+</style>
+</head>
+<body>
+  <div class="top">
+    <span class="brand"><img src="/static/logo-icon.png?v=2" alt="">Tokverse Studio</span>
+    <span class="nav">
+      <a href="/">Create</a><a href="/dashboard">Dashboard</a><a href="/characters">Characters</a>
+      <a href="/content-library">Library</a><a href="/products">Products</a>
+      <a href="/learnings">Learnings</a><a href="/analytics">Analytics</a>
+    </span>
+  </div>
+  <div class="main">
+  <div class="topbar">
+    <a href="/billing" class="pill" style="text-decoration:none">Credits: <b id="balance">…</b></a>
+    <button id="logoutBtn">Log out</button>
+  </div>
+  <div class="wrap">
+    <h2>Plan & Billing</h2>
+    <div class="card" id="current"><div class="empty">Loading…</div></div>
+    <h2>Choose a plan</h2>
+    <div class="plans" id="plans"><div class="empty">Loading…</div></div>
+    <div class="note" id="note"></div>
+  </div>
+  </div>
+<script>
+const $=id=>document.getElementById(id);
+async function api(p,o){ const r=await fetch(p,Object.assign({headers:{'Content-Type':'application/json'}},o));
+  if(r.status===401){ location.href='/login'; throw new Error('unauth'); } return r; }
+$('logoutBtn').onclick=async()=>{ await api('/api/auth/logout',{method:'POST'}); location.href='/login'; };
+
+let current = null;
+async function loadCurrent(){
+  const s = await (await api('/api/billing/subscription')).json();
+  current = s;
+  $('balance').textContent = s.balance;
+  const renew = s.current_period_end ? new Date(s.current_period_end).toLocaleDateString() : '—';
+  $('current').innerHTML = `<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div><div style="font-size:1.3rem;font-weight:800">${s.plan_name}</div>
+    <div style="font-size:.82rem;color:var(--muted)">Status: ${s.status} · ${s.monthly_credits} credits / month · renews ${renew}</div></div>
+    <div class="spacer"></div>
+    <div style="text-align:right"><div style="font-size:1.6rem;font-weight:800;color:var(--teal)">${s.balance}</div>
+    <div style="font-size:.75rem;color:var(--muted)">credits available</div></div></div>`;
+}
+async function loadPlans(){
+  const d = await (await api('/api/billing/plans')).json();
+  $('plans').innerHTML = (d.plans||[]).map(p=>{
+    const isCur = current && current.plan===p.id;
+    const btn = isCur
+      ? `<button class="btn-ghost" disabled style="width:100%">Current plan</button>`
+      : `<button class="btn-primary" data-plan="${p.id}" style="width:100%">${p.price_usd===0?'Switch to Free':'Choose '+p.name}</button>`;
+    return `<div class="plan ${isCur?'cur':''}">
+      <div class="nm">${p.name}${isCur?'<span class="badge-cur">current</span>':''}</div>
+      <div class="tg">${p.tagline||''}</div>
+      <div class="pr">$${p.price_usd}<small>/mo</small></div>
+      <ul>${(p.features||[]).map(f=>`<li>${f}</li>`).join('')}</ul>
+      <div class="act">${btn}</div></div>`;
+  }).join('');
+  document.querySelectorAll('[data-plan]').forEach(b=>b.onclick=async()=>{
+    b.disabled=true; b.textContent='Working…';
+    const r = await (await api('/api/billing/checkout',{method:'POST',body:JSON.stringify({plan_id:b.dataset.plan})})).json();
+    if(r.checkout_url){ location.href=r.checkout_url; return; }   // real gateway later
+    await loadCurrent(); await loadPlans();                       // manual: activated now
+  });
+  $('note').textContent = 'Payments are in manual mode — plan changes apply instantly and grant the plan’s monthly credits. A payment gateway (Paddle / LemonSqueezy) plugs in here later.';
+}
+(async()=>{ await loadCurrent(); await loadPlans(); })();
+</script>
+</body>
+</html>

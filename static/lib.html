@@ -9,19 +9,22 @@
 </head>
 <body>
   <div class="top">
-    <span class="brand">Tokverse Studio</span>
+    <span class="brand"><img src="/static/logo-icon.png?v=2" alt="">Tokverse Studio</span>
     <span class="nav">
-      <a href="/">Create</a><a href="/dashboard">Dashboard</a>
+      <a href="/">Create</a><a href="/dashboard">Dashboard</a><a href="/characters">Characters</a>
       <a href="/content-library" class="active">Library</a>
-      <a href="/products">Products</a><a href="/learnings">Learnings</a>
+      <a href="/products">Products</a><a href="/learnings">Learnings</a><a href="/analytics">Analytics</a>
     </span>
-    <span class="spacer"></span>
+  </div>
+  <div class="main">
+  <div class="topbar">
     <button id="logoutBtn">Log out</button>
   </div>
   <div class="wrap">
     <h2>Content Library</h2>
     <div id="grid" class="grid"></div>
-    <div id="empty" class="empty" style="display:none">No videos yet — generate one from <a href="/" style="color:#13b9d6">Create</a>.</div>
+    <div id="empty" class="empty" style="display:none">No videos yet — generate one from <a href="/" style="color:var(--teal);font-weight:600">Create</a>.</div>
+  </div>
   </div>
 <script>
 async function api(p,o){ const r=await fetch(p,Object.assign({headers:{'Content-Type':'application/json'}},o));

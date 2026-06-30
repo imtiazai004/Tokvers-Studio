@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     generation_enabled: bool = True          # global kill-switch for generation
     credits_per_scene: float = 1.0           # placeholder estimate until probe gives real cost
 
+    # ── Billing ─────────────────────────────────────────────────
+    billing_provider: str = "manual"         # manual | paddle | lemonsqueezy (plug gateway later)
+
     # ── Cloudflare R2 (object storage) ──────────────────────────
     r2_account_id: str = ""
     r2_access_key_id: str = ""

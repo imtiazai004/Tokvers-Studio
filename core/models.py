@@ -92,15 +92,26 @@ class CreditLedger(Base, TimestampMixin):
 
 
 class Subscription(Base, TimestampMixin):
+    """Provider-agnostic subscription. `provider` + `external_*` map to whatever
+    payment gateway is plugged in later (manual/paddle/lemonsqueezy/stripe)."""
     __tablename__ = "subscriptions"
     id: Mapped[uuid.UUID] = _pk()
     workspace_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("workspaces.id", ondelete="CASCADE"), unique=True, index=True
     )
-    stripe_customer_id: Mapped[str | None] = mapped_column(String(80), nullable=True)
-    stripe_subscription_id: Mapped[str | None] = mapped_column(String(80), nullable=True)
     plan: Mapped[str] = mapped_column(String(40), default="free")
-    status: Mapped[str] = mapped_column(String(30), default="inactive")
+    status: Mapped[str] = mapped_column(String(30), default="active")  # active/canceled/past_due
+
+    # Payment-gateway link (generic — set when a real gateway is wired)
+    provider: Mapped[str] = mapped_column(String(40), default="manual")
+    external_customer_id: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    external_subscription_id: Mapped[str | None] = mapped_column(String(120), nullable=True)
+
+    # Plan quota + billing period
+    monthly_credits: Mapped[int] = mapped_column(Integer, default=0)
+    current_period_start: Mapped[datetime | None] = mapped_column(nullable=True)
+    current_period_end: Mapped[datetime | None] = mapped_column(nullable=True)
+    last_grant_period: Mapped[str | None] = mapped_column(String(7), nullable=True)  # "YYYY-MM"
 
 
 # ── Generation pipeline ─────────────────────────────────────────

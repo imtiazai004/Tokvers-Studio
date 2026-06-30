@@ -41,6 +41,13 @@ async def create_account(
     await session.flush()  # assign workspace.id
 
     session.add(Membership(workspace_id=workspace.id, user_id=user.id, role="owner"))
+    await session.flush()
+
+    # Provision the free plan + grant its starter credits, so a brand-new
+    # workspace can generate immediately. (activate_plan commits internally.)
+    from . import billing  # local import avoids any import-time cycle
+    await billing.activate_plan(session, workspace.id, "free")
+
     await session.commit()
     return user, workspace
 

@@ -5,63 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Create · Tokverse Studio</title>
 <link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
+<link rel="stylesheet" href="/static/appui.css">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #0f1420; color: #e6edf6; }
-  a { color: inherit; }
-  .top {
-    display: flex; align-items: center; gap: 16px; padding: 12px 22px;
-    background: #141b2b; border-bottom: 1px solid #20293c; position: sticky; top: 0; z-index: 5;
-  }
-  .brand { font-weight: 800; font-size: 1.05rem;
-    background: linear-gradient(90deg,#06e8d8,#13b9d6,#ff0a5e); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .nav { display:flex; gap:6px; }
-  .nav a { text-decoration:none; color:#9fb0c9; font-size:.9rem; padding:6px 12px; border-radius:8px; }
-  .nav a.active, .nav a:hover { background:#1b2540; color:#e6edf6; }
-  .top .spacer { flex: 1; }
-  .pill { background: #1b2540; border: 1px solid #2a375a; padding: 6px 12px; border-radius: 999px; font-size: .85rem; }
-  .pill b { color: #06e8d8; }
-  button { font: inherit; cursor: pointer; border: none; border-radius: 9px; }
-  .btn-ghost { background: #1b2540; color: #cdd9ee; border: 1px solid #2a375a; padding: 7px 12px; font-size: .85rem; }
-  .btn-primary { background: linear-gradient(90deg,#13b9d6,#ff0a5e); color: #fff; font-weight: 700; padding: 12px; width: 100%; font-size: .98rem; }
-  .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
-  .wrap { display: grid; grid-template-columns: 380px 1fr; gap: 20px; padding: 22px; max-width: 1100px; margin: 0 auto; }
+  /* page-specific: two-column create layout */
+  .wrap { display: grid; grid-template-columns: 380px 1fr; gap: 20px; max-width: 1100px; align-items: start; }
   @media (max-width: 820px){ .wrap { grid-template-columns: 1fr; } }
-  .card { background: #141b2b; border: 1px solid #20293c; border-radius: 14px; padding: 18px; }
-  h2 { font-size: 1rem; margin-bottom: 14px; }
-  label { display: block; font-size: .78rem; color: #9fb0c9; margin: 12px 0 5px; }
-  input, select, textarea {
-    width: 100%; padding: 10px 12px; font-size: .92rem; color: #e6edf6; font-family: inherit;
-    background: #0f1626; border: 1px solid #2a375a; border-radius: 9px; outline: none;
-  }
-  textarea { resize: vertical; }
-  input:focus, select:focus, textarea:focus { border-color: #13b9d6; }
+  .btn-primary { padding: 12px; width: 100%; font-size: .98rem; margin-top: 18px; }
   .jobs { display: flex; flex-direction: column; gap: 10px; }
-  .job { background: #0f1626; border: 1px solid #20293c; border-radius: 11px; padding: 12px 14px; }
-  .job-row { display: flex; align-items: center; gap: 10px; }
-  .job-row .t { font-weight: 600; flex: 1; }
-  .badge { font-size: .72rem; padding: 3px 9px; border-radius: 999px; font-weight: 700; }
-  .b-queued  { background: #243; color: #8fe; }
-  .b-running { background: #234a6b; color: #7cf; }
-  .b-done    { background: #1c4a2e; color: #6f6; }
-  .b-failed  { background: #4a2230; color: #f99; }
-  .job .meta { font-size: .76rem; color: #8294af; margin-top: 5px; }
-  .stages { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
-  .stages .st { font-size: .68rem; padding: 2px 7px; border-radius: 6px; background: #0f1626; color: #5a6b86; border: 1px solid #20293c; }
-  .stages .st.act { background: #234a6b; color: #7cf; }
-  .stages .st.ok { background: #1c4a2e; color: #6f6; }
-  .stages .st.fail { background: #4a2230; color: #f99; }
-  .empty { color: #6b7a96; font-size: .88rem; padding: 8px 2px; }
-  .err { display:none; margin-top:12px; background:#3a1620; border:1px solid #5b2433; color:#ffb3c0; padding:9px 12px; border-radius:9px; font-size:.83rem; }
-  .err.show { display:block; }
 </style>
 </head>
 <body>
   <div class="top">
-    <span class="brand">Tokverse Studio</span>
+    <span class="brand"><img src="/static/logo-icon.png?v=2" alt="">Tokverse Studio</span>
     <span class="nav"><a href="/" class="active">Create</a><a href="/dashboard">Dashboard</a><a href="/characters">Characters</a><a href="/content-library">Library</a><a href="/products">Products</a><a href="/learnings">Learnings</a><a href="/analytics">Analytics</a></span>
-    <span class="spacer"></span>
-    <span class="pill">Credits: <b id="balance">…</b></span>
+  </div>
+
+  <div class="main">
+  <div class="topbar">
+    <a href="/billing" class="pill" style="text-decoration:none">Credits: <b id="balance">…</b></a>
     <button class="btn-ghost" id="topupBtn">+ Add 50 (test)</button>
     <span class="pill" id="userPill">…</span>
     <button class="btn-ghost" id="logoutBtn">Log out</button>
@@ -98,6 +59,7 @@
       <h2>Your jobs</h2>
       <div class="jobs" id="jobs"><div class="empty">No jobs yet.</div></div>
     </div>
+  </div>
   </div>
 
 <script>

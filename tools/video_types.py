@@ -1,6 +1,20 @@
 """Video type definitions and instructions for script and visual generation."""
 
 VIDEO_TYPES = {
+    "ugc": {
+        "name": "UGC (User-Generated Content)",
+        "description": "Authentic, selfie-style content that looks like a real person filming themselves on their phone",
+        "script_structure": "Native hook | Casual product mention | Real opinion / why I love it | Honest result | Soft recommendation",
+        "tone": "authentic, casual, unscripted, friendly, like talking to the camera",
+        "pacing": "natural conversational pace, slightly imperfect, real",
+        "visual_style": "Handheld selfie/phone-shot look, real home or everyday setting, natural lighting, direct-to-camera, no studio polish",
+        "hook_type": "relatable first-person hook ('ok I have to tell you about this'), pattern interrupt",
+        "cta_style": "casual, organic ('honestly just try it', 'link's in my bio'), non-salesy",
+        "best_for": "almost any product — highest trust/conversion format on TikTok, beauty, gadgets, food, apps",
+        "script_instruction": "Write in natural first-person as a real everyday person, NOT an ad. Open with a casual native hook like a friend texting you. Mention the product organically as part of your real life. Give an honest, specific opinion with a relatable detail. Avoid marketing buzzwords and perfect grammar — sound human, use filler-free but conversational language. End with a soft, non-pushy recommendation.",
+        "visual_instruction": "Shoot to look like genuine phone footage: handheld selfie angle or talking directly to camera, everyday real-life setting (bedroom, kitchen, car, bathroom), natural/available lighting, no studio backdrop. Subject holds and uses the product casually and authentically. Keep it raw and relatable, not polished or commercial.",
+    },
+
     "product_demo": {
         "name": "Product Demo",
         "description": "Shows product in action, features and benefits",

@@ -7,7 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.deps import require_workspace_id
-from core import credits, storage
+from core import billing, credits, storage
 from core.db import get_session
 from core.models import GenerationJob, Learning, ScriptPattern, Video
 
@@ -16,6 +16,8 @@ router = APIRouter(prefix="/api", tags=["dashboard"])
 
 @router.get("/dashboard")
 async def dashboard(ws=Depends(require_workspace_id), session: AsyncSession = Depends(get_session)):
+    # Renew the plan's monthly credits if a new month has begun (idempotent).
+    await billing.refresh_credits_if_due(session, ws)
     balance = float(await credits.get_balance(session, ws))
 
     rows = (

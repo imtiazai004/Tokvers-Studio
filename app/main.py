@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.routes import auth, characters, credits, dashboard, jobs, providers
+from app.routes import auth, billing, characters, credits, dashboard, jobs, providers
 from core.config import settings
 from core.queue import get_pool
 
@@ -37,6 +37,7 @@ app.include_router(jobs.router)
 app.include_router(providers.router)
 app.include_router(dashboard.router)
 app.include_router(characters.router)
+app.include_router(billing.router)
 
 
 @app.get("/api/health")
@@ -56,6 +57,7 @@ _PAGES = {
     "/products": "static/prod.html",
     "/learnings": "static/learn.html",
     "/characters": "static/chars.html",
+    "/billing": "static/billing.html",
     "/guide": "static/guide.html",
 }
 
@@ -83,7 +85,7 @@ for _route, _file in _PAGES.items():
 # ── Auth guard (inner) + session (outer) ────────────────────
 APP_PAGES = set(_PAGES.keys())
 PUBLIC_EXACT = {
-    "/login", "/signup", "/api/health", "/api/providers",
+    "/login", "/signup", "/api/health", "/api/providers", "/api/billing/plans",
     "/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/me",
 }
 PUBLIC_PREFIX = ("/static", "/favicon")

@@ -7,22 +7,22 @@
 <link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
 <link rel="stylesheet" href="/static/appui.css">
 <style>
-  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:8px; }
-  .kpi { background:#141b2b; border:1px solid #20293c; border-radius:13px; padding:16px; }
-  .kpi .n { font-size:1.6rem; font-weight:800; } .kpi .l { font-size:.78rem; color:#8294af; margin-top:3px; }
-  td input { width:84px; padding:6px 8px; background:#0f1626; color:#e6edf6; border:1px solid #2a375a; border-radius:7px; }
+  .kpis { margin-bottom:8px; }
+  td input { width:84px; padding:6px 8px; }
   td button { padding:6px 11px; }
 </style>
 </head>
 <body>
   <div class="top">
-    <span class="brand">Tokverse Studio</span>
+    <span class="brand"><img src="/static/logo-icon.png?v=2" alt="">Tokverse Studio</span>
     <span class="nav">
       <a href="/">Create</a><a href="/dashboard">Dashboard</a><a href="/characters">Characters</a>
       <a href="/content-library">Library</a><a href="/products">Products</a>
       <a href="/learnings">Learnings</a><a href="/analytics" class="active">Analytics</a>
     </span>
-    <span class="spacer"></span>
+  </div>
+  <div class="main">
+  <div class="topbar">
     <button id="logoutBtn">Log out</button>
   </div>
   <div class="wrap">
@@ -30,6 +30,7 @@
     <div class="kpis" id="kpis"></div>
     <h2>Track performance</h2>
     <div class="card" id="table"><div class="empty">Loading…</div></div>
+  </div>
   </div>
 <script>
 const $=id=>document.getElementById(id);
