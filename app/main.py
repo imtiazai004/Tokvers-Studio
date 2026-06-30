@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.routes import auth, billing, characters, credits, dashboard, jobs, providers, tiktok
+from app.routes import auth, billing, characters, credits, dashboard, jobs, providers, settings as settings_routes, tiktok
 from core.config import settings
 from core.queue import get_pool
 
@@ -55,6 +55,7 @@ app.include_router(dashboard.router)
 app.include_router(characters.router)
 app.include_router(billing.router)
 app.include_router(tiktok.router)
+app.include_router(settings_routes.router)
 
 
 @app.get("/api/health")
@@ -75,6 +76,7 @@ _PAGES = {
     "/learnings": "static/learn.html",
     "/characters": "static/chars.html",
     "/billing": "static/billing.html",
+    "/settings": "static/settings.html",
     "/guide": "static/guide.html",
 }
 

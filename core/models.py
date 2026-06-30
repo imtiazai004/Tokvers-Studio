@@ -46,6 +46,9 @@ class Workspace(Base, TimestampMixin):
     name: Mapped[str] = mapped_column(String(120))
     plan: Mapped[str] = mapped_column(String(40), default="free")
     credit_balance: Mapped[float] = mapped_column(Numeric(12, 4), default=0)
+    # Per-workspace generation defaults (pre-fill the Create form). e.g.
+    # {"provider","voice_provider","video_type","scenes","niche"}.
+    gen_defaults: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
 class User(Base, TimestampMixin):

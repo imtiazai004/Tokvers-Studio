@@ -17,7 +17,7 @@
 <body>
   <div class="top">
     <span class="brand"><img src="/static/logo-icon.png?v=2" alt="">Tokverse Studio</span>
-    <span class="nav"><a href="/" class="active">Create</a><a href="/dashboard">Dashboard</a><a href="/characters">Characters</a><a href="/content-library">Library</a><a href="/products">Products</a><a href="/learnings">Learnings</a><a href="/analytics">Analytics</a></span>
+    <span class="nav"><a href="/" class="active">Create</a><a href="/dashboard">Dashboard</a><a href="/characters">Characters</a><a href="/content-library">Library</a><a href="/products">Products</a><a href="/learnings">Learnings</a><a href="/analytics">Analytics</a><a href="/settings">Settings</a></span>
   </div>
 
   <div class="main">
@@ -139,8 +139,21 @@ $('topupBtn').addEventListener('click', async () => {
 });
 $('logoutBtn').addEventListener('click', async () => { await api('/api/auth/logout', { method:'POST' }); window.location.href='/login'; });
 
+async function applyDefaults(){
+  // Pre-fill from the workspace's saved generation defaults (Settings page).
+  try {
+    const s = await (await api('/api/settings')).json();
+    const d = s.defaults || {};
+    if(d.provider) $('provider').value = d.provider;
+    if(d.voice_provider) $('voice').value = d.voice_provider;
+    if(d.video_type) $('vtype').value = d.video_type;
+    if(d.scenes) $('scenes').value = d.scenes;
+    if(d.niche && !$('niche').value) $('niche').value = d.niche;
+  } catch(e){ /* defaults are optional */ }
+}
+
 (async () => {
-  await loadMe(); await loadProviders(); await loadCharacters(); await refresh();
+  await loadMe(); await loadProviders(); await loadCharacters(); await applyDefaults(); await refresh();
   setInterval(refresh, 3000);   // live status polling
 })();
 </script>
