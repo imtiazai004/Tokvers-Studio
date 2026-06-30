@@ -37,7 +37,12 @@
   live **Active Agents** panel (status from actual running jobs), recent activity +
   top videos. All wired to real data — **no dummy numbers** (zeros/idle until you generate).
 - **Settings page** (real, NOT BYOK): Profile + password change, **Generation
-  defaults** (pre-fill the Create form), Connections (TikTok), Plan & usage.
+  defaults** (pre-fill the Create form), Connections (TikTok), Plan & usage,
+  **Team** (members + email invites that auto-join on signup + roles + remove),
+  **Workspace switcher** (multi-workspace membership).
+- **Rich pages** (all real data): Library (per-video stats + search + sort),
+  Products (performance cards, top performer), Learnings (confidence bars +
+  winning patterns).
 - **Branding**: marketing light theme + landing logo + left gradient sidebar + top action bar.
 - **Billing core** (provider-agnostic): plans (Free/Starter/Pro), monthly credits,
   signup pe free credits, gateway-interface ready (Paddle/LemonSqueezy baad mein plug).
