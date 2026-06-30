@@ -46,6 +46,9 @@ envVarGroups:
 
 services:
   # ── Web (API + served frontend) ──────────────────────────────
+  # WEB-ONLY launch: free tier, generation disabled (no keys + no worker yet).
+  # Everything else works (signup / login / billing / browsing). When provider
+  # keys arrive: set GENERATION_ENABLED=true and uncomment the worker below.
   - type: web
     name: tokverse-studio
     runtime: docker
@@ -60,6 +63,8 @@ services:
         value: "1"
       - key: ENVIRONMENT           # enables secure cookies + HSTS
         value: production
+      - key: GENERATION_ENABLED    # OFF until keys + worker are live (no stuck jobs)
+        value: "false"
       - key: SESSION_SECRET
         generateValue: true
       - key: APP_BASE_URL          # set to this service's public URL (for email links)
@@ -75,15 +80,17 @@ services:
       - key: SENTRY_DSN            # optional error tracking
         sync: false
 
-  # ── Worker (generation pipeline) ─────────────────────────────
-  - type: worker
-    name: tokverse-worker
-    runtime: docker
-    plan: starter                  # workers need a paid plan
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
-    dockerCommand: sh start-worker.sh   # python -m arq worker.WorkerSettings
-    envVars:
-      - fromGroup: tokverse-shared
-      - key: PYTHONUNBUFFERED
-        value: "1"
+  # ── Worker (generation pipeline) — ENABLE WHEN KEYS ARRIVE ───
+  # Uncomment this block (needs a PAID plan) once provider keys are set and you
+  # flip GENERATION_ENABLED=true on the web service above.
+  # - type: worker
+  #   name: tokverse-worker
+  #   runtime: docker
+  #   plan: starter                # workers need a paid plan
+  #   dockerfilePath: ./Dockerfile
+  #   dockerContext: .
+  #   dockerCommand: sh start-worker.sh   # python -m arq worker.WorkerSettings
+  #   envVars:
+  #     - fromGroup: tokverse-shared
+  #     - key: PYTHONUNBUFFERED
+  #       value: "1"
