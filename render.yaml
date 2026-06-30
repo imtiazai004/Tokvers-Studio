@@ -1,43 +1,89 @@
-services:
-  - type: web
-    name: tokverse-studio
-    runtime: docker
-    # FREE TEST TIER — no persistent disk (data resets on restart/redeploy).
-    # For production: change plan to "starter" and re-add the disk + DB_PATH/OUTPUT_DIR
-    # (/data) block so the database and videos persist.
-    plan: free
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+# Render blueprint — NEW multi-tenant Tokverse Studio (app/main.py + Arq worker).
+#
+# Cutover note: this targets the new app. The legacy entrypoint (main.py via
+# start-render.sh) is left in the repo untouched; this blueprint simply deploys
+# the new architecture. Do NOT sync/deploy until you're ready to cut over.
+#
+# Worker requires a PAID plan (Render free tier is web-only). Web can stay free
+# for testing (note: free web sleeps when idle and has no persistent disk —
+# fine here because state lives in Neon + R2, not on local disk).
+
+envVarGroups:
+  - name: tokverse-shared
+    # Shared by web + worker. Fill these in the Render dashboard (sync:false).
     envVars:
-      - key: PYTHONUNBUFFERED
-        value: "1"
-      - key: SESSION_SECRET
-        generateValue: true
-      - key: TIKTOK_CLIENT_KEY
+      - key: DATABASE_URL          # Neon Postgres (postgresql://...)
         sync: false
-      - key: TIKTOK_CLIENT_SECRET
+      - key: REDIS_URL             # Upstash (rediss://...)
         sync: false
-      - key: TIKTOK_SHOP_APP_KEY
+      - key: ENCRYPTION_KEY        # Fernet key (persist — do not regenerate)
         sync: false
-      - key: TIKTOK_SHOP_APP_SECRET
+      - key: R2_ACCOUNT_ID
         sync: false
-      - key: TIKTOK_SHOP_ACCESS_TOKEN
+      - key: R2_ACCESS_KEY_ID
         sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        sync: false
+      - key: R2_PUBLIC_BASE_URL
+        sync: false
+      # Provider keys (platform-owned). Leave blank to graceful-fail that provider.
       - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY        # Veo
+        sync: false
+      - key: XAI_API_KEY           # Grok Imagine
         sync: false
       - key: ELEVENLABS_API_KEY
         sync: false
-      - key: ELEVENLABS_VOICE_ID_MALE
+      - key: DEEPGRAM_API_KEY      # captions
         sync: false
-      - key: ELEVENLABS_VOICE_ID_FEMALE
+      - key: HIGGSFIELD_API_KEY    # optional
         sync: false
-      - key: GROK_API_KEY
+      - key: FISH_AUDIO_API_KEY    # optional
         sync: false
-      - key: GOOGLE_AI_STUDIO_API_KEY
+
+services:
+  # ── Web (API + served frontend) ──────────────────────────────
+  - type: web
+    name: tokverse-studio
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: sh start-web.sh   # migrations + uvicorn app.main:app
+    preDeployCommand: alembic upgrade head
+    envVars:
+      - fromGroup: tokverse-shared
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: ENVIRONMENT           # enables secure cookies + HSTS
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: APP_BASE_URL          # set to this service's public URL (for email links)
         sync: false
-      - key: APIFY_API_TOKEN
+      - key: EMAIL_PROVIDER        # console | smtp
+        value: console
+      - key: SMTP_HOST
         sync: false
-      - key: BRAVE_SEARCH_API_KEY
+      - key: SMTP_USER
         sync: false
-      - key: DEEPGRAM_API_KEY
+      - key: SMTP_PASSWORD
         sync: false
+      - key: SENTRY_DSN            # optional error tracking
+        sync: false
+
+  # ── Worker (generation pipeline) ─────────────────────────────
+  - type: worker
+    name: tokverse-worker
+    runtime: docker
+    plan: starter                  # workers need a paid plan
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: sh start-worker.sh   # python -m arq worker.WorkerSettings
+    envVars:
+      - fromGroup: tokverse-shared
+      - key: PYTHONUNBUFFERED
+        value: "1"
