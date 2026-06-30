@@ -34,7 +34,12 @@ def prepare_url(url: str) -> tuple[str, bool]:
 
     parts = urlsplit(url)
     pairs = parse_qsl(parts.query, keep_blank_values=True)
-    needs_ssl = any(k == "sslmode" and v != "disable" for k, v in pairs)
+    sslmode = dict(pairs).get("sslmode")
+    host = parts.hostname or ""
+    # SSL on for any remote host (Neon requires it) unless explicitly disabled —
+    # don't depend on `sslmode` being present in the URL string.
+    is_local = host in ("localhost", "127.0.0.1", "::1", "")
+    needs_ssl = sslmode != "disable" and not is_local
     kept = [(k, v) for k, v in pairs if k not in ("sslmode", "channel_binding")]
     url = urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(kept), parts.fragment))
     return url, needs_ssl
