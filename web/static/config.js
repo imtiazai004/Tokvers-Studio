@@ -11,4 +11,4 @@
  *
  * Change the production value once your Render domain is set, redeploy Vercel.
  */
-window.APP_URL = "http://localhost:8000";
+window.APP_URL = "https://tokverse-studio.onrender.com";
