@@ -4,10 +4,14 @@ Workspace-aware authentication & account provisioning.
 Signing up creates a User, a Workspace, and an owner Membership in one step — so
 every account is multi-tenant from the first login (no single-tenant data sharing).
 """
+import hashlib
+import secrets
+from datetime import datetime, timedelta
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .models import Membership, User, Workspace
+from .models import AuthToken, Membership, User, Workspace
 from .security import hash_password, verify_password
 
 
@@ -58,6 +62,61 @@ async def authenticate(session: AsyncSession, email: str, password: str) -> User
     if not user or not verify_password(password, user.password_hash):
         return None
     return user
+
+
+# ── Single-use tokens (password reset / email verification) ─────
+
+def _hash_token(raw: str) -> str:
+    return hashlib.sha256(raw.encode()).hexdigest()
+
+
+async def create_token(session: AsyncSession, user_id, purpose: str, ttl_minutes: int) -> str:
+    """Create a single-use token; returns the RAW token (only the hash is stored)."""
+    raw = secrets.token_urlsafe(32)
+    session.add(AuthToken(
+        user_id=user_id, purpose=purpose, token_hash=_hash_token(raw),
+        expires_at=datetime.utcnow() + timedelta(minutes=ttl_minutes),
+    ))
+    await session.commit()
+    return raw
+
+
+async def consume_token(session: AsyncSession, raw: str, purpose: str) -> User | None:
+    """Validate + burn a token. Returns the owning user, or None if invalid/expired/used."""
+    tok = await session.scalar(
+        select(AuthToken).where(
+            AuthToken.token_hash == _hash_token(raw),
+            AuthToken.purpose == purpose,
+        )
+    )
+    if not tok or tok.used_at is not None or tok.expires_at < datetime.utcnow():
+        return None
+    tok.used_at = datetime.utcnow()
+    return await session.get(User, tok.user_id)
+
+
+async def get_user_by_email(session: AsyncSession, email: str) -> User | None:
+    return await session.scalar(select(User).where(User.email == (email or "").strip().lower()))
+
+
+async def reset_password(session: AsyncSession, raw_token: str, new_password: str) -> bool:
+    if len(new_password or "") < 8:
+        raise AuthError("Password must be at least 8 characters.")
+    user = await consume_token(session, raw_token, "reset")
+    if not user:
+        return False
+    user.password_hash = hash_password(new_password)
+    await session.commit()
+    return True
+
+
+async def verify_email(session: AsyncSession, raw_token: str) -> bool:
+    user = await consume_token(session, raw_token, "verify")
+    if not user:
+        return False
+    user.email_verified = True
+    await session.commit()
+    return True
 
 
 async def get_primary_workspace(session: AsyncSession, user_id) -> Workspace | None:

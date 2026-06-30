@@ -57,6 +57,20 @@ class User(Base, TimestampMixin):
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
+class AuthToken(Base, TimestampMixin):
+    """Single-use tokens for password reset / email verification.
+
+    Only the SHA-256 hash is stored; the raw token travels in the emailed link.
+    """
+    __tablename__ = "auth_tokens"
+    id: Mapped[uuid.UUID] = _pk()
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    purpose: Mapped[str] = mapped_column(String(20))          # reset | verify
+    token_hash: Mapped[str] = mapped_column(String(64), index=True)
+    expires_at: Mapped[datetime] = mapped_column()
+    used_at: Mapped[datetime | None] = mapped_column(nullable=True)
+
+
 class Membership(Base, TimestampMixin):
     __tablename__ = "memberships"
     __table_args__ = (UniqueConstraint("workspace_id", "user_id", name="uq_member_ws_user"),)

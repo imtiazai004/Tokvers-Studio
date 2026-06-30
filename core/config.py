@@ -14,6 +14,21 @@ class Settings(BaseSettings):
     # ── Security ────────────────────────────────────────────────
     session_secret: str = "dev-only-insecure-change-me"
     encryption_key: str = ""        # Fernet key for per-workspace BYOK secrets
+    environment: str = "development"  # "production" => secure cookies + HSTS
+    app_base_url: str = "http://localhost:8001"  # for building email links
+    sentry_dsn: str = ""            # optional error tracking (env-gated)
+
+    # ── Email (password reset / verification) ───────────────────
+    email_provider: str = "console"  # console | smtp (plug SMTP later)
+    email_from: str = "Tokverse Studio <no-reply@tokverse.studio>"
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment.lower() == "production"
 
     # ── Limits / cost control ───────────────────────────────────
     max_workspace_monthly_spend: float = 0   # 0 = no cap (USD-equivalent credits/month)

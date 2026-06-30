@@ -14,6 +14,15 @@ from app.routes import auth, billing, characters, credits, dashboard, jobs, prov
 from core.config import settings
 from core.queue import get_pool
 
+# ── Error tracking (optional, env-gated) ────────────────────
+if settings.sentry_dsn:
+    try:
+        import sentry_sdk
+        sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.environment,
+                        traces_sample_rate=0.1)
+    except Exception:
+        pass  # never let monitoring break startup
+
 app = FastAPI(title="Tokverse Studio")
 
 
@@ -72,6 +81,16 @@ async def signup_page():
     return FileResponse("static/signup.html")
 
 
+@app.get("/forgot")
+async def forgot_page():
+    return FileResponse("static/forgot.html")
+
+
+@app.get("/reset")
+async def reset_page():
+    return FileResponse("static/reset.html")
+
+
 def _page(file_path: str):
     async def _serve():
         return FileResponse(file_path)
@@ -85,8 +104,9 @@ for _route, _file in _PAGES.items():
 # ── Auth guard (inner) + session (outer) ────────────────────
 APP_PAGES = set(_PAGES.keys())
 PUBLIC_EXACT = {
-    "/login", "/signup", "/api/health", "/api/providers", "/api/billing/plans",
+    "/login", "/signup", "/forgot", "/reset", "/api/health", "/api/providers", "/api/billing/plans",
     "/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/me",
+    "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/verify",
 }
 PUBLIC_PREFIX = ("/static", "/favicon")
 
@@ -102,10 +122,23 @@ async def _auth_guard(request: Request, call_next):
     return JSONResponse({"error": "Authentication required"}, status_code=401)
 
 
-# Order: SessionMiddleware added last => outermost => runs first, so request.session
-# is populated before the auth guard runs.
+async def _security_headers(request: Request, call_next):
+    resp = await call_next(request)
+    resp.headers["X-Content-Type-Options"] = "nosniff"
+    resp.headers["X-Frame-Options"] = "DENY"
+    resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    resp.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    if settings.is_production:
+        resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return resp
+
+
+# Middleware order (added last = outermost = runs first on request):
+#   security headers  ->  session  ->  auth guard  ->  app
+# Session must populate request.session before the auth guard reads it.
 app.add_middleware(BaseHTTPMiddleware, dispatch=_auth_guard)
 app.add_middleware(
     SessionMiddleware, secret_key=settings.session_secret,
-    same_site="lax", https_only=False,
+    same_site="lax", https_only=settings.is_production,
 )
+app.add_middleware(BaseHTTPMiddleware, dispatch=_security_headers)

@@ -1,0 +1,63 @@
+"""
+Pluggable email sender. Default `console` provider just logs the message — so
+password-reset / verification flows work end-to-end TODAY without any SMTP
+account. Set `email_provider=smtp` + SMTP_* env later to actually deliver.
+"""
+from __future__ import annotations
+
+import abc
+import asyncio
+import smtplib
+from email.message import EmailMessage
+
+from .config import settings
+
+
+class EmailSender(abc.ABC):
+    @abc.abstractmethod
+    async def send(self, to: str, subject: str, text: str, html: str | None = None) -> None:
+        ...
+
+
+class ConsoleEmailSender(EmailSender):
+    """Dev/default: prints the email (incl. any action link) to the server log."""
+    async def send(self, to, subject, text, html=None):
+        print("\n" + "=" * 60)
+        print(f"[EMAIL to {to}] {subject}")
+        print("-" * 60)
+        print(text)
+        print("=" * 60 + "\n", flush=True)
+
+
+class SmtpEmailSender(EmailSender):
+    """Real delivery via SMTP (blocking smtplib run off the event loop)."""
+    async def send(self, to, subject, text, html=None):
+        msg = EmailMessage()
+        msg["From"] = settings.email_from
+        msg["To"] = to
+        msg["Subject"] = subject
+        msg.set_content(text)
+        if html:
+            msg.add_alternative(html, subtype="html")
+        await asyncio.to_thread(self._deliver, msg)
+
+    def _deliver(self, msg: EmailMessage):
+        with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as s:
+            s.starttls()
+            if settings.smtp_user:
+                s.login(settings.smtp_user, settings.smtp_password)
+            s.send_message(msg)
+
+
+_SENDERS: dict[str, EmailSender] = {
+    "console": ConsoleEmailSender(),
+    "smtp": SmtpEmailSender(),
+}
+
+
+def get_email_sender() -> EmailSender:
+    return _SENDERS.get(settings.email_provider, _SENDERS["console"])
+
+
+async def send_email(to: str, subject: str, text: str, html: str | None = None) -> None:
+    await get_email_sender().send(to, subject, text, html)

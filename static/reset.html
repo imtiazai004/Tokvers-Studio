@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set New Password · Tokverse Studio</title>
+<link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI','Helvetica Neue',-apple-system,sans-serif; min-height:100vh;
+    display:flex; align-items:center; justify-content:center; padding:24px;
+    background:linear-gradient(135deg,#06c2d4 0%,#0a90b0 22%,#2a4f82 52%,#7a2767 80%,#d11663 100%); }
+  .auth-card { width:100%; max-width:410px; background:#fff; border-radius:18px; padding:38px 34px 30px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.28); }
+  .auth-logo { text-align:center; margin-bottom:6px; }
+  .auth-logo img { width:52px; height:auto; display:block; margin:0 auto 8px; }
+  .auth-brand { font-size:1.5rem; font-weight:800; letter-spacing:-0.6px;
+    background:linear-gradient(90deg,#06e8d8 0%,#13b9d6 42%,#ff0a5e 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
+  .auth-title { font-size:1.25rem; font-weight:700; color:#1a202c; margin:18px 0 18px; text-align:center; }
+  label { display:block; font-size:.8rem; font-weight:600; color:#4a5568; margin:14px 0 6px; }
+  input { width:100%; padding:12px 14px; font-size:.95rem; border:1px solid #e2e8f0; border-radius:10px; outline:none;
+    transition:border-color .2s, box-shadow .2s; }
+  input:focus { border-color:#13b9d6; box-shadow:0 0 0 3px rgba(19,185,214,0.15); }
+  .btn { width:100%; margin-top:22px; padding:13px; border:none; border-radius:10px; cursor:pointer;
+    font-size:.98rem; font-weight:700; color:#fff;
+    background:linear-gradient(90deg,#06e8d8 0%,#13b9d6 42%,#ff0a5e 100%);
+    box-shadow:0 6px 18px rgba(19,185,214,0.32); transition:transform .15s; }
+  .btn:hover { transform:translateY(-1px); } .btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+  .auth-foot { text-align:center; font-size:.85rem; color:#718096; margin-top:20px; }
+  .auth-foot a { color:#13b9d6; font-weight:700; }
+  .auth-msg { display:none; margin-top:16px; padding:10px 13px; border-radius:9px; font-size:.85rem; }
+  .auth-msg.ok { display:block; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; }
+  .auth-msg.err { display:block; background:#fff1f2; border:1px solid #fecdd3; color:#be123c; }
+</style>
+</head>
+<body>
+  <form class="auth-card" id="form">
+    <div class="auth-logo">
+      <img src="/static/logo-icon.png?v=2" alt="Tokverse Studio">
+      <div class="auth-brand">Tokverse Studio</div>
+    </div>
+    <div class="auth-title">Set a new password</div>
+    <label for="password">New password</label>
+    <input type="password" id="password" placeholder="At least 8 characters" required autocomplete="new-password">
+    <label for="confirm">Confirm password</label>
+    <input type="password" id="confirm" placeholder="Re-enter password" required autocomplete="new-password">
+    <div class="auth-msg" id="msg"></div>
+    <button class="btn" id="btn" type="submit">Update password</button>
+    <div class="auth-foot"><a href="/login">Back to log in</a></div>
+  </form>
+<script>
+  const params=new URLSearchParams(location.search), token=params.get('token');
+  const form=document.getElementById('form'), msg=document.getElementById('msg'), btn=document.getElementById('btn');
+  if(!token){ msg.textContent='Invalid reset link.'; msg.className='auth-msg err'; btn.disabled=true; }
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault(); msg.className='auth-msg';
+    const pw=document.getElementById('password').value, cf=document.getElementById('confirm').value;
+    if(pw!==cf){ msg.textContent='Passwords do not match.'; msg.className='auth-msg err'; return; }
+    if(pw.length<8){ msg.textContent='Password must be at least 8 characters.'; msg.className='auth-msg err'; return; }
+    btn.disabled=true; btn.textContent='Updating…';
+    try {
+      const r=await fetch('/api/auth/reset-password',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({token, password:pw})});
+      const d=await r.json();
+      if(r.ok){ msg.textContent='Password updated. Redirecting to log in…'; msg.className='auth-msg ok';
+        setTimeout(()=>location.href='/login', 1400); return; }
+      msg.textContent=d.error||'Could not reset password.'; msg.className='auth-msg err';
+    } catch(err){ msg.textContent='Could not reach the server.'; msg.className='auth-msg err'; }
+    btn.disabled=false; btn.textContent='Update password';
+  });
+</script>
+</body>
+</html>
