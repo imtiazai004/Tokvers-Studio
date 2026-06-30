@@ -61,6 +61,12 @@ async def download_to(key: str, path: str) -> str:
     return path
 
 
+async def download_bytes(key: str) -> bytes:
+    async with _client() as s3:
+        obj = await s3.get_object(Bucket=settings.r2_bucket, Key=key)
+        return await obj["Body"].read()
+
+
 async def delete(key: str) -> None:
     async with _client() as s3:
         await s3.delete_object(Bucket=settings.r2_bucket, Key=key)

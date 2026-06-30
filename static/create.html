@@ -54,7 +54,7 @@
 <body>
   <div class="top">
     <span class="brand">Tokverse Studio</span>
-    <span class="nav"><a href="/" class="active">Create</a><a href="/dashboard">Dashboard</a><a href="/content-library">Library</a><a href="/products">Products</a><a href="/learnings">Learnings</a></span>
+    <span class="nav"><a href="/" class="active">Create</a><a href="/dashboard">Dashboard</a><a href="/characters">Characters</a><a href="/content-library">Library</a><a href="/products">Products</a><a href="/learnings">Learnings</a></span>
     <span class="spacer"></span>
     <span class="pill">Credits: <b id="balance">…</b></span>
     <button class="btn-ghost" id="topupBtn">+ Add 50 (test)</button>
@@ -75,6 +75,8 @@
       <select id="provider"></select>
       <label>Voice provider</label>
       <select id="voice"></select>
+      <label>Character (optional, consistent face) — <a href="/characters" style="color:#13b9d6">manage</a></label>
+      <select id="character"><option value="">None</option></select>
       <label>Product image (optional — image-to-video)</label>
       <input id="image" type="file" accept="image/*">
       <label>Manual script (optional — leave empty to auto-write)</label>
@@ -112,6 +114,11 @@ async function loadProviders(){
   $('voice').innerHTML = d.voice.map(opt).join('');
   $('vtype').innerHTML = (d.video_types||[]).map(t=>`<option value="${t.id}">${t.label}</option>`).join('');
 }
+async function loadCharacters(){
+  const d = await (await api('/api/characters')).json();
+  $('character').innerHTML = '<option value="">None</option>' +
+    (d.characters||[]).map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
 function fileToB64(file){ return new Promise((res,rej)=>{ const r=new FileReader();
   r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=rej; r.readAsDataURL(file); }); }
 function badge(s){ return `<span class="badge b-${s}">${s}</span>`; }
@@ -140,7 +147,7 @@ $('genBtn').addEventListener('click', async () => {
       topic, niche: $('niche').value.trim()||null,
       provider: $('provider').value, voice_provider: $('voice').value,
       video_type: $('vtype').value, scenes: parseInt($('scenes').value)||6,
-      manual_script: $('manual').value.trim()||null,
+      manual_script: $('manual').value.trim()||null, character_id: $('character').value||null,
       product_image, batch_count: parseInt($('batch').value)||1,
     })});
     if(r.status === 402){ showErr('Not enough credits — click "+ Add 50".'); }
@@ -155,7 +162,7 @@ $('topupBtn').addEventListener('click', async () => {
 $('logoutBtn').addEventListener('click', async () => { await api('/api/auth/logout', { method:'POST' }); window.location.href='/login'; });
 
 (async () => {
-  await loadMe(); await loadProviders(); await refresh();
+  await loadMe(); await loadProviders(); await loadCharacters(); await refresh();
   setInterval(refresh, 3000);   // live status polling
 })();
 </script>

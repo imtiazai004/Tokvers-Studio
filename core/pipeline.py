@@ -10,13 +10,17 @@ keys; each external call raises a clear error until its key is set (then it runs
 for real). Progress is reported via the async `progress(step, percent)` callback
 so the Dashboard/Create pages reflect live status.
 """
+import base64
 import json
 import os
+import uuid
 
 from anthropic import AsyncAnthropic
 
 from config.client_config import get_key
 from core import storage
+from core.db import SessionLocal
+from core.models import Character
 from providers import get_provider
 from providers.voice import get_voice_provider
 from tools.ffmpeg_tool import (
@@ -103,11 +107,31 @@ async def run_pipeline(*, job_id, params, workspace_id, progress) -> dict:
     video_type = params.get("video_type") or "product_demo"
     manual_script = (params.get("manual_script") or "").strip()
     product_image = params.get("product_image") or None  # base64, for image-to-video
+    character_id = params.get("character_id")
     scenes_n = max(1, min(8, int(params.get("scenes") or 4)))
 
     out_dir = os.path.join(WORK_DIR, str(job_id))
     os.makedirs(out_dir, exist_ok=True)
     cost = 0.0
+
+    # Consistent character: reuse its reference image + appearance across every scene
+    reference_image = product_image
+    character_note = ""
+    if character_id:
+        async with SessionLocal() as cs:
+            ch = await cs.get(Character, uuid.UUID(str(character_id)))
+            if ch and ch.workspace_id == workspace_id:
+                if ch.image_r2_key:
+                    try:
+                        reference_image = base64.b64encode(
+                            await storage.download_bytes(ch.image_r2_key)
+                        ).decode()
+                    except Exception:
+                        pass
+                character_note = (
+                    f" Main character: {ch.name}. Appearance: {ch.appearance or ''}."
+                    " The SAME person appears in every scene — consistent face, hair and style."
+                )
 
     # 1) Script — generated, or the user's manual script
     await progress("script", 12)
@@ -136,9 +160,10 @@ async def run_pipeline(*, job_id, params, workspace_id, progress) -> dict:
         pct = 40 + int(35 * (i / max(1, len(scenes))))
         await progress("video", pct)
         clip = os.path.join(out_dir, f"scene_{i+1:02d}.mp4")
-        res = await video.generate(scene.get("visual_prompt", topic), clip,
+        prompt = scene.get("visual_prompt", topic) + character_note
+        res = await video.generate(prompt, clip,
                                    duration_seconds=int(scene.get("duration_seconds", 8)),
-                                   reference_image_b64=product_image)
+                                   reference_image_b64=reference_image)
         if res.cost_usd:
             cost += res.cost_usd
         clip_paths.append(clip)
