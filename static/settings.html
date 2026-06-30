@@ -101,6 +101,28 @@
       <div id="ttcard"><div class="empty">Loading…</div></div>
     </div>
 
+    <!-- Team -->
+    <div class="card">
+      <h3>Team</h3>
+      <div class="sub">Invite people to collaborate in this workspace.</div>
+      <div id="inviteRow" class="row2" style="display:none">
+        <div><label>Invite by email</label><input id="invEmail" type="email" placeholder="teammate@email.com"></div>
+        <div><label>Role</label><select id="invRole"><option value="member">Member</option><option value="admin">Admin</option></select></div>
+      </div>
+      <div class="save-row" id="inviteBtnRow" style="display:none">
+        <button class="btn-primary" id="inviteBtn">Send invite</button>
+        <span class="ok-msg" id="invOk">Done ✓</span>
+      </div>
+      <div id="members" style="margin-top:14px"><div class="empty">Loading…</div></div>
+    </div>
+
+    <!-- Workspaces -->
+    <div class="card">
+      <h3>Your workspaces</h3>
+      <div class="sub">Switch between workspaces you belong to.</div>
+      <div id="wslist"><div class="empty">Loading…</div></div>
+    </div>
+
     <!-- Plan & Usage -->
     <div class="card">
       <h3>Plan &amp; usage</h3>
@@ -136,7 +158,34 @@ async function loadAll(){
   if(DEFAULTS.scenes) $('d_scenes').value=DEFAULTS.scenes;
   if(DEFAULTS.niche) $('d_niche').value=DEFAULTS.niche;
 
-  loadTikTok(); loadPlan();
+  loadTikTok(); loadPlan(); loadTeam(); loadWorkspaces();
+}
+async function loadTeam(){
+  const t=await (await api('/api/team')).json();
+  const owner = t.my_role==='owner';
+  $('inviteRow').style.display = owner?'grid':'none';
+  $('inviteBtnRow').style.display = owner?'flex':'none';
+  const memRows = t.members.map(m=>`<tr>
+      <td>${m.name?m.name+' · ':''}${m.email}${m.user_id===t.my_user_id?' <b>(you)</b>':''}</td>
+      <td>${m.role}</td>
+      ${owner?`<td>${(m.role!=='owner'&&m.user_id!==t.my_user_id)?`<button class="rm" data-id="${m.user_id}">Remove</button>`:''}</td>`:''}
+    </tr>`).join('');
+  const invRows = t.invites.map(i=>`<tr>
+      <td>${i.email} <span class="vbadge no">pending</span></td><td>${i.role}</td>${owner?'<td></td>':''}</tr>`).join('');
+  $('members').innerHTML = `<table><thead><tr><th>Member</th><th>Role</th>${owner?'<th></th>':''}</tr></thead>
+    <tbody>${memRows}${invRows}</tbody></table>`;
+  document.querySelectorAll('.rm').forEach(b=>b.onclick=async()=>{
+    await api('/api/team/remove',{method:'POST',body:JSON.stringify({user_id:b.dataset.id})}); loadTeam(); });
+}
+async function loadWorkspaces(){
+  const w=await (await api('/api/workspaces')).json();
+  $('wslist').innerHTML = w.workspaces.map(x=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)">
+      <div style="flex:1"><b>${x.name}</b> <span class="vbadge no" style="background:#eef3fb;color:#64748b">${x.role}</span></div>
+      ${x.id===w.current?'<span class="ok-msg show">current</span>':`<button class="sw" data-id="${x.id}">Switch</button>`}
+    </div>`).join('');
+  document.querySelectorAll('.sw').forEach(b=>b.onclick=async()=>{
+    await api('/api/workspaces/switch',{method:'POST',body:JSON.stringify({workspace_id:b.dataset.id})}); location.reload(); });
 }
 async function loadTikTok(){
   const t=await (await api('/api/tiktok/status')).json();
@@ -176,6 +225,11 @@ $('savePw').onclick=async()=>{
   const r=await api('/api/settings/password',{method:'POST',body:JSON.stringify({current_password:$('curpw').value,new_password:$('newpw').value})});
   if(r.ok){ $('curpw').value=''; $('newpw').value=''; flash('pwOk'); }
   else { const d=await r.json(); err.textContent=d.error||'Could not update.'; err.classList.add('show'); }
+};
+$('inviteBtn').onclick=async()=>{
+  const email=$('invEmail').value.trim(); if(!email) return;
+  await api('/api/team/invite',{method:'POST',body:JSON.stringify({email,role:$('invRole').value})});
+  $('invEmail').value=''; flash('invOk'); loadTeam();
 };
 $('saveDefaults').onclick=async()=>{
   await api('/api/settings/defaults',{method:'POST',body:JSON.stringify({

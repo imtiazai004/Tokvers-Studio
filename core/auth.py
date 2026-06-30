@@ -52,6 +52,10 @@ async def create_account(
     from . import billing  # local import avoids any import-time cycle
     await billing.activate_plan(session, workspace.id, "free")
 
+    # Auto-join any workspaces this email was invited to.
+    from . import team
+    await team.claim_invites(session, user)
+
     await session.commit()
     return user, workspace
 

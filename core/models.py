@@ -83,6 +83,21 @@ class Membership(Base, TimestampMixin):
     role: Mapped[str] = mapped_column(String(20), default="owner")  # owner/admin/member
 
 
+class WorkspaceInvite(Base, TimestampMixin):
+    """Pending invite to join a workspace. Claimed automatically when the invited
+    email signs up (or applied instantly if that user already exists)."""
+    __tablename__ = "workspace_invites"
+    __table_args__ = (UniqueConstraint("workspace_id", "email", name="uq_invite_ws_email"),)
+    id: Mapped[uuid.UUID] = _pk()
+    workspace_id: Mapped[uuid.UUID] = _ws_fk()
+    email: Mapped[str] = mapped_column(String(255), index=True)
+    role: Mapped[str] = mapped_column(String(20), default="member")
+    invited_by: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    accepted_at: Mapped[datetime | None] = mapped_column(nullable=True)
+
+
 class WorkspaceApiKey(Base, TimestampMixin):
     """Per-workspace BYOK secrets (encrypted at rest)."""
     __tablename__ = "workspace_api_keys"
