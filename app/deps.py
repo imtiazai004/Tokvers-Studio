@@ -4,8 +4,27 @@ import uuid
 from fastapi import Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.config import settings
 from core.db import get_session
 from core.models import User
+
+
+def client_ip(request: Request) -> str:
+    """Real client IP for rate-limiting behind Render's proxy.
+
+    Each proxy APPENDS the address it received the connection from to the right
+    of X-Forwarded-For, so with N trusted proxies the genuine client IP is the
+    Nth entry from the right — and it can't be spoofed by a client-supplied XFF
+    (any forged value lands to the left of what our proxy appends)."""
+    xff = request.headers.get("x-forwarded-for")
+    if xff:
+        parts = [p.strip() for p in xff.split(",") if p.strip()]
+        hops = max(1, settings.trusted_proxy_hops)
+        if len(parts) >= hops:
+            return parts[-hops]
+        if parts:
+            return parts[0]
+    return request.client.host if request.client else "unknown"
 
 
 def require_user_id(request: Request) -> uuid.UUID:

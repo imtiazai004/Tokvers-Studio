@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.deps import client_ip
 from core import auth as auth_core
 from core import ratelimit
 from core.config import settings
@@ -18,13 +19,27 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 async def _throttle(request: Request, name: str, limit: int, window: int):
     """Per-IP brute-force throttle; raises 429 when the window is exhausted."""
-    ip = request.client.host if request.client else "unknown"
+    ip = client_ip(request)
     ok, retry = await ratelimit.check(f"{name}:{ip}", limit, window)
     if not ok:
         raise HTTPException(
             status_code=429,
             detail=f"Too many attempts. Please try again in {retry} seconds.",
         )
+
+
+async def _send_verification_email(session: AsyncSession, user: User) -> None:
+    """Issue a verify token and email the confirmation link. Best-effort — a
+    mail failure must never break signup."""
+    try:
+        raw = await auth_core.create_token(session, user.id, "verify", ttl_minutes=1440)
+        link = f"{settings.app_base_url}/api/auth/verify?token={raw}"
+        await send_email(
+            user.email, "Verify your Tokverse Studio email",
+            f"Confirm your email to start generating (valid 24 hours):\n\n{link}",
+        )
+    except Exception:
+        pass
 
 
 class SignupIn(BaseModel):
@@ -47,6 +62,7 @@ async def signup(request: Request, data: SignupIn, session: AsyncSession = Depen
         )
     except auth_core.AuthError as e:
         return JSONResponse({"error": str(e)}, status_code=400)
+    await _send_verification_email(session, user)   # confirm-email link (needed before generation)
     request.session["user_id"] = str(user.id)
     request.session["workspace_id"] = str(workspace.id)
     return {"status": "ok", "workspace_id": str(workspace.id)}
@@ -114,12 +130,7 @@ async def request_verify(request: Request, session: AsyncSession = Depends(get_s
     await _throttle(request, "verify-req", limit=5, window=3600)
     user = await session.get(User, uuid.UUID(uid))
     if user and not user.email_verified:
-        raw = await auth_core.create_token(session, user.id, "verify", ttl_minutes=1440)
-        link = f"{settings.app_base_url}/api/auth/verify?token={raw}"
-        await send_email(
-            user.email, "Verify your Tokverse Studio email",
-            f"Confirm your email (valid 24 hours):\n\n{link}",
-        )
+        await _send_verification_email(session, user)
     return {"status": "ok"}
 
 

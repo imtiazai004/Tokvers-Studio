@@ -10,7 +10,7 @@ from app.deps import require_user_id, require_workspace_id
 from core import credits, jobs
 from core.config import settings
 from core.db import get_session
-from core.models import GenerationJob
+from core.models import GenerationJob, User
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 
@@ -54,6 +54,15 @@ async def create(
     uid=Depends(require_user_id),
     session: AsyncSession = Depends(get_session),
 ):
+    # Anti-abuse: block generation (which spends real API credits) until the
+    # account's email is verified. Platform staff are exempt so they can test.
+    user = await session.get(User, uid)
+    if not user or (not user.is_admin and not user.email_verified):
+        return JSONResponse(
+            {"error": "Please verify your email before generating videos.", "code": "email_unverified"},
+            status_code=403,
+        )
+
     scenes = max(1, min(12, data.scenes))
     estimate = scenes * settings.credits_per_scene
     batch = max(1, min(10, data.batch_count or 1))

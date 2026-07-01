@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     environment: str = "development"  # "production" => secure cookies + HSTS
     app_base_url: str = "http://localhost:8001"  # for building email links
     sentry_dsn: str = ""            # optional error tracking (env-gated)
+    # Number of trusted reverse proxies in front of the app (Render LB = 1;
+    # set to 2 if you later put Cloudflare in front). Used to derive the real
+    # client IP from X-Forwarded-For safely (rightmost hop is unspoofable).
+    trusted_proxy_hops: int = 1
 
     # ── Email (password reset / verification) ───────────────────
     email_provider: str = "console"  # console | smtp (plug SMTP later)
