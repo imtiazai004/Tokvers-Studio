@@ -168,6 +168,7 @@ class StripeBillingProvider(BillingProvider):
 
     async def start_checkout(self, session, workspace_id, plan_id) -> CheckoutResult:
         price_id = _stripe_price_for(plan_id)
+        print(f"DEBUG checkout: provider={settings.billing_provider!r} plan={plan_id!r} price_id={price_id!r} pro_env={settings.stripe_price_pro!r}", flush=True)
         if not price_id:
             # Free/unpriced plan — no payment needed, activate immediately.
             await activate_plan(session, workspace_id, plan_id, provider="stripe")
