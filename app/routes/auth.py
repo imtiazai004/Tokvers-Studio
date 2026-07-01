@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.deps import client_ip
+from core import appsettings
 from core import auth as auth_core
 from core import ratelimit
 from core.config import settings
@@ -56,6 +57,8 @@ class LoginIn(BaseModel):
 
 @router.post("/signup")
 async def signup(request: Request, data: SignupIn, session: AsyncSession = Depends(get_session)):
+    if not await appsettings.get_bool("signup_enabled", True):
+        return JSONResponse({"error": "New signups are temporarily closed."}, status_code=403)
     await _throttle(request, "signup", limit=5, window=3600)   # 5 / hour / IP
     try:
         user, workspace = await auth_core.create_account(

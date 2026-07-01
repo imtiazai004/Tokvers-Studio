@@ -90,7 +90,8 @@ async def charge(session, workspace_id, amount, reason="generation", job_id=None
     amount = _dec(amount)
     if amount <= 0:
         raise ValueError("amount must be positive")
-    if not settings.generation_enabled:
+    from . import appsettings  # local import avoids an import cycle at module load
+    if not await appsettings.get_bool("generation_enabled", settings.generation_enabled):
         raise GenerationDisabled("Generation is temporarily disabled.")
 
     balance = await get_balance(session, workspace_id)

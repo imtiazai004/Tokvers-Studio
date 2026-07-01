@@ -38,6 +38,16 @@ def _ws_fk() -> Mapped[uuid.UUID]:
     return mapped_column(ForeignKey("workspaces.id", ondelete="CASCADE"), index=True)
 
 
+# ── Platform-wide runtime settings (admin-toggleable, no redeploy) ──
+
+class AppSetting(Base, TimestampMixin):
+    """Key→value flags an admin can flip live (e.g. generation kill-switch).
+    Absent key = fall back to the env default. See `core/appsettings.py`."""
+    __tablename__ = "app_settings"
+    key: Mapped[str] = mapped_column(String(60), primary_key=True)
+    value: Mapped[str] = mapped_column(String(255))
+
+
 # ── Tenancy & identity ──────────────────────────────────────────
 
 class Workspace(Base, TimestampMixin):
