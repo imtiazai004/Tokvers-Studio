@@ -19,6 +19,18 @@ except Exception:  # redis not importable
 
 _redis = None
 _mem: dict[str, tuple[int, float]] = {}  # key -> (count, window_reset_epoch)
+_last_sweep: float = 0.0
+_SWEEP_EVERY = 60.0  # seconds between purges of expired in-memory entries
+
+
+def _sweep_mem(now: float) -> None:
+    """Drop expired entries so the in-memory fallback can't grow unbounded."""
+    global _last_sweep
+    if now - _last_sweep < _SWEEP_EVERY:
+        return
+    for k in [k for k, (_, reset) in _mem.items() if now > reset]:
+        _mem.pop(k, None)
+    _last_sweep = now
 
 
 _redis_unavailable = False
@@ -62,6 +74,7 @@ async def check(key: str, limit: int, window: int) -> tuple[bool, int]:
             pass  # fall through to in-memory
 
     now = time.time()
+    _sweep_mem(now)
     count, reset = _mem.get(key, (0, now + window))
     if now > reset:
         count, reset = 0, now + window
