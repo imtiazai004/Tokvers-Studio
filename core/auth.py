@@ -85,11 +85,17 @@ async def create_account(
     return user, workspace
 
 
+class AccountSuspended(Exception):
+    """Raised on login for a banned account."""
+
+
 async def authenticate(session: AsyncSession, email: str, password: str) -> User | None:
     email = (email or "").strip().lower()
     user = await session.scalar(select(User).where(User.email == email))
     if not user or not verify_password(password, user.password_hash):
         return None
+    if user.suspended:
+        raise AccountSuspended("This account has been suspended.")
     return user
 
 

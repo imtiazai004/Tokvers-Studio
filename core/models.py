@@ -79,6 +79,8 @@ class User(Base, TimestampMixin):
     signup_fp: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
     flagged: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     flag_reason: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    # Admin-set ban: blocks login and invalidates active sessions.
+    suspended: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
 
 class AuthToken(Base, TimestampMixin):

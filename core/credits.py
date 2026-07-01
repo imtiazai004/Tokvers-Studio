@@ -109,6 +109,18 @@ async def charge(session, workspace_id, amount, reason="generation", job_id=None
     return entry
 
 
+async def admin_adjust(session, workspace_id, amount, reason="adjustment") -> CreditLedger:
+    """Admin grant (+) or deduction (−). A deduction never drives the balance
+    below zero (it's clamped to the current balance)."""
+    amount = _dec(amount)
+    if amount < 0:
+        balance = await get_balance(session, workspace_id)
+        amount = -min(balance, -amount)   # clamp deduction to available balance
+    entry = await _post(session, workspace_id, amount, reason)
+    await session.commit()
+    return entry
+
+
 # ── Generation job lifecycle helpers ────────────────────────────
 
 async def place_hold(session, workspace_id, estimate, job_id) -> CreditLedger:

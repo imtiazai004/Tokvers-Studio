@@ -77,7 +77,10 @@ async def signup(request: Request, data: SignupIn, session: AsyncSession = Depen
 @router.post("/login")
 async def login(request: Request, data: LoginIn, session: AsyncSession = Depends(get_session)):
     await _throttle(request, "login", limit=10, window=300)    # 10 / 5 min / IP
-    user = await auth_core.authenticate(session, data.email, data.password)
+    try:
+        user = await auth_core.authenticate(session, data.email, data.password)
+    except auth_core.AccountSuspended as e:
+        return JSONResponse({"error": str(e)}, status_code=403)
     if not user:
         return JSONResponse({"error": "Invalid email or password."}, status_code=401)
     workspace = await auth_core.get_primary_workspace(session, user.id)

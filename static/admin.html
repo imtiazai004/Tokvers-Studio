@@ -56,6 +56,13 @@
     <div class="cards" id="metrics"><div class="empty">Loading…</div></div>
     <div class="toggles" id="toggles"></div>
 
+    <div class="section-title">Users</div>
+    <div class="bar">
+      <input id="userSearch" placeholder="Search email or name…" style="flex:1;max-width:340px;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;outline:none;font-size:0.88rem">
+      <button class="btn ghost" id="userSearchBtn" type="button">Search</button>
+    </div>
+    <div id="users"><div class="empty">Loading…</div></div>
+
     <div class="section-title">Flag Review <span class="muted" style="font-weight:500;font-size:0.8rem">— suspected duplicate device; approve to clear + grant free credits</span></div>
     <div id="content"><div class="empty">Loading…</div></div>
   </div>
@@ -165,7 +172,75 @@
     sw.classList.remove('busy');
   }
 
-  function refreshAll() { loadSystem(); load(); }
+  // ── Users: search + per-user actions ────────────────────────
+  const usersEl = document.getElementById('users');
+
+  function badge(text, color) {
+    const c = { green: '#16a34a', red: '#be123c', amber: '#b45309', gray: '#718096' }[color] || '#718096';
+    const bg = { green: '#f0fdf4', red: '#fff1f2', amber: '#fffbeb', gray: '#f1f5f9' }[color] || '#f1f5f9';
+    return '<span class="tag" style="background:' + bg + ';color:' + c + '">' + esc(text) + '</span>';
+  }
+
+  async function loadUsers(q) {
+    usersEl.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      const url = '/api/admin/users' + (q ? ('?q=' + encodeURIComponent(q)) : '');
+      const rows = (await (await fetch(url)).json()).users || [];
+      if (!rows.length) { usersEl.innerHTML = '<div class="empty">No users found.</div>'; return; }
+      let html = '<table><thead><tr><th>Email</th><th>Status</th><th>Credits</th><th>Joined</th><th>Actions</th></tr></thead><tbody>';
+      for (const u of rows) {
+        let tags = '';
+        if (u.is_admin) tags += badge('admin', 'green');
+        tags += u.email_verified ? badge('verified', 'gray') : badge('unverified', 'amber');
+        if (u.flagged) tags += badge('flagged', 'red');
+        if (u.suspended) tags += badge('suspended', 'red');
+        const d = 'data-id="' + esc(u.id) + '"';
+        html += '<tr id="u-' + esc(u.id) + '">'
+          + '<td>' + esc(u.email) + (u.name ? '<div class="muted" style="font-size:0.78rem">' + esc(u.name) + '</div>' : '') + '</td>'
+          + '<td>' + tags + '</td>'
+          + '<td class="mono">' + esc(Math.round(u.credits)) + '</td>'
+          + '<td class="muted">' + esc((u.created_at || '').slice(0, 10)) + '</td>'
+          + '<td class="row-actions" style="flex-wrap:wrap">'
+          + (u.email_verified ? '' : '<button class="btn ghost" data-act="verify-email" ' + d + '>Verify</button>')
+          + '<button class="btn ghost" data-act="adjust-credits" ' + d + '>±Credits</button>'
+          + '<button class="btn ghost" data-act="force-logout" ' + d + '>Log out</button>'
+          + '<button class="btn ghost" data-act="set-admin" data-val="' + (!u.is_admin) + '" ' + d + '>' + (u.is_admin ? 'Remove admin' : 'Make admin') + '</button>'
+          + '<button class="btn" data-act="suspend" data-val="' + (!u.suspended) + '" ' + d + '>' + (u.suspended ? 'Unsuspend' : 'Suspend') + '</button>'
+          + '</td></tr>';
+      }
+      html += '</tbody></table>';
+      usersEl.innerHTML = html;
+      usersEl.querySelectorAll('button[data-act]').forEach(b => b.addEventListener('click', () => userAction(b)));
+    } catch (e) { usersEl.innerHTML = '<div class="empty">Could not load users.</div>'; }
+  }
+
+  async function userAction(btn) {
+    const id = btn.getAttribute('data-id');
+    const act = btn.getAttribute('data-act');
+    let body = null;
+    if (act === 'set-admin' || act === 'suspend') body = { value: btn.getAttribute('data-val') === 'true' };
+    if (act === 'adjust-credits') {
+      const raw = prompt('Credits to add (use a negative number to deduct):', '10');
+      if (raw === null) return;
+      const amt = parseFloat(raw);
+      if (!amt) return;
+      body = { amount: amt };
+    }
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/admin/users/' + id + '/' + act, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: body ? JSON.stringify(body) : null,
+      });
+      if (!res.ok) { const e = await res.json().catch(() => ({})); alert(e.detail || 'Action failed'); btn.disabled = false; return; }
+      loadUsers(document.getElementById('userSearch').value.trim());
+    } catch (e) { alert('Action failed'); btn.disabled = false; }
+  }
+
+  document.getElementById('userSearchBtn').addEventListener('click', () => loadUsers(document.getElementById('userSearch').value.trim()));
+  document.getElementById('userSearch').addEventListener('keydown', e => { if (e.key === 'Enter') loadUsers(e.target.value.trim()); });
+
+  function refreshAll() { loadSystem(); loadUsers(''); load(); }
   document.getElementById('refreshBtn').addEventListener('click', refreshAll);
   refreshAll();
 </script>

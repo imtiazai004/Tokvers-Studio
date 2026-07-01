@@ -167,10 +167,15 @@ async def _session_still_valid(request: Request) -> bool:
     ver = request.session.get("sv", 0)
     try:
         async with SessionLocal() as s:
-            current = await s.scalar(select(User.session_version).where(User.id == uuid.UUID(uid)))
+            row = (await s.execute(
+                select(User.session_version, User.suspended).where(User.id == uuid.UUID(uid))
+            )).first()
     except Exception:
         return True
-    if current is None:      # user no longer exists
+    if row is None:          # user no longer exists
+        return False
+    current, suspended = row
+    if suspended:            # banned — invalidate immediately
         return False
     return current == ver
 
