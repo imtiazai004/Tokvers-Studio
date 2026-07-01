@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Flag Review · Tokverse Studio</title>
+<link rel="icon" href="/static/logo-icon.png?v=2" type="image/png">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: #f4f6fb; color: #1a202c; padding: 32px; }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+  .brand { background: linear-gradient(90deg, #06e8d8 0%, #13b9d6 42%, #ff0a5e 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .sub { color: #718096; font-size: 0.9rem; margin: 6px 0 22px; }
+  .bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .count { font-size: 0.85rem; color: #4a5568; }
+  .btn { border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; padding: 8px 14px; color: #fff; background: linear-gradient(90deg, #13b9d6, #ff0a5e); }
+  .btn.ghost { background: #fff; color: #4a5568; border: 1px solid #e2e8f0; }
+  .btn:disabled { opacity: .55; cursor: not-allowed; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,0.06); }
+  th, td { text-align: left; padding: 12px 14px; font-size: 0.85rem; border-bottom: 1px solid #edf2f7; vertical-align: middle; }
+  th { background: #f8fafc; color: #718096; font-weight: 700; text-transform: uppercase; font-size: 0.7rem; letter-spacing: .04em; }
+  tr:last-child td { border-bottom: none; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; background: #fff1f2; color: #be123c; }
+  .mono { font-family: ui-monospace, Consolas, monospace; font-size: 0.78rem; color: #4a5568; }
+  .muted { color: #a0aec0; }
+  .empty { text-align: center; padding: 48px; color: #718096; background: #fff; border-radius: 12px; }
+  .row-actions { display: flex; gap: 8px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1><span class="brand">Flag Review</span></h1>
+    <div class="sub">Accounts held for review (suspected duplicate device). Approving clears the flag and grants the withheld free credits.</div>
+
+    <div class="bar">
+      <button class="btn ghost" id="refreshBtn" type="button">↻ Refresh</button>
+      <span class="count" id="count"></span>
+    </div>
+
+    <div id="content"><div class="empty">Loading…</div></div>
+  </div>
+
+<script>
+  const content = document.getElementById('content');
+  const countEl = document.getElementById('count');
+
+  function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  async function load() {
+    content.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      const res = await fetch('/api/admin/flagged');
+      if (!res.ok) { content.innerHTML = '<div class="empty">Not authorized.</div>'; return; }
+      const rows = (await res.json()).flagged || [];
+      countEl.textContent = rows.length + ' flagged account' + (rows.length === 1 ? '' : 's');
+      if (!rows.length) { content.innerHTML = '<div class="empty">🎉 No flagged accounts. All clear.</div>'; return; }
+      let html = '<table><thead><tr><th>Email</th><th>Name</th><th>Reason</th><th>Signup IP</th><th>Fingerprint</th><th>Verified</th><th>Created</th><th></th></tr></thead><tbody>';
+      for (const u of rows) {
+        html += '<tr id="row-' + esc(u.id) + '">'
+          + '<td>' + esc(u.email) + '</td>'
+          + '<td>' + (esc(u.name) || '<span class="muted">—</span>') + '</td>'
+          + '<td><span class="tag">' + esc(u.flag_reason || 'flagged') + '</span></td>'
+          + '<td class="mono">' + (esc(u.signup_ip) || '<span class="muted">—</span>') + '</td>'
+          + '<td class="mono">' + (esc(u.fingerprint) || '<span class="muted">—</span>') + '</td>'
+          + '<td>' + (u.email_verified ? '✅' : '<span class="muted">no</span>') + '</td>'
+          + '<td class="muted">' + esc((u.created_at || '').slice(0, 10)) + '</td>'
+          + '<td class="row-actions">'
+          + '<button class="btn" data-id="' + esc(u.id) + '" data-credits="1">Approve + credits</button>'
+          + '<button class="btn ghost" data-id="' + esc(u.id) + '" data-credits="0">Approve only</button>'
+          + '</td></tr>';
+      }
+      html += '</tbody></table>';
+      content.innerHTML = html;
+      content.querySelectorAll('button[data-id]').forEach(b => b.addEventListener('click', () => approve(b)));
+    } catch (e) {
+      content.innerHTML = '<div class="empty">Could not load. Try refresh.</div>';
+    }
+  }
+
+  async function approve(btn) {
+    const id = btn.getAttribute('data-id');
+    const grant = btn.getAttribute('data-credits') === '1';
+    content.querySelectorAll('button[data-id="' + id + '"]').forEach(x => x.disabled = true);
+    btn.textContent = 'Approving…';
+    try {
+      const res = await fetch('/api/admin/users/' + id + '/approve?grant_credits=' + grant, { method: 'POST' });
+      if (res.ok) {
+        const row = document.getElementById('row-' + id);
+        if (row) row.remove();
+        const left = content.querySelectorAll('tbody tr').length;
+        countEl.textContent = left + ' flagged account' + (left === 1 ? '' : 's');
+        if (!left) content.innerHTML = '<div class="empty">🎉 No flagged accounts. All clear.</div>';
+      } else {
+        btn.textContent = 'Failed'; content.querySelectorAll('button[data-id="' + id + '"]').forEach(x => x.disabled = false);
+      }
+    } catch (e) {
+      btn.textContent = 'Failed'; content.querySelectorAll('button[data-id="' + id + '"]').forEach(x => x.disabled = false);
+    }
+  }
+
+  document.getElementById('refreshBtn').addEventListener('click', load);
+  load();
+</script>
+</body>
+</html>

@@ -13,7 +13,7 @@ from sqlalchemy import select
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.routes import auth, billing, characters, credits, dashboard, jobs, providers, settings as settings_routes, team, tiktok
+from app.routes import admin, auth, billing, characters, credits, dashboard, jobs, providers, settings as settings_routes, team, tiktok
 from core.config import settings
 from core.db import SessionLocal
 from core.models import User
@@ -79,6 +79,7 @@ app.include_router(billing.router)
 app.include_router(tiktok.router)
 app.include_router(settings_routes.router)
 app.include_router(team.router)
+app.include_router(admin.router)
 
 
 @app.get("/api/health")
@@ -122,6 +123,18 @@ async def forgot_page():
 @app.get("/reset")
 async def reset_page():
     return FileResponse("static/reset.html")
+
+
+@app.get("/admin")
+async def admin_page(request: Request):
+    """Admin-only review console. Non-admins are bounced to the dashboard."""
+    uid = request.session.get("user_id")
+    if uid and SessionLocal is not None:
+        async with SessionLocal() as s:
+            user = await s.get(User, uuid.UUID(uid))
+        if user and user.is_admin:
+            return FileResponse("static/admin.html")
+    return RedirectResponse("/dashboard", status_code=302)
 
 
 def _page(file_path: str):
