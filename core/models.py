@@ -58,6 +58,8 @@ class User(Base, TimestampMixin):
     password_hash: Mapped[str] = mapped_column(String(255))
     name: Mapped[str | None] = mapped_column(String(120), nullable=True)
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Platform staff — gates admin-only endpoints (e.g. manual credit top-up).
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
 
 class AuthToken(Base, TimestampMixin):

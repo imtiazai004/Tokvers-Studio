@@ -1,5 +1,8 @@
 """Central application settings — env-driven (12-factor)."""
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_INSECURE_SESSION_SECRET = "dev-only-insecure-change-me"
 
 
 class Settings(BaseSettings):
@@ -12,7 +15,7 @@ class Settings(BaseSettings):
     redis_url: str = ""             # Arq queue + cache + SSE pub/sub
 
     # ── Security ────────────────────────────────────────────────
-    session_secret: str = "dev-only-insecure-change-me"
+    session_secret: str = _INSECURE_SESSION_SECRET
     encryption_key: str = ""        # Fernet key for per-workspace BYOK secrets
     environment: str = "development"  # "production" => secure cookies + HSTS
     app_base_url: str = "http://localhost:8001"  # for building email links
@@ -29,6 +32,20 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.environment.lower() == "production"
+
+    @model_validator(mode="after")
+    def _fail_closed_in_production(self):
+        """In production, refuse to boot with a forgeable session secret or a
+        missing encryption key — fail closed rather than run insecurely."""
+        if self.is_production:
+            if not self.session_secret or self.session_secret == _INSECURE_SESSION_SECRET:
+                raise ValueError(
+                    "SESSION_SECRET must be set to a strong random value in production "
+                    "(the insecure default would let sessions be forged)."
+                )
+            if not self.encryption_key:
+                raise ValueError("ENCRYPTION_KEY must be set in production (used to encrypt stored secrets).")
+        return self
 
     # ── Limits / cost control ───────────────────────────────────
     max_workspace_monthly_spend: float = 0   # 0 = no cap (USD-equivalent credits/month)
