@@ -60,6 +60,8 @@ class User(Base, TimestampMixin):
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     # Platform staff — gates admin-only endpoints (e.g. manual credit top-up).
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    # Bumped on password change/reset to invalidate all existing sessions.
+    session_version: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
 
 
 class AuthToken(Base, TimestampMixin):

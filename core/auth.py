@@ -110,6 +110,7 @@ async def reset_password(session: AsyncSession, raw_token: str, new_password: st
     if not user:
         return False
     user.password_hash = hash_password(new_password)
+    user.session_version += 1   # invalidate every existing session after a reset
     await session.commit()
     return True
 

@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     # set to 2 if you later put Cloudflare in front). Used to derive the real
     # client IP from X-Forwarded-For safely (rightmost hop is unspoofable).
     trusted_proxy_hops: int = 1
+    # Reject request bodies larger than this (base64 product images inflate ~33%,
+    # so 8 MB covers a ~6 MB source image while blocking memory-exhaustion payloads).
+    max_request_bytes: int = 8 * 1024 * 1024
 
     # ── Email (password reset / verification) ───────────────────
     email_provider: str = "console"  # console | smtp (plug SMTP later)

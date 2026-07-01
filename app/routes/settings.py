@@ -1,5 +1,5 @@
 """Settings API — profile, password, and per-workspace generation defaults (all real)."""
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -56,7 +56,7 @@ class PasswordIn(BaseModel):
 
 
 @router.post("/password")
-async def change_password(data: PasswordIn, uid=Depends(require_user_id),
+async def change_password(data: PasswordIn, request: Request, uid=Depends(require_user_id),
                           session: AsyncSession = Depends(get_session)):
     user = await session.get(User, uid)
     if not user or not verify_password(data.current_password, user.password_hash):
@@ -64,7 +64,9 @@ async def change_password(data: PasswordIn, uid=Depends(require_user_id),
     if len(data.new_password or "") < 8:
         return JSONResponse({"error": "New password must be at least 8 characters."}, status_code=400)
     user.password_hash = hash_password(data.new_password)
+    user.session_version += 1              # log out all OTHER sessions
     await session.commit()
+    request.session["sv"] = user.session_version   # keep THIS session valid
     return {"status": "ok"}
 
 

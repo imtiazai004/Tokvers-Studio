@@ -65,6 +65,7 @@ async def signup(request: Request, data: SignupIn, session: AsyncSession = Depen
     await _send_verification_email(session, user)   # confirm-email link (needed before generation)
     request.session["user_id"] = str(user.id)
     request.session["workspace_id"] = str(workspace.id)
+    request.session["sv"] = user.session_version
     return {"status": "ok", "workspace_id": str(workspace.id)}
 
 
@@ -77,6 +78,7 @@ async def login(request: Request, data: LoginIn, session: AsyncSession = Depends
     workspace = await auth_core.get_primary_workspace(session, user.id)
     request.session["user_id"] = str(user.id)
     request.session["workspace_id"] = str(workspace.id) if workspace else None
+    request.session["sv"] = user.session_version
     return {"status": "ok"}
 
 
@@ -146,8 +148,8 @@ async def me(request: Request, session: AsyncSession = Depends(get_session)):
     if not uid:
         return {"authenticated": False}
     user = await session.get(User, uuid.UUID(uid))
-    if not user:
-        request.session.clear()
+    if not user or user.session_version != request.session.get("sv", 0):
+        request.session.clear()   # user gone, or session invalidated by a password change
         return {"authenticated": False}
     return {
         "authenticated": True,

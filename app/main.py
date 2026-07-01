@@ -4,15 +4,37 @@ New Tokverse Studio app (multi-tenant, Neon-backed) — JSON API + served fronte
 Runs alongside legacy main.py until proven, then becomes the entrypoint.
 Run:  uvicorn app.main:app --reload
 """
+import uuid
+
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import select
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.routes import auth, billing, characters, credits, dashboard, jobs, providers, settings as settings_routes, team, tiktok
 from core.config import settings
+from core.db import SessionLocal
+from core.models import User
 from core.queue import get_pool
+
+# Session cookie lifetime (also caps how long a stolen cookie stays valid).
+SESSION_MAX_AGE = 7 * 24 * 3600  # 7 days
+
+# Content-Security-Policy: scripts are all same-origin; only fonts are external
+# (Fontshare). 'unsafe-inline' is kept for the hand-written inline styles/scripts;
+# CSP here still blocks external script origins, framing, and base-tag hijacking.
+_CSP = (
+    "default-src 'self'; "
+    "img-src 'self' data: https:; "
+    "media-src 'self' https: blob:; "
+    "style-src 'self' 'unsafe-inline' https://api.fontshare.com https://cdn.fontshare.com; "
+    "font-src 'self' data: https://api.fontshare.com https://cdn.fontshare.com; "
+    "script-src 'self' 'unsafe-inline'; "
+    "connect-src 'self'; "
+    "frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+)
 
 # ── Error tracking (optional, env-gated) ────────────────────
 if settings.sentry_dsn:
@@ -122,15 +144,47 @@ PUBLIC_EXACT = {
 PUBLIC_PREFIX = ("/static", "/favicon")
 
 
+async def _session_still_valid(request: Request) -> bool:
+    """Confirm the session's version still matches the user's — lets a password
+    change/reset invalidate all previously issued cookies. Fails open on a
+    transient DB error (defense-in-depth, not the primary auth check)."""
+    if SessionLocal is None:
+        return True
+    uid = request.session.get("user_id")
+    ver = request.session.get("sv", 0)
+    try:
+        async with SessionLocal() as s:
+            current = await s.scalar(select(User.session_version).where(User.id == uuid.UUID(uid)))
+    except Exception:
+        return True
+    if current is None:      # user no longer exists
+        return False
+    return current == ver
+
+
 async def _auth_guard(request: Request, call_next):
     path = request.url.path
     if path in PUBLIC_EXACT or path.startswith(PUBLIC_PREFIX):
         return await call_next(request)
     if request.session.get("user_id"):
-        return await call_next(request)
+        if await _session_still_valid(request):
+            return await call_next(request)
+        request.session.clear()
     if path in APP_PAGES:
         return RedirectResponse("/login", status_code=302)
     return JSONResponse({"error": "Authentication required"}, status_code=401)
+
+
+async def _limit_body(request: Request, call_next):
+    """Reject oversized request bodies up front (memory-exhaustion guard)."""
+    cl = request.headers.get("content-length")
+    if cl:
+        try:
+            if int(cl) > settings.max_request_bytes:
+                return JSONResponse({"error": "Request too large"}, status_code=413)
+        except ValueError:
+            return JSONResponse({"error": "Invalid Content-Length"}, status_code=400)
+    return await call_next(request)
 
 
 async def _security_headers(request: Request, call_next):
@@ -139,6 +193,7 @@ async def _security_headers(request: Request, call_next):
     resp.headers["X-Frame-Options"] = "DENY"
     resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     resp.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    resp.headers["Content-Security-Policy"] = _CSP
     if settings.is_production:
         resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     return resp
@@ -150,6 +205,7 @@ async def _security_headers(request: Request, call_next):
 app.add_middleware(BaseHTTPMiddleware, dispatch=_auth_guard)
 app.add_middleware(
     SessionMiddleware, secret_key=settings.session_secret,
-    same_site="lax", https_only=settings.is_production,
+    same_site="lax", https_only=settings.is_production, max_age=SESSION_MAX_AGE,
 )
 app.add_middleware(BaseHTTPMiddleware, dispatch=_security_headers)
+app.add_middleware(BaseHTTPMiddleware, dispatch=_limit_body)
