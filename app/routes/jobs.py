@@ -62,6 +62,13 @@ async def create(
             {"error": "Please verify your email before generating videos.", "code": "email_unverified"},
             status_code=403,
         )
+    # Suspected-duplicate accounts are held for review rather than blocked outright.
+    if not user.is_admin and user.flagged:
+        return JSONResponse(
+            {"error": "Your account is under review. Please contact support to start generating.",
+             "code": "account_flagged"},
+            status_code=403,
+        )
 
     scenes = max(1, min(12, data.scenes))
     estimate = scenes * settings.credits_per_scene

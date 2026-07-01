@@ -46,6 +46,7 @@ class SignupIn(BaseModel):
     email: str
     password: str
     name: str | None = ""
+    fingerprint: str | None = None   # client-side device signal (anti-abuse)
 
 
 class LoginIn(BaseModel):
@@ -58,7 +59,8 @@ async def signup(request: Request, data: SignupIn, session: AsyncSession = Depen
     await _throttle(request, "signup", limit=5, window=3600)   # 5 / hour / IP
     try:
         user, workspace = await auth_core.create_account(
-            session, data.email, data.password, data.name or ""
+            session, data.email, data.password, data.name or "",
+            signup_ip=client_ip(request), fingerprint=(data.fingerprint or None),
         )
     except auth_core.AuthError as e:
         return JSONResponse({"error": str(e)}, status_code=400)

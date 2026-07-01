@@ -82,6 +82,7 @@
     <div class="auth-foot">Already have an account? <a href="/login">Log in</a></div>
   </form>
 
+<script src="/static/fp.js"></script>
 <script>
   const form = document.getElementById('authForm');
   const errBox = document.getElementById('authError');
@@ -93,6 +94,8 @@
     e.preventDefault();
     errBox.classList.remove('show');
     btn.disabled = true; btn.textContent = 'Creating…';
+    let fingerprint = null;
+    try { fingerprint = await window.getFingerprint(); } catch (e) { /* non-fatal */ }
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -101,6 +104,7 @@
           name: document.getElementById('name').value,
           email: document.getElementById('email').value,
           password: document.getElementById('password').value,
+          fingerprint: fingerprint,
         }),
       });
       const data = await res.json();

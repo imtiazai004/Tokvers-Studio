@@ -20,12 +20,26 @@ class AuthError(Exception):
     """Raised for signup/login problems surfaced to the user."""
 
 
+async def _flag_reason(session: AsyncSession, fingerprint: str | None) -> str | None:
+    """Return a flag reason if this signup looks like a duplicate. Fingerprint
+    only (IP is too noisy behind NAT/mobile to flag on) — and this only flags,
+    never blocks, so a shared-device false positive just triggers review."""
+    if fingerprint:
+        seen = await session.scalar(select(User.id).where(User.signup_fp == fingerprint).limit(1))
+        if seen:
+            return "duplicate_device"
+    return None
+
+
 async def create_account(
     session: AsyncSession,
     email: str,
     password: str,
     name: str = "",
     workspace_name: str | None = None,
+    *,
+    signup_ip: str | None = None,
+    fingerprint: str | None = None,
 ) -> tuple[User, Workspace]:
     email = normalize_email(email)
     if not is_valid_format(email):
@@ -38,7 +52,12 @@ async def create_account(
     if await session.scalar(select(User).where(User.email == email)):
         raise AuthError("An account with this email already exists.")
 
-    user = User(email=email, password_hash=hash_password(password), name=(name or None))
+    reason = await _flag_reason(session, fingerprint)
+    user = User(
+        email=email, password_hash=hash_password(password), name=(name or None),
+        signup_ip=signup_ip, signup_fp=fingerprint,
+        flagged=bool(reason), flag_reason=reason,
+    )
     session.add(user)
     await session.flush()  # assign user.id
 
@@ -50,10 +69,13 @@ async def create_account(
     session.add(Membership(workspace_id=workspace.id, user_id=user.id, role="owner"))
     await session.flush()
 
-    # Provision the free plan + grant its starter credits, so a brand-new
-    # workspace can generate immediately. (activate_plan commits internally.)
+    # Provision the free plan. Flagged (suspected-duplicate) accounts get the plan
+    # row but NO free credits until reviewed — so device abuse yields nothing.
     from . import billing  # local import avoids any import-time cycle
-    await billing.activate_plan(session, workspace.id, "free")
+    if user.flagged:
+        await billing.get_or_create_subscription(session, workspace.id)
+    else:
+        await billing.activate_plan(session, workspace.id, "free")
 
     # Auto-join any workspaces this email was invited to.
     from . import team

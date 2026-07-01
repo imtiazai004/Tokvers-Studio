@@ -62,6 +62,13 @@ class User(Base, TimestampMixin):
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     # Bumped on password change/reset to invalidate all existing sessions.
     session_version: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    # Anti-abuse signals captured at signup. `flagged` accounts (e.g. same device
+    # as an existing account) are allowed in but withheld free credits + generation
+    # until reviewed — never hard-blocked, to avoid locking out shared-device users.
+    signup_ip: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    signup_fp: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    flagged: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    flag_reason: Mapped[str | None] = mapped_column(String(60), nullable=True)
 
 
 class AuthToken(Base, TimestampMixin):
