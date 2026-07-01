@@ -168,7 +168,6 @@ class StripeBillingProvider(BillingProvider):
 
     async def start_checkout(self, session, workspace_id, plan_id) -> CheckoutResult:
         price_id = _stripe_price_for(plan_id)
-        print(f"DEBUG checkout: provider={settings.billing_provider!r} plan={plan_id!r} price_id={price_id!r} pro_env={settings.stripe_price_pro!r}", flush=True)
         if not price_id:
             # Free/unpriced plan — no payment needed, activate immediately.
             await activate_plan(session, workspace_id, plan_id, provider="stripe")
@@ -245,6 +244,4 @@ _PROVIDERS: dict[str, BillingProvider] = {
 
 
 def get_billing_provider() -> BillingProvider:
-    provider = _PROVIDERS.get(settings.billing_provider, _PROVIDERS["manual"])
-    print(f"DEBUG get_billing_provider: setting={settings.billing_provider!r} -> {provider.name!r} stripe_key={bool(settings.stripe_secret_key)} price_pro={settings.stripe_price_pro!r}", flush=True)
-    return provider
+    return _PROVIDERS.get(settings.billing_provider, _PROVIDERS["manual"])
