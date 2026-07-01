@@ -29,12 +29,13 @@ class Settings(BaseSettings):
     max_request_bytes: int = 8 * 1024 * 1024
 
     # ── Email (password reset / verification) ───────────────────
-    email_provider: str = "console"  # console | smtp (plug SMTP later)
+    email_provider: str = "console"  # console | smtp | resend
     email_from: str = "Tokverse Studio <no-reply@tokverse.studio>"
     smtp_host: str = ""
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
+    resend_api_key: str = ""         # https://resend.com — set email_provider=resend
 
     @property
     def is_production(self) -> bool:

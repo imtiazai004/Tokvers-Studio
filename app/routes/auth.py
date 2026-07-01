@@ -112,11 +112,14 @@ async def forgot_password(request: Request, data: ForgotIn, session: AsyncSessio
     if user:  # silent when not found — no account enumeration
         raw = await auth_core.create_token(session, user.id, "reset", ttl_minutes=60)
         link = f"{settings.app_base_url}/reset?token={raw}"
-        await send_email(
-            user.email, "Reset your Tokverse Studio password",
-            f"Click to reset your password (valid 1 hour):\n\n{link}\n\n"
-            f"If you didn't request this, ignore this email.",
-        )
+        try:
+            await send_email(
+                user.email, "Reset your Tokverse Studio password",
+                f"Click to reset your password (valid 1 hour):\n\n{link}\n\n"
+                f"If you didn't request this, ignore this email.",
+            )
+        except Exception:
+            pass  # never leak (via a 500) whether the address exists
     return {"status": "ok"}  # always ok
 
 

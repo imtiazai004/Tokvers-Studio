@@ -68,13 +68,15 @@ services:
         generateValue: true
       - key: APP_BASE_URL          # set to this service's public URL (for email links)
         sync: false
-      - key: EMAIL_PROVIDER        # console | smtp
+      - key: EMAIL_PROVIDER        # console | smtp | resend
         value: console
       - key: SMTP_HOST
         sync: false
       - key: SMTP_USER
         sync: false
       - key: SMTP_PASSWORD
+        sync: false
+      - key: RESEND_API_KEY        # set + EMAIL_PROVIDER=resend to deliver real mail
         sync: false
       - key: SENTRY_DSN            # optional error tracking
         sync: false

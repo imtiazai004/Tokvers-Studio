@@ -10,6 +10,8 @@ import asyncio
 import smtplib
 from email.message import EmailMessage
 
+import httpx
+
 from .config import settings
 
 
@@ -49,9 +51,36 @@ class SmtpEmailSender(EmailSender):
             s.send_message(msg)
 
 
+class ResendEmailSender(EmailSender):
+    """Real delivery via the Resend HTTP API (https://resend.com). Set
+    email_provider=resend, RESEND_API_KEY, and an email_from on a verified
+    domain. Errors are logged, not raised, so auth flows never 500 on a mail hiccup."""
+    _URL = "https://api.resend.com/emails"
+
+    async def send(self, to, subject, text, html=None):
+        if not settings.resend_api_key:
+            print("WARNING: email_provider=resend but RESEND_API_KEY is unset; email not sent.", flush=True)
+            return
+        payload = {"from": settings.email_from, "to": [to], "subject": subject, "text": text}
+        if html:
+            payload["html"] = html
+        try:
+            async with httpx.AsyncClient(timeout=15) as client:
+                resp = await client.post(
+                    self._URL,
+                    headers={"Authorization": f"Bearer {settings.resend_api_key}"},
+                    json=payload,
+                )
+            if resp.status_code >= 300:
+                print(f"WARNING: Resend send failed ({resp.status_code}): {resp.text[:300]}", flush=True)
+        except Exception as e:
+            print(f"WARNING: Resend send error: {e}", flush=True)
+
+
 _SENDERS: dict[str, EmailSender] = {
     "console": ConsoleEmailSender(),
     "smtp": SmtpEmailSender(),
+    "resend": ResendEmailSender(),
 }
 
 
