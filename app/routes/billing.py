@@ -1,14 +1,34 @@
 """Billing API — plans, current subscription, checkout (provider-agnostic)."""
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.deps import require_workspace_id
 from core import billing, credits
+from core.config import settings
 from core.db import get_session
 from core.plans import get_plan, is_valid_plan, list_plans
 
 router = APIRouter(prefix="/api/billing", tags=["billing"])
+
+
+@router.post("/webhook")
+async def stripe_webhook(request: Request, session: AsyncSession = Depends(get_session)):
+    """Stripe webhook. PUBLIC but authenticated by signature — we verify the
+    Stripe-Signature header against STRIPE_WEBHOOK_SECRET before trusting anything."""
+    if not settings.stripe_webhook_secret:
+        raise HTTPException(status_code=503, detail="Webhook not configured")
+    payload = await request.body()
+    sig = request.headers.get("stripe-signature", "")
+    import stripe
+    try:
+        event = stripe.Webhook.construct_event(payload, sig, settings.stripe_webhook_secret)
+    except Exception:
+        # Bad signature / malformed — reject (could be a forged request).
+        return JSONResponse({"error": "invalid signature"}, status_code=400)
+    await billing.handle_stripe_event(session, event)
+    return {"received": True}
 
 
 @router.get("/plans")

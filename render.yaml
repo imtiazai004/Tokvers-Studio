@@ -80,6 +80,17 @@ services:
         sync: false
       - key: SENTRY_DSN            # optional error tracking
         sync: false
+      # ── Billing (Stripe). Set BILLING_PROVIDER=stripe to activate. ──
+      - key: BILLING_PROVIDER      # manual | stripe
+        value: manual
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_STARTER
+        sync: false
+      - key: STRIPE_PRICE_PRO
+        sync: false
 
   # ── Worker (generation pipeline) — ENABLE WHEN KEYS ARRIVE ───
   # Uncomment this block (needs a PAID plan) once provider keys are set and you

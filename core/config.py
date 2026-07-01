@@ -61,7 +61,13 @@ class Settings(BaseSettings):
     credits_per_scene: float = 1.0           # placeholder estimate until probe gives real cost
 
     # ── Billing ─────────────────────────────────────────────────
-    billing_provider: str = "manual"         # manual | paddle | lemonsqueezy (plug gateway later)
+    billing_provider: str = "manual"         # manual | stripe
+    # Stripe (set billing_provider=stripe to activate). Price IDs come from the
+    # Stripe dashboard (one recurring Price per paid plan).
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""          # whsec_... — verifies webhook signatures
+    stripe_price_starter: str = ""           # price_... for the Starter plan
+    stripe_price_pro: str = ""               # price_... for the Pro plan
 
     # ── TikTok integration (Login Kit + Content Posting API) ────
     tiktok_client_key: str = ""

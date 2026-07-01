@@ -151,6 +151,7 @@ for _route, _file in _PAGES.items():
 APP_PAGES = set(_PAGES.keys())
 PUBLIC_EXACT = {
     "/login", "/signup", "/forgot", "/reset", "/api/health", "/api/providers", "/api/billing/plans",
+    "/api/billing/webhook",   # authenticated by Stripe signature, not a session
     "/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/me",
     "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/verify",
 }
