@@ -245,4 +245,6 @@ _PROVIDERS: dict[str, BillingProvider] = {
 
 
 def get_billing_provider() -> BillingProvider:
-    return _PROVIDERS.get(settings.billing_provider, _PROVIDERS["manual"])
+    provider = _PROVIDERS.get(settings.billing_provider, _PROVIDERS["manual"])
+    print(f"DEBUG get_billing_provider: setting={settings.billing_provider!r} -> {provider.name!r} stripe_key={bool(settings.stripe_secret_key)} price_pro={settings.stripe_price_pro!r}", flush=True)
+    return provider
