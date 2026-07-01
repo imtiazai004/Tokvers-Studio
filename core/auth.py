@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from .email_policy import is_disposable, is_valid_format, normalize_email
 from .models import AuthToken, Membership, User, Workspace
 from .security import hash_password, verify_password
 
@@ -26,9 +27,11 @@ async def create_account(
     name: str = "",
     workspace_name: str | None = None,
 ) -> tuple[User, Workspace]:
-    email = (email or "").strip().lower()
-    if "@" not in email:
+    email = normalize_email(email)
+    if not is_valid_format(email):
         raise AuthError("Please enter a valid email.")
+    if is_disposable(email):
+        raise AuthError("Please use a permanent email address — temporary email providers aren't allowed.")
     if len(password or "") < 8:
         raise AuthError("Password must be at least 8 characters.")
 
