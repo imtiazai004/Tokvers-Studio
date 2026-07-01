@@ -15,24 +15,6 @@ from core.models import GenerationJob, Membership, User, Video, Workspace
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
-
-@router.get("/debug/sentry-test")
-async def sentry_test(raise_error: bool = False, _admin: User = Depends(require_admin)):
-    """Admin-only Sentry connectivity check. Default: send a test event and report
-    whether it was accepted (event_id present = Sentry is wired). `?raise_error=1`
-    throws an unhandled error to also exercise auto-capture (returns a 500)."""
-    try:
-        import sentry_sdk
-    except Exception:
-        return {"sentry_installed": False, "sent": False}
-    if raise_error:
-        raise RuntimeError("Tokverse Studio: intentional Sentry test error (admin-triggered)")
-    event_id = sentry_sdk.capture_message(
-        "Tokverse Studio: Sentry test event (admin-triggered)", level="error"
-    )
-    return {"sentry_installed": True, "sent": bool(event_id), "event_id": str(event_id) if event_id else None}
-
-
 # Flags an admin can flip live (key -> env fallback used when unset).
 _TOGGLES = {
     "generation_enabled": lambda: cfg.generation_enabled,
