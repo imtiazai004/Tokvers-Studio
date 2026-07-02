@@ -21,11 +21,12 @@ async def stripe_webhook(request: Request, session: AsyncSession = Depends(get_s
         raise HTTPException(status_code=503, detail="Webhook not configured")
     payload = await request.body()
     sig = request.headers.get("stripe-signature", "")
+    print(f"DEBUG webhook: sig_present={bool(sig)} sig_prefix={sig[:20]!r} secret_prefix={settings.stripe_webhook_secret[:10]!r}", flush=True)
     import stripe
     try:
         event = stripe.Webhook.construct_event(payload, sig, settings.stripe_webhook_secret)
-    except Exception:
-        # Bad signature / malformed — reject (could be a forged request).
+    except Exception as e:
+        print(f"DEBUG webhook error: {type(e).__name__}: {e}", flush=True)
         return JSONResponse({"error": "invalid signature"}, status_code=400)
     await billing.handle_stripe_event(session, event)
     return {"received": True}
